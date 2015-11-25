@@ -5,7 +5,7 @@
         Bicycle route recording and assistance.
     </description>
   <author email="info@cuuats.org" href="http://ionicframework.com/">
-      Champaign-Urbana Urbanized Area Transportation Study
+      Champaign Urbana Urbanized Area Transportation Study
     </author>
   <content src="index.html"/>
   <access origin="*"/>
