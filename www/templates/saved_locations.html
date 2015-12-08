@@ -1,0 +1,17 @@
+<ion-view view-title="Saved Locations">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-repeat="location in locations" href="#/app/previous_trips/{{location.id}}">
+        {{location.title}}
+
+        <ion-option-button class="button-assertive"
+                           ng-click="onItemDelete(trip)">
+          Delete
+        </ion-option-button>
+
+        <ion-reorder-button class="ion-navicon" on-reorder="moveItem(item, $fromIndex, $toIndex)"></ion-reorder-button>
+
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>
