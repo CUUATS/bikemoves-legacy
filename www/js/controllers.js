@@ -72,13 +72,122 @@ angular.module('starter.controllers', [])
   $scope.trips = JSON.parse(window.localStorage.getItem("trips"));
 })
 
-.controller('mapCtrl', function($scope, $ionicLoading) {
+.controller('mapCtrl', function($scope, $ionicLoading, $http) {
   $scope.mapCreated = function(map) {
     $scope.map = map;
+
+    $scope.infoWindow = new google.maps.InfoWindow();
+
+    $scope.infoWindow.addListener('closeclick', function(){
+      $scope.infoWindow.setContent("");
+    });
+
+    $scope.infoWindow.addListener('content_changed', function() {
+      if ($scope.selectedPath) {
+        $scope.selectedPath.setOptions({strokeColor: '#585858'})
+        $scope.selectedPath = null;
+      }
+    });
+
+    $scope.markers = [];
+    $scope.markersVisible = true;
+
+    $http.get('bikeracks.json')
+      .success(function(data) {
+        for (var i = 0; i < data.features.length; i++) {
+            var coords = data.features[i].geometry.coordinates;
+            var properties = data.features[i].properties;
+
+            var covered = false;
+
+            if (properties.Covered) covered = true;
+
+            var marker = new google.maps.Marker({
+              position: {lat : coords[1], lng: coords[0]},
+              map: $scope.map,
+              icon: "img/bike_rack.png",
+              owner: properties.Owner,
+              parkName: properties.ParkName,
+              covered: covered
+            });
+
+            marker.addListener('click', function() {
+              var content = '';
+
+              if (this.owner) content += 'Owner: ' + this.owner + '<br>';
+
+              if (this.parkName) content += 'Park Name: ' + this.parkName + '<br>';
+
+              if (this.covered) {
+                content += 'Covered: Yes';
+              }
+              else
+                content += 'Covered: No';
+
+              $scope.infoWindow.setContent(
+                "<b>Bike Rack Information:</b><br>" + 
+                content
+              );
+
+              $scope.infoWindow.open($scope.map, this);
+            });
+
+            $scope.markers.push(marker);
+        }
+    });
+
+    var selectedPath;
+    $scope.selectedPath = selectedPath;
+
+    $http.get('bikepaths.json')
+      .success(function(data) {
+        for (var i = 0; i < data.features.length; i++) {
+            var coords = data.features[i].geometry.coordinates;
+            var properties = data.features[i].properties;
+
+            var path = [];
+
+            for (var j = 0; j < coords.length; j++) {
+              path.push({lat: coords[j][1], lng: coords[j][0]});
+            }
+
+            var bikepath = new google.maps.Polyline({
+              path: path,
+              geodesic: true,
+              strokeColor: '#585858',
+              strokeOpacity: .4,
+              strokeWeight: 4,
+              distance: properties.Dx_Miles,
+              name: properties.Name
+            });
+
+            bikepath.setMap($scope.map)
+
+            bikepath.addListener('click', function(event) {
+
+              var content = '';
+
+              if (this.name) content += 'Name: ' + this.name + '<br>'
+
+              if (this.distance) content += 'Distance: ' + this.distance + ' miles<br>';
+
+              $scope.infoWindow.setContent(
+                "<b>Bike Path Information:</b><br>" + 
+                content
+              );
+
+              $scope.infoWindow.setPosition(event.latLng);
+
+              $scope.infoWindow.open($scope.map, this);
+              $scope.selectedPath = this;
+              $scope.selectedPath.setOptions({strokeColor: '#FF0000'})
+            });
+        }
+    });
   };
 
   $scope.centerOnMe = function () {
-    console.log("Centering");
+    
     if (!$scope.map) {
       return;
     }
@@ -89,7 +198,7 @@ angular.module('starter.controllers', [])
     });
 
     navigator.geolocation.getCurrentPosition(function (pos) {
-      console.log('Got pos', pos);
+      
       $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
       $scope.loading.hide();
     }, function (error) {
@@ -97,6 +206,12 @@ angular.module('starter.controllers', [])
     });
   };
 
+  $scope.toggleMarkers = function() {
+    for (var i=0; i < $scope.markers.length; i++){
+      $scope.markers[i].setMap($scope.markersVisible ? null : $scope.map);
+    }
+    $scope.markersVisible = ! $scope.markersVisible;
+  }
 })
 
 .controller('SavedLocationsCtrl', function($scope, $ionicActionSheet) {
