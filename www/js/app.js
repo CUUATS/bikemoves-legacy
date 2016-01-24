@@ -19,6 +19,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'app.directives'])
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+    if (window.cordova) {
+      if (window.BackgroundGeolocation) {
+        BackgroundGeolocationService.configurePlugin(window.BackgroundGeolocation);
+      }
+    }
   });
 })
 
