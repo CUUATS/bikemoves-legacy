@@ -88,11 +88,11 @@ angular.module('starter.controllers', [])
   $scope.currentLocationMarker  = undefined;
   $scope.previousLocation       = undefined;
   $scope.locationMarkers        = [];
-  $scope.geofenceMarkers        = [];
   $scope.path                   = undefined;
   $scope.currentLocationMarker  = undefined;
   $scope.locationAccuracyMarker = undefined;
   $scope.stationaryRadiusMarker = undefined;
+  $scope.tracking               = false;
 
   $scope.odometer = 0;
 
@@ -100,23 +100,6 @@ angular.module('starter.controllers', [])
   ionic.Platform.ready(function() {
     BackgroundGeolocationService.onLocation($scope.centerOnMe);
     BackgroundGeolocationService.onMotionChange($scope.onMotionChange);
-    BackgroundGeolocationService.onGeofence($scope.onGeofence);
-  });
-
-  // Build Add Geofence Modal.
-  $ionicModal.fromTemplateUrl('templates/geofences/add.html', {
-    scope: $scope,
-    animation: 'slide-in-up'
-  }).then(function(modal) {
-    $scope.addGeofenceModal = modal;
-  });
-
-  // Build Add Geofence Modal.
-  $ionicModal.fromTemplateUrl('templates/geofences/show.html', {
-    scope: $scope,
-    animation: 'slide-in-up'
-  }).then(function(modal) {
-    $scope.showGeofenceModal = modal;
   });
 
   /**
@@ -133,53 +116,11 @@ angular.module('starter.controllers', [])
 
   $scope.mapCreated = function(map) {
     $scope.map = map;
-    
-    // Add custom LongPress event to google map so we can add Geofences with longpress event!
-    //new LongPress(map, 500);
-
-    // Draw a red circle around the Marker we wish to move.
-    geofenceCursor = new google.maps.Marker({
-        map: map,
-        clickable: false,
-        icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 100,
-            fillColor: '#11b700',   //'2f71ff',
-            fillOpacity: 0.2,
-            strokeColor: '#11b700', // 2f71ff
-            strokeWeight: 2,
-            strokeOpacity: 0.9
-        }
-    });
-
-    // Tap&hold detected.  Play a sound a draw a circular cursor.
-    google.maps.event.addListener(map, 'longpresshold', function(e) {      
-      geofenceCursor.setPosition(e.latLng);
-      geofenceCursor.setMap(map);
-      BackgroundGeolocationService.playSound('LONG_PRESS_ACTIVATE')
-    });
-
-    // Longpress cancelled.  Get rid of the circle cursor.
-    google.maps.event.addListener(map, 'longpresscancel', function() {
-      geofenceCursor.setMap(null);
-      BackgroundGeolocationService.playSound('LONG_PRESS_CANCEL');
-    });
-
-    // Longpress initiated, add the geofence
-    google.maps.event.addListener(map, 'longpress', function(e) {
-      $scope.onAddGeofence(geofenceCursor.getPosition());
-      geofenceCursor.setMap(null);
-    });
 
     // Add BackgroundGeolocationService event-listeners when Platform is ready.
     ionic.Platform.ready(function() {
       var bgGeo = BackgroundGeolocationService.getPlugin();
       if (!bgGeo) { return; }
-      bgGeo.getGeofences(function(rs) {
-        for (var n=0,len=rs.length;n<len;n++) {
-          createGeofenceMarker(rs[n]);
-        }
-      });
     });
 
     $scope.infoWindow = new google.maps.InfoWindow();
@@ -466,13 +407,6 @@ angular.module('starter.controllers', [])
       }
       $scope.locationMarkers = [];
 
-      // Clear geofence markers.
-      for (var n=0,len=$scope.geofenceMarkers.length;n<len;n++) {
-        marker = $scope.geofenceMarkers[n];
-        marker.setMap(null);
-      }
-      $scope.geofenceMarkers = [];
-
       
       // Clear red stationaryRadius marker
       if ($scope.stationaryRadiusMarker) {
@@ -491,12 +425,25 @@ angular.module('starter.controllers', [])
   * Start/stop aggressive monitoring / stationary mode
   */
   $scope.onClickStart = function() {
+    if($scope.tracking) {
+      console.log($scope.path)
+      $scope.tracking = false;
+      var old_trips = window.localStorage.getItem('trips');
+      var new_trips = [];
+      if(old_trips !== null) {
+        new_trips = old_trips;
+      }
+      new_trips.push({title: 'test', id: '0', points: $scope.path});
+      window.localStorage.setItem('trips', new_trips)
+    } else {
+      $scope.tracking = true;
+    }
+    $scope.startButtonIcon  = ($scope.tracking) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
     var willStart = !$scope.bgGeo.isMoving;
     console.log('onClickStart: ', willStart);
 
     BackgroundGeolocationService.setPace(willStart, function() {
       $scope.bgGeo.isMoving    = willStart;
-      $scope.startButtonIcon  = (willStart) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
     });
   };
   /**
@@ -526,137 +473,6 @@ angular.module('starter.controllers', [])
   $scope.centerOnMe = function (location) {
     $scope.map.setCenter(new google.maps.LatLng(location.coords.latitude, location.coords.longitude));
     $scope.setCurrentLocationMarker(location);
-  };
-
-  /**
-  * Geofence features
-  */
-  $scope.geofenceRecord = {};
-
-  /**
-  * Geofence event-handler from plugin
-  */
-  $scope.onGeofence = function(params, taskId) {
-    $scope.showAlert('Geofence ' + params.action, "Identifier: " + params.identifier);
-    
-    var bgGeo = BackgroundGeolocationService.getPlugin();
-    // Remove geofence after it triggers.
-    bgGeo.removeGeofence(params.identifier, function() {
-      var marker = getGeofenceMarker(params.identifier);
-      // Grey-out the google.maps.Circle to show it's been triggered.
-      if (marker) {
-        marker.removed = true;
-        marker.setOptions({
-          fillColor: '#000000',
-          fillOpacity: 0.3,
-          strokeColor: '#000000',
-          strokeOpacity: 0.5
-        });
-      }
-      // We're inside a nested async callback here, which has now completed.  #finish the outer #onGeofence taskId now.
-      bgGeo.finish(taskId);
-    }, function(error) {
-      console.log('Failed to remove geofence: ' + error);
-      // Finish outer #onGeofence taskId now.
-      bgGeo.finish(taskId);
-    });
-  };
-  /**
-  * Add geofence click-handler
-  */
-  $scope.onAddGeofence = function(latLng) {
-    $scope.geofenceRecord = {
-      latitude: latLng.lat(),
-      longitude: latLng.lng(),
-      identifier: '',
-      radius: 200,
-      notifyOnEntry: true,
-      notifyOnExit: false
-    };
-    $scope.addGeofenceModal.show();
-  };
-  /**
-  * Create geofence click-handler
-  */
-  $scope.onCreateGeofence = function() {
-    $scope.addGeofenceModal.hide();
-    BackgroundGeolocationService.addGeofence($scope.geofenceRecord, function() {
-      createGeofenceMarker($scope.geofenceRecord);
-    });
-  };
-  /**
-  * Cancel geofence modal
-  */
-  $scope.onCancelGeofence = function() {
-    BackgroundGeolocationService.playSound('LONG_PRESS_ACTIVATE');
-    $scope.modal.hide();
-  };
-  /**
-  * show geofence modal
-  * @param {Google.maps.Circle} circle
-  */
-  $scope.onShowGeofence = function(params) {
-    BackgroundGeolocationService.playSound("LONG_PRESS_ACTIVATE");
-    $scope.geofenceRecord = params;
-    $scope.showGeofenceModal.show();
-  };
-  /**
-  * Remove geofence click-handler
-  */
-  $scope.onRemoveGeofence = function() {
-    var identifier = $scope.geofenceRecord.identifier;
-    removeGeofence(identifier);
-    $scope.showGeofenceModal.hide();
-  };
-  /**
-  * Create google.maps.Circle geofence marker.
-  * @param {Object}
-  */
-  var createGeofenceMarker = function(params) {
-    // Add longpress event for adding GeoFence of hard-coded radius 200m.
-    var geofence = new google.maps.Circle({
-      zIndex: 100,
-      fillColor: '#11b700',
-      fillOpacity: 0.2,
-      strokeColor: '#11b700',
-      strokeWeight: 2,
-      strokeOpacity: 0.9,
-      params: params,
-      radius: parseInt(params.radius, 10),
-      center: new google.maps.LatLng(params.latitude, params.longitude),
-      map: $scope.map
-    });
-    // Add 'click' listener to geofence so we can edit it.
-    google.maps.event.addListener(geofence, 'click', function() {
-      $scope.onShowGeofence(this.params);
-    });
-    $scope.geofenceMarkers.push(geofence);
-    return geofence;
-  };
-  /**
-  * Fetch a google.maps.Circle marker
-  */
-  var getGeofenceMarker = function(identifier) {
-    var index = $scope.geofenceMarkers.map(function(geofence) { return geofence.params.identifier; }).indexOf(identifier);
-    if (index >= 0) {
-      return $scope.geofenceMarkers[index];
-    }
-    return -1;
-  };
-  /**
-  * Remove a geofence
-  */
-  var removeGeofence = function(identifier) {
-    var marker = getGeofenceMarker(identifier);
-    if (marker) {
-      var index = $scope.geofenceMarkers.indexOf(marker);
-      $scope.geofenceMarkers.splice(index, 1);
-      marker.setMap(null);
-      if (marker.removed) {
-        return;
-      }
-    }
-    BackgroundGeolocationService.removeGeofence(identifier);
   };
 
 
