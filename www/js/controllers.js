@@ -72,9 +72,10 @@ angular.module('starter.controllers', [])
   $scope.trips = JSON.parse(window.localStorage.getItem("trips"));
 })
 
-.controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http) {
+.controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup) {
   var PLAY_BUTTON_CLASS = "ion-play button-balanced",
-      PAUSE_BUTTON_CLASS = "ion-pause button-assertive";
+      PAUSE_BUTTON_CLASS = "ion-pause button-energized",
+      STOP_BUTTON_CLASS = "ion-stop button-assertive";
 
   /**
   * BackgroundGelocation plugin state
@@ -84,6 +85,7 @@ angular.module('starter.controllers', [])
     isMoving: (window.localStorage.getItem('bgGeo:isMoving') == 'true')
   };
   $scope.startButtonIcon = ($scope.bgGeo.isMoving) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
+  $scope.stopButtonIcon = STOP_BUTTON_CLASS;
   $scope.map                    = undefined;
   $scope.currentLocationMarker  = undefined;
   $scope.previousLocation       = undefined;
@@ -448,6 +450,21 @@ angular.module('starter.controllers', [])
       $scope.bgGeo.isMoving    = willStart;
     });
   };
+
+  $scope.onClickStop = function() {
+    var confirmPopup = $ionicPopup.confirm({
+      title: 'Complete Route',
+      template: 'Are you done recording your route?'
+    });
+    confirmPopup.then(function(res) {
+      if(res) {
+        console.log("route stopped");
+        console.log($scope.locationMarkers);
+      } else {
+        
+      }
+    });
+  }
   /**
   * Show Settings screen
   */
