@@ -139,18 +139,19 @@ angular.module('starter.controllers', [])
     $scope.markers = [];
     $scope.markersVisible = true;
 
-    $http.get('bikeracks.json')
+    $http.get('http://utility.arcgis.com/usrsvcs/servers/9e391a972ba14591945243a8f11408d3/rest/services/CCRPC/BicycleRack/MapServer/0/query?outSR=4326&where=SHAPE+IS+NOT+NULL&outFields=*&f=json')
       .success(function(data) {
+        
         for (var i = 0; i < data.features.length; i++) {
-            var coords = data.features[i].geometry.coordinates;
-            var properties = data.features[i].properties;
+            var coords = data.features[i].geometry;
+            var properties = data.features[i].attributes;
 
             var covered = false;
 
             if (properties.Covered) covered = true;
 
             var marker = new google.maps.Marker({
-              position: {lat : coords[1], lng: coords[0]},
+              position: {lat : coords.y, lng: coords.x},
               map: $scope.map,
               icon: "img/bike_rack.png",
               owner: properties.Owner,
@@ -181,21 +182,22 @@ angular.module('starter.controllers', [])
 
             $scope.markers.push(marker);
         }
+        
     });
 
     var selectedPath;
     $scope.selectedPath = selectedPath;
 
-    $http.get('bikepaths.json')
+    $http.get('http://utility.arcgis.com/usrsvcs/servers/31e89733946d441187c0c4f692be8cf3/rest/services/CCRPC/BicyclePedestrianNetwork/MapServer/0/query?outSR=4326&where=SHAPE+IS+NOT+NULL&outFields=*&f=json')
       .success(function(data) {
-        for (var i = 0; i < data.features.length; i++) {
-            var coords = data.features[i].geometry.coordinates;
-            var properties = data.features[i].properties;
+        console.log(data); for (var i = 0; i < data.features.length; i++) {
+            var coordlist = data.features[i].geometry.paths[0];
+            var properties = data.features[i].attributes;
 
             var path = [];
 
-            for (var j = 0; j < coords.length; j++) {
-              path.push({lat: coords[j][1], lng: coords[j][0]});
+            for (var j = 0; j < coordlist.length; j++) {
+              path.push({lat: coordlist[j][1], lng: coordlist[j][0]});
             }
 
             var bikepath = new google.maps.Polyline({
@@ -475,26 +477,6 @@ angular.module('starter.controllers', [])
     $scope.setCurrentLocationMarker(location);
   };
 
-
-  // $scope.centerOnMe = function () {
-    
-  //   if (!$scope.map) {
-  //     return;
-  //   }
-
-  //   $scope.loading = $ionicLoading.show({
-  //     content: 'Getting current location...',
-  //     showBackdrop: false
-  //   });
-
-  //   navigator.geolocation.getCurrentPosition(function (pos) {
-      
-  //     $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-  //     $scope.loading.hide();
-  //   }, function (error) {
-  //     alert('Unable to get location: ' + error.message);
-  //   });
-  // };
 
   $scope.toggleMarkers = function() {
     for (var i=0; i < $scope.markers.length; i++){
