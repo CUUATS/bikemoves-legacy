@@ -78,6 +78,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'app.directives'])
   })
 
   .state('app.previous_trips', {
+    cache: false,
     url: '/previous_trips',
     views: {
       'menuContent': {
@@ -88,11 +89,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'app.directives'])
   })
 
   .state('app.single', {
-    url: '/previous_trips/:playlistId',
+    url: '/previous_trips/:previousTripID',
     views: {
       'menuContent': {
-        templateUrl: 'templates/playlist.html',
-        controller: 'PreviousTripsCtrl'
+        templateUrl: 'templates/previous_trip.html',
+        controller: 'PreviousTripCtrl'
       }
     }
   });

@@ -41,37 +41,6 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('PreviousTripsCtrl', function($scope, $ionicActionSheet) {
-
-  $scope.onItemDelete = function(item) {
-    $ionicActionSheet.show({
-      destructiveText: 'Delete',
-      cancelText: 'Cancel',
-      cancel: function() {
-         // add cancel code..
-      },
-      destructiveButtonClicked: function(index) {
-        $scope.trips.splice($scope.trips.indexOf(item), 1);
-        window.localStorage['trips'] = JSON.stringify($scope.trips);
-        return true;
-      }
-    });
-  };
-
-  if(window.localStorage.getItem("trips") !== undefined) {
-    var sampleTrips = [
-      { title: 'Trip 1', id: 1 },
-      { title: 'Trip 2', id: 2 },
-      { title: 'Trip 3', id: 3 },
-      { title: 'Trip 4', id: 4 },
-      { title: 'Trip 5', id: 5 },
-      { title: 'Trip 6', id: 6 }
-    ];
-    window.localStorage['trips'] = JSON.stringify(sampleTrips);
-  }
-  $scope.trips = JSON.parse(window.localStorage.getItem("trips"));
-})
-
 .controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup) {
   var PLAY_BUTTON_CLASS = "ion-play button-balanced",
       PAUSE_BUTTON_CLASS = "ion-pause button-energized",
@@ -94,7 +63,7 @@ angular.module('starter.controllers', [])
   $scope.currentLocationMarker  = undefined;
   $scope.locationAccuracyMarker = undefined;
   $scope.stationaryRadiusMarker = undefined;
-  $scope.tracking               = false;
+  $scope.recording               = false;
 
   $scope.odometer = 0;
 
@@ -141,6 +110,7 @@ angular.module('starter.controllers', [])
     $scope.markers = [];
     $scope.markersVisible = true;
 
+    /* Bike rack markers */
     $http.get('http://utility.arcgis.com/usrsvcs/servers/9e391a972ba14591945243a8f11408d3/rest/services/CCRPC/BicycleRack/MapServer/0/query?outSR=4326&where=SHAPE+IS+NOT+NULL&outFields=*&f=json')
       .success(function(data) {
         
@@ -190,6 +160,7 @@ angular.module('starter.controllers', [])
     var selectedPath;
     $scope.selectedPath = selectedPath;
 
+    /* Bike path markers */
     $http.get('http://utility.arcgis.com/usrsvcs/servers/31e89733946d441187c0c4f692be8cf3/rest/services/CCRPC/BicyclePedestrianNetwork/MapServer/0/query?outSR=4326&where=SHAPE+IS+NOT+NULL&outFields=*&f=json')
       .success(function(data) {
         console.log(data); for (var i = 0; i < data.features.length; i++) {
@@ -258,6 +229,7 @@ angular.module('starter.controllers', [])
     }
     BackgroundGeolocationService.finish(taskId); 
   }
+
   /**
   * Draw google map marker for current location
   */
@@ -425,24 +397,22 @@ angular.module('starter.controllers', [])
       }
     }
   };
+
   /**
   * Start/stop aggressive monitoring / stationary mode
   */
   $scope.onClickStart = function() {
-    if($scope.tracking) {
-      console.log($scope.path)
-      $scope.tracking = false;
-      var old_trips = window.localStorage.getItem('trips');
-      var new_trips = [];
-      if(old_trips !== null) {
-        new_trips = old_trips;
-      }
-      new_trips.push({title: 'test', id: '0', points: $scope.path});
-      window.localStorage.setItem('trips', new_trips)
-    } else {
-      $scope.tracking = true;
+    if(!$scope.running) {
+      var d = new Date();
+      $scope.startTime = d.getTime();
     }
-    $scope.startButtonIcon  = ($scope.tracking) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
+    if($scope.recording) {
+      $scope.recording = false;
+    } else {
+      $scope.running = true;
+      $scope.recording = true;
+    }
+    $scope.startButtonIcon  = ($scope.recording) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
     var willStart = !$scope.bgGeo.isMoving;
     console.log('onClickStart: ', willStart);
 
@@ -452,6 +422,8 @@ angular.module('starter.controllers', [])
   };
 
   $scope.onClickStop = function() {
+    if(!$scope.running)
+      return;
     var confirmPopup = $ionicPopup.confirm({
       title: 'Complete Route',
       template: 'Are you done recording your route?'
@@ -460,11 +432,33 @@ angular.module('starter.controllers', [])
       if(res) {
         console.log("route stopped");
         console.log($scope.locationMarkers);
-      } else {
         
+
+        $scope.running = false;
+        $scope.recording = false;
+        $scope.startButtonIcon  = ($scope.recording) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
+        var d = new Date();
+        $scope.endTime = d.getTime();
+
+        var trips = {};
+        if(window.localStorage.getItem('trips') !== null) {
+          trips = JSON.parse(window.localStorage.getItem('trips')); 
+        }
+        trips[$scope.startTime] = {
+          title: 'Trip ' + $scope.startTime,
+          id: $scope.startTime,
+          points: $scope.path,
+          startTime: $scope.startTime,
+          endTime: $scope.endTime
+        }
+        window.localStorage['trips'] = JSON.stringify(trips);
+
+      } else {
+
       }
     });
   }
+
   /**
   * Show Settings screen
   */
@@ -503,8 +497,47 @@ angular.module('starter.controllers', [])
   }
 })
 
-.controller('SavedLocationsCtrl', function($scope, $ionicActionSheet) {
+.controller('PreviousTripsCtrl', function($scope, $ionicActionSheet) {
 
+  $scope.onItemDelete = function(item) {
+    $ionicActionSheet.show({
+      destructiveText: 'Delete',
+      cancelText: 'Cancel',
+      cancel: function() {
+         // add cancel code..
+      },
+      destructiveButtonClicked: function(index)   {
+        delete $scope.trips[item.id];
+        console.log(index);
+        window.localStorage['trips'] = JSON.stringify($scope.trips);
+        return true;
+      }
+    });
+  };
+
+  if(window.localStorage.getItem('trips') == undefined) {
+    var sampleTrips = {};
+    window.localStorage['trips'] = JSON.stringify(sampleTrips);
+  }
+  $scope.trips = JSON.parse(window.localStorage.getItem('trips'));
+
+})
+
+.controller('PreviousTripCtrl', function($scope, $ionicActionSheet, $stateParams) {
+  $scope.trips = JSON.parse(window.localStorage.getItem('trips'));
+  $scope.trip = $scope.trips[$stateParams.previousTripID];
+  var startDate = new Date($scope.trip.startTime);
+  var endDate = new Date($scope.trip.endTime);
+  var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  $scope.date = startDate.getDay();
+  $scope.day = days[startDate.getDay()];
+  $scope.month = months[startDate.getMonth()];
+  $scope.year = startDate.getFullYear();
+  $scope.duration = ($scope.trip.endTime - $scope.trip.startTime) / 1000;
+})
+
+.controller('SavedLocationsCtrl', function($scope, $ionicActionSheet) {
   $scope.onItemDelete = function(item) {
     $ionicActionSheet.show({
       destructiveText: 'Delete',
@@ -530,8 +563,8 @@ angular.module('starter.controllers', [])
     window.localStorage['saved_locations'] = JSON.stringify(sampleLocations);
   }
   $scope.locations = JSON.parse(window.localStorage.getItem("saved_locations"));
-
 })
+
 
 .controller('SettingsCtrl', function($scope) {
   if (window.localStorage.getItem("dataSubmission") == undefined) {
