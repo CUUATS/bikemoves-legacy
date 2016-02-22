@@ -530,7 +530,7 @@ angular.module('starter.controllers', [])
   var endDate = new Date($scope.trip.endTime);
   var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  $scope.date = startDate.getDay();
+  $scope.date = startDate.getDate();
   $scope.day = days[startDate.getDay()];
   $scope.month = months[startDate.getMonth()];
   $scope.year = startDate.getFullYear();
