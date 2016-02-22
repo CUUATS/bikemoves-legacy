@@ -466,7 +466,7 @@ angular.module('starter.controllers', [])
           window.localStorage['trips'] = JSON.stringify(trips);
         }
 
-        $http.post("http://api.bikemoves.cuuats.org/v0.1/trip", tripData: trips[$scope.startTime]).then(
+        $http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {tripData: trips[$scope.startTime]}).then(
           function successCallback(response) {
             console.log(response)
           }, function errorCallback(response) {
