@@ -562,7 +562,6 @@ angular.module('starter.controllers', [])
       ]; 
       $scope.trip.points = new google.maps.Polyline({
         zIndex: 1,
-        map: $scope.map,
         path: testPath,
         geodesic: true,
         strokeColor: '#2677FF',
@@ -571,7 +570,7 @@ angular.module('starter.controllers', [])
       });
     }
 
-    $scope.trip.points.map = $scope.map;
+    $scope.trip.points.setMap($scope.map);
   };
 
 })
