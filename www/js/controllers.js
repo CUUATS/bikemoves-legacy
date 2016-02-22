@@ -572,26 +572,17 @@ angular.module('starter.controllers', [])
         $scope.selectedPath = null;
       }
     });
- 
-    if ($scope.trip.points == undefined) 
-    {
-      var testPath = [
-        {lat: 37.772, lng: -122.214},
-        {lat: 21.291, lng: -157.821},
-        {lat: -18.142, lng: 178.431},
-        {lat: -27.467, lng: 153.027}
-      ]; 
-      $scope.trip.points = new google.maps.Polyline({
-        zIndex: 1,
-        path: testPath,
-        geodesic: true,
-        strokeColor: '#2677FF',
-        strokeOpacity: 0.7,
-        strokeWeight: 5
-      });
-    }
+      
+    var points = new google.maps.Polyline({
+      zIndex: 1,
+      path: $scope.trip.points,
+      map: $scope.map,
+      geodesic: true,
+      strokeColor: '#2677FF',
+      strokeOpacity: 0.7,
+      strokeWeight: 5
+    });
 
-    $scope.trip.points.setMap($scope.map);
   };
 
 })
