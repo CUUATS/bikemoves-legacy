@@ -534,6 +534,46 @@ angular.module('starter.controllers', [])
   $scope.month = months[startDate.getMonth()];
   $scope.year = startDate.getFullYear();
   $scope.duration = ($scope.trip.endTime - $scope.trip.startTime) / 1000;
+
+
+  $scope.mapCreated = function(map) {
+    $scope.map = map;
+
+    $scope.infoWindow = new google.maps.InfoWindow();
+
+    $scope.infoWindow.addListener('closeclick', function(){
+      $scope.infoWindow.setContent("");
+    });
+
+    $scope.infoWindow.addListener('content_changed', function() {
+      if ($scope.selectedPath) {
+        $scope.selectedPath.setOptions({strokeColor: '#585858'})
+        $scope.selectedPath = null;
+      }
+    });
+ 
+    if ($scope.trip.points == undefined) 
+    {
+      var testPath = [
+        {lat: 37.772, lng: -122.214},
+        {lat: 21.291, lng: -157.821},
+        {lat: -18.142, lng: 178.431},
+        {lat: -27.467, lng: 153.027}
+      ]; 
+      $scope.trip.points = new google.maps.Polyline({
+        zIndex: 1,
+        map: $scope.map,
+        path: testPath,
+        geodesic: true,
+        strokeColor: '#2677FF',
+        strokeOpacity: 0.7,
+        strokeWeight: 5
+      });
+    }
+
+    $scope.trip.points.map = $scope.map;
+  };
+
 })
 
 .controller('SavedLocationsCtrl', function($scope, $ionicActionSheet) {
@@ -542,7 +582,6 @@ angular.module('starter.controllers', [])
       destructiveText: 'Delete',
       cancelText: 'Cancel',
       cancel: function() {
-         // add cancel code..
       },
       destructiveButtonClicked: function(index) {
         $scope.locations.splice($scope.locations.indexOf(item), 1);
@@ -569,7 +608,7 @@ angular.module('starter.controllers', [])
   if (window.localStorage.getItem("dataSubmission") == undefined) {
     window.localStorage['dataSubmission'] = "true";
   }
-  
+
   $scope.dataSubmission = { checked: JSON.parse(window.localStorage['dataSubmission'])};
   $scope.dataSubmissionChange = function() {
     window.localStorage['dataSubmission'] = JSON.stringify($scope.dataSubmission.checked);
@@ -581,7 +620,6 @@ angular.module('starter.controllers', [])
       destructiveText: 'Delete',
       cancelText: 'Cancel',
       cancel: function() {
-         // add cancel code..
       },
       destructiveButtonClicked: function() {
         window.localStorage.clear();
