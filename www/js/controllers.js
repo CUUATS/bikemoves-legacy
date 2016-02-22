@@ -433,7 +433,6 @@ angular.module('starter.controllers', [])
         console.log("route stopped");
         console.log($scope.locationMarkers);
         
-
         $scope.running = false;
         $scope.recording = false;
         $scope.startButtonIcon  = ($scope.recording) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
@@ -566,12 +565,35 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('SettingsCtrl', function($scope) {
+.controller('SettingsCtrl', function($scope, $ionicActionSheet, $ionicPopup) {
   if (window.localStorage.getItem("dataSubmission") == undefined) {
     window.localStorage['dataSubmission'] = "true";
   }
+  
   $scope.dataSubmission = { checked: JSON.parse(window.localStorage['dataSubmission'])};
   $scope.dataSubmissionChange = function() {
     window.localStorage['dataSubmission'] = JSON.stringify($scope.dataSubmission.checked);
   };
+
+  $scope.reset = function() {
+
+    $ionicActionSheet.show({
+      destructiveText: 'Delete',
+      cancelText: 'Cancel',
+      cancel: function() {
+         // add cancel code..
+      },
+      destructiveButtonClicked: function() {
+        window.localStorage.clear();
+        $ionicPopup.alert({
+          title: 'Data Reset',
+          content: 'All data has been reset.'
+        }).then(function(res) {
+          console.log('Test Alert Box');
+        });
+        return true;
+      }
+    });
+  
+  }
 })

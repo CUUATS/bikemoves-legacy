@@ -1,22 +1,17 @@
 <ion-view view-title="Settings">
   <ion-content>
-    <div class="item item-divider">
-      Settings
-    </div>
 
     <ion-toggle ng-model="dataSubmission.checked"
                  ng-change="dataSubmissionChange()">
       Automatically Submit Data
     </ion-toggle>
 
-    <div class="item item-divider" style="font-weight:normal;">
-      Automatically submit anonymous trip data to CCRPC.
-    </div>
-
     <ion-item href="#/app/settings/saved_locations">
       Saved Locations
+    </ion-item>
 
+    <ion-item href="#" ng-click="reset()">
+      Reset All Data
     </ion-item>
   </ion-content>
-
 </ion-view>
