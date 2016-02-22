@@ -443,14 +443,35 @@ angular.module('starter.controllers', [])
         if(window.localStorage.getItem('trips') !== null) {
           trips = JSON.parse(window.localStorage.getItem('trips')); 
         }
-        trips[$scope.startTime] = {
-          title: 'Trip ' + $scope.startTime,
-          id: $scope.startTime,
-          points: $scope.path,
-          startTime: $scope.startTime,
-          endTime: $scope.endTime
+        if($scope.path) {
+          console.log($scope.path);
+          console.log($scope.path.getPath());
+          trips[$scope.startTime] = {
+            title: 'Trip ' + $scope.startTime,
+            id: $scope.startTime,
+            points: $scope.path.getPath(),
+            startTime: $scope.startTime,
+            endTime: $scope.endTime
+          }
+          window.localStorage['trips'] = JSON.stringify(trips);
         }
-        window.localStorage['trips'] = JSON.stringify(trips);
+        else {
+          trips[$scope.startTime] = {
+            title: 'Trip ' + $scope.startTime,
+            id: $scope.startTime,
+            points: [],
+            startTime: $scope.startTime,
+            endTime: $scope.endTime
+          }
+          window.localStorage['trips'] = JSON.stringify(trips);
+        }
+
+        $http.post("http://api.bikemoves.cuuats.org/v0.1/trip", tripData: trips[$scope.startTime]).then(
+          function successCallback(response) {
+            console.log(response)
+          }, function errorCallback(response) {
+            console.log(response)
+          });
 
       } else {
 
