@@ -143,7 +143,7 @@ angular.module('starter.controllers', [])
 
     $http.get('http://utility.arcgis.com/usrsvcs/servers/9e391a972ba14591945243a8f11408d3/rest/services/CCRPC/BicycleRack/MapServer/0/query?outSR=4326&where=SHAPE+IS+NOT+NULL&outFields=*&f=json')
       .success(function(data) {
-        
+
         for (var i = 0; i < data.features.length; i++) {
             var coords = data.features[i].geometry;
             var properties = data.features[i].attributes;
@@ -175,7 +175,7 @@ angular.module('starter.controllers', [])
                 content += 'Covered: No';
 
               $scope.infoWindow.setContent(
-                "<b>Bike Rack Information:</b><br>" + 
+                "<b>Bike Rack Information:</b><br>" +
                 content
               );
 
@@ -184,7 +184,7 @@ angular.module('starter.controllers', [])
 
             $scope.markers.push(marker);
         }
-        
+
     });
 
     var selectedPath;
@@ -223,7 +223,7 @@ angular.module('starter.controllers', [])
               if (this.distance) content += 'Distance: ' + this.distance + ' miles<br>';
 
               $scope.infoWindow.setContent(
-                "<b>Bike Path Information:</b><br>" + 
+                "<b>Bike Path Information:</b><br>" +
                 content
               );
 
@@ -239,12 +239,12 @@ angular.module('starter.controllers', [])
 
   $scope.onMotionChange = function(isMoving, location, taskId) {
     console.log('[js] onMotionChange: ', isMoving, JSON.stringify(location));
-    
-    // Cache isMoving state in localStorage 
+
+    // Cache isMoving state in localStorage
     window.localStorage.setItem('bgGeo:isMoving', isMoving);
     $scope.bgGeo.isMoving = isMoving;
 
-    // Change state of start-button icon:  [>] or [||] 
+    // Change state of start-button icon:  [>] or [||]
     $scope.startButtonIcon  = (isMoving) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
 
     if ($scope.map) {
@@ -256,7 +256,7 @@ angular.module('starter.controllers', [])
         $scope.stationaryRadiusMarker.setMap(null);
       }
     }
-    BackgroundGeolocationService.finish(taskId); 
+    BackgroundGeolocationService.finish(taskId);
   }
   /**
   * Draw google map marker for current location
@@ -266,7 +266,7 @@ angular.module('starter.controllers', [])
 
     // Set currentLocation @property
     $scope.currentLocation = location;
-    
+
     var coords = location.coords;
 
     if (!$scope.currentLocationMarker) {
@@ -304,7 +304,7 @@ angular.module('starter.controllers', [])
       });
     }
     var latlng = new google.maps.LatLng(coords.latitude, coords.longitude);
-    
+
     if ($scope.previousLocation) {
       var prevLocation = $scope.previousLocation;
       // Drop a breadcrumb of where we've been.
@@ -332,7 +332,7 @@ angular.module('starter.controllers', [])
     if (location.sample === true) {
       return;
     }
-    
+
     // Add breadcrumb to current Polyline path.
     $scope.path.getPath().push(latlng);
     $scope.previousLocation = location;
@@ -355,7 +355,7 @@ angular.module('starter.controllers', [])
     $scope.setCurrentLocationMarker(location);
 
     var coords = location.coords;
-    
+
     if (!$scope.stationaryRadiusMarker) {
       $scope.stationaryRadiusMarker = new google.maps.Circle({
         zIndex: 0,
@@ -380,7 +380,7 @@ angular.module('starter.controllers', [])
   */
   $scope.onToggleEnabled = function() {
     var isEnabled = $scope.bgGeo.enabled;
-    
+
     console.log('onToggleEnabled: ', isEnabled);
     BackgroundGeolocationService.setEnabled(isEnabled, function() {}, function(error) {
       alert('Failed to start tracking with error code: ' + error);
@@ -399,7 +399,7 @@ angular.module('starter.controllers', [])
       BackgroundGeolocationService.playSound('BUTTON_CLICK');
       $scope.bgGeo.isMoving = false;
       $scope.startButtonIcon = PLAY_BUTTON_CLASS;
-      
+
       // Clear previousLocation
       $scope.previousLocation = undefined;
 
@@ -411,7 +411,7 @@ angular.module('starter.controllers', [])
       }
       $scope.locationMarkers = [];
 
-      
+
       // Clear red stationaryRadius marker
       if ($scope.stationaryRadiusMarker) {
         $scope.stationaryRadiusMarker.setMap(null);
@@ -461,7 +461,7 @@ angular.module('starter.controllers', [])
         console.log("route stopped");
         console.log($scope.locationMarkers);
       } else {
-        
+
       }
     });
   }
@@ -540,5 +540,59 @@ angular.module('starter.controllers', [])
   $scope.dataSubmission = { checked: JSON.parse(window.localStorage['dataSubmission'])};
   $scope.dataSubmissionChange = function() {
     window.localStorage['dataSubmission'] = JSON.stringify($scope.dataSubmission.checked);
+  };
+})
+
+.controller('profileCtrl', function($scope, $ionicPopup) {
+  var info = {
+    sex: window.localStorage['sex'] || '',
+    age: Number(window.localStorage['age']) || 0,
+    cyclingExperience: window.localStorage['cyclingExperience'] || ''
+  };
+
+  $scope.sexOps = [{
+    text: "Male",
+    value: "Male"
+  }, {
+    text: "Female",
+    value: "Female"
+  }];
+
+  $scope.cycleOps = [{
+    text: "Beginner",
+    value: "Beginner"
+  }, {
+    text: "Intermediate",
+    value: "Intermediate"
+  }, {
+    text: "Expert",
+    value: "Expert"
+  }, {
+    text: "Master",
+    value: "Master"
+  }];
+
+  $scope.info = info;
+
+  $scope.editInfo = function() {
+    var myPopup = $ionicPopup.show({
+      title: 'Enter Information',
+      template: '<label class="item item-label"><span class="input-label">Choose Gender</span> \
+        <ion-list><ion-radio ng-repeat="sexOp in sexOps" ng-model="info.sex" value="{{sexOp.value}}" name="sex">{{sexOp.text}}</ion-radio></ion-list></label><br> \
+        <label class="item item-label"><span class="input-label">Choose Age</span> \
+        <input type="number" ng-model="info.age" value="info.age"></label><br> \
+        <label class="item item-label"><span class="input-label">Choose Experience</span> \
+        <ion-radio ng-repeat="cycleOp in cycleOps" ng-model="info.cyclingExperience" value="{{cycleOp.value}}" name="cycle">{{cycleOp.text}}</ion-radio></label>',
+      scope: $scope,
+      buttons: [{
+        text: '<b>OK</b>',
+        type: 'button-positive',
+        onTap: function(e) {
+          window.localStorage['sex'] = info.sex;
+          window.localStorage['age'] = JSON.stringify(info.age);
+          window.localStorage['cyclingExperience'] = info.cyclingExperience;
+        }
+      }]
+    });
   };
 })
