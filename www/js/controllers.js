@@ -432,8 +432,6 @@ angular.module('starter.controllers', [])
       if(res) {
         console.log("route stopped");
         console.log($scope.locationMarkers);
-<<<<<<< HEAD
-=======
         
         $scope.running = false;
         $scope.recording = false;
@@ -476,7 +474,6 @@ angular.module('starter.controllers', [])
             console.log(response)
           });
 
->>>>>>> origin/tracking
       } else {
 
       }
