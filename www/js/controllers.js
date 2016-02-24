@@ -65,6 +65,8 @@ angular.module('starter.controllers', [])
   $scope.stationaryRadiusMarker = undefined;
   $scope.recording               = false;
 
+  $scope.deviceID = device.uuid;
+
   $scope.odometer = 0;
 
   // Add BackgroundGeolocation event-listeners when Platform is ready.
@@ -451,7 +453,8 @@ angular.module('starter.controllers', [])
             id: $scope.startTime,
             points: $scope.path.getPath(),
             startTime: $scope.startTime,
-            endTime: $scope.endTime
+            endTime: $scope.endTime,
+            deviceID: $scope.deviceID
           }
           window.localStorage['trips'] = JSON.stringify(trips);
         }
@@ -461,7 +464,8 @@ angular.module('starter.controllers', [])
             id: $scope.startTime,
             points: [],
             startTime: $scope.startTime,
-            endTime: $scope.endTime
+            endTime: $scope.endTime,
+            deviceID: $scope.deviceID
           }
           window.localStorage['trips'] = JSON.stringify(trips);
         }
