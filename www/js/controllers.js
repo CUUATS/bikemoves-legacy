@@ -432,52 +432,74 @@ angular.module('starter.controllers', [])
     });
     confirmPopup.then(function(res) {
       if(res) {
-        console.log("route stopped");
-        console.log($scope.locationMarkers);
+
+        $scope.formData = {};
+
+        var tripForm = $ionicPopup.show({
+          title: 'Tell Us about Your Trip',
+          templateUrl: 'templates/trip_form.html',
+          scope: $scope,
+          buttons: [
+            { text: 'Save and Submit',
+              type: 'button-positive',
+              onTap: function(e) {
+                return $scope.formData;
+              }
+            }
+          ]
+        });
         
-        $scope.running = false;
-        $scope.recording = false;
-        $scope.startButtonIcon  = ($scope.recording) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
-        var d = new Date();
-        $scope.endTime = d.getTime();
-
-        var trips = {};
-        if(window.localStorage.getItem('trips') !== null) {
-          trips = JSON.parse(window.localStorage.getItem('trips')); 
-        }
-        if($scope.path) {
-          console.log($scope.path);
-          console.log($scope.path.getPath());
-          trips[$scope.startTime] = {
-            title: 'Trip ' + $scope.startTime,
-            id: $scope.startTime,
-            points: $scope.path.getPath(),
-            startTime: $scope.startTime,
-            endTime: $scope.endTime,
-            deviceID: $scope.deviceID
+        tripForm.then(function(res) {
+  
+          $scope.running = false;
+          $scope.recording = false;
+          $scope.startButtonIcon  = ($scope.recording) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
+          var d = new Date();
+          $scope.endTime = d.getTime();
+  
+          var trips = {};
+          if(window.localStorage.getItem('trips') !== null) {
+            trips = JSON.parse(window.localStorage.getItem('trips')); 
           }
-          window.localStorage['trips'] = JSON.stringify(trips);
-        }
-        else {
-          trips[$scope.startTime] = {
-            title: 'Trip ' + $scope.startTime,
-            id: $scope.startTime,
-            points: [],
-            startTime: $scope.startTime,
-            endTime: $scope.endTime,
-            deviceID: $scope.deviceID
+          if($scope.path) {
+            console.log($scope.path);
+            console.log($scope.path.getPath());
+            trips[$scope.startTime] = {
+              title: 'Trip ' + $scope.startTime,
+              id: $scope.startTime,
+              points: $scope.path.getPath(),
+              startTime: $scope.startTime,
+              endTime: $scope.endTime,
+              deviceID: $scope.deviceID,
+              from: $scope.formData.from,
+              to: $scope.formData.to
+            }
+            window.localStorage['trips'] = JSON.stringify(trips);
           }
-          window.localStorage['trips'] = JSON.stringify(trips);
-        }
-
-        $http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {tripData: LZString.compressToBase64(JSON.stringify(trips[$scope.startTime]))}).then(
-        //$http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {tripData: JSON.stringify(trips[$scope.startTime])}).then(
-          function successCallback(response) {
-            console.log(response)
-          }, function errorCallback(response) {
-            console.log(response)
-          });
-
+          else {
+            trips[$scope.startTime] = {
+              title: 'Trip ' + $scope.startTime,
+              id: $scope.startTime,
+              points: [],
+              startTime: $scope.startTime,
+              endTime: $scope.endTime,
+              deviceID: $scope.deviceID,
+              from: $scope.formData.from,
+              to: $scope.formData.to
+            }
+            window.localStorage['trips'] = JSON.stringify(trips);
+          }
+  
+          console.log(trips[$scope.startTime]);
+  
+          $http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {tripData: LZString.compressToBase64(JSON.stringify(trips[$scope.startTime]))}).then(
+          //$http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {tripData: JSON.stringify(trips[$scope.startTime])}).then(
+            function successCallback(response) {
+              console.log(response)
+            }, function errorCallback(response) {
+              console.log(response)
+            });
+        });
       } else {
 
       }
