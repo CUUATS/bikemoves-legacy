@@ -8,37 +8,6 @@ angular.module('starter.controllers', [])
   // listen for the $ionicView.enter event:
   //$scope.$on('$ionicView.enter', function(e) {
   //});
-
-  // Form data for the login modal
-  $scope.loginData = {};
-
-  // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/login.html', {
-    scope: $scope
-  }).then(function(modal) {
-    $scope.modal = modal;
-  });
-
-  // Triggered in the login modal to close it
-  $scope.closeLogin = function() {
-    $scope.modal.hide();
-  };
-
-  // Open the login modal
-  $scope.login = function() {
-    $scope.modal.show();
-  };
-
-  // Perform the login action when the user submits the login form
-  $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
-
-    // Simulate a login delay. Remove this and replace with your login
-    // code if using a login system
-    $timeout(function() {
-      $scope.closeLogin();
-    }, 1000);
-  };
 })
 
 .controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup) {
@@ -74,6 +43,54 @@ angular.module('starter.controllers', [])
     BackgroundGeolocationService.onLocation($scope.centerOnMe);
     BackgroundGeolocationService.onMotionChange($scope.onMotionChange);
   });
+
+  var resetGeolocation = function() {
+    console.log("geo reset")
+    // Reset odometer to 0.
+    var plugin = BackgroundGeolocationService.getPlugin();
+    if (plugin) {
+      plugin.resetOdometer(function() {
+        $scope.$apply(function() {
+          $scope.odometer = 0;
+        });
+      });
+    }
+    BackgroundGeolocationService.playSound('BUTTON_CLICK');
+    $scope.bgGeo.isMoving = false;
+    $scope.startButtonIcon = PLAY_BUTTON_CLASS;
+
+    // Clear previousLocation
+    $scope.previousLocation = undefined;
+
+    // Clear location-markers.
+    var marker;
+    for (var n=0,len=$scope.locationMarkers.length;n<len;n++) {
+      marker = $scope.locationMarkers[n];
+      marker.setMap(null);
+    }
+    $scope.locationMarkers = [];
+
+
+    // Clear red stationaryRadius marker
+    if ($scope.stationaryRadiusMarker) {
+      $scope.stationaryRadiusMarker.setMap(null);
+      $scope.stationaryRadiusMarker = null;
+    }
+
+    // Clear blue route PolyLine
+    if ($scope.path) {
+      $scope.path.setMap(null);
+      $scope.path = undefined;
+    }
+    
+  }
+
+  // Enable background geolocation
+  $scope.bgGeo.enabled = true;
+  BackgroundGeolocationService.setEnabled(true, function() {}, function(error) {
+      alert('Failed to start tracking with error code: ' + error);
+    });
+  resetGeolocation();
 
   /**
   * Show an alert
@@ -359,44 +376,8 @@ angular.module('starter.controllers', [])
     BackgroundGeolocationService.setEnabled(isEnabled, function() {}, function(error) {
       alert('Failed to start tracking with error code: ' + error);
     });
-
     if (!isEnabled) {
-      // Reset odometer to 0.
-      var plugin = BackgroundGeolocationService.getPlugin();
-      if (plugin) {
-        plugin.resetOdometer(function() {
-          $scope.$apply(function() {
-            $scope.odometer = 0;
-          });
-        });
-      }
-      BackgroundGeolocationService.playSound('BUTTON_CLICK');
-      $scope.bgGeo.isMoving = false;
-      $scope.startButtonIcon = PLAY_BUTTON_CLASS;
-
-      // Clear previousLocation
-      $scope.previousLocation = undefined;
-
-      // Clear location-markers.
-      var marker;
-      for (var n=0,len=$scope.locationMarkers.length;n<len;n++) {
-        marker = $scope.locationMarkers[n];
-        marker.setMap(null);
-      }
-      $scope.locationMarkers = [];
-
-
-      // Clear red stationaryRadius marker
-      if ($scope.stationaryRadiusMarker) {
-        $scope.stationaryRadiusMarker.setMap(null);
-        $scope.stationaryRadiusMarker = null;
-      }
-
-      // Clear blue route PolyLine
-      if ($scope.path) {
-        $scope.path.setMap(null);
-        $scope.path = undefined;
-      }
+      resetGeolocation();    
     }
   };
 
@@ -432,7 +413,7 @@ angular.module('starter.controllers', [])
     });
     confirmPopup.then(function(res) {
       if(res) {
-
+        resetGeolocation();
         $scope.formData = {};
 
         var tripForm = $ionicPopup.show({
