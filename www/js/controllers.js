@@ -413,7 +413,7 @@ angular.module('starter.controllers', [])
     });
     confirmPopup.then(function(res) {
       if(res) {
-        resetGeolocation();
+        
         $scope.formData = {};
 
         var tripForm = $ionicPopup.show({
@@ -480,7 +480,11 @@ angular.module('starter.controllers', [])
             }, function errorCallback(response) {
               console.log(response)
             });
+
+          resetGeolocation();
         });
+
+          
       } else {
 
       }
