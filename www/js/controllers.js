@@ -286,7 +286,7 @@ angular.module('starter.controllers', [])
       });
     }
 
-    if (!$scope.path) {
+    if (!$scope.path && $scope.recording) {
       $scope.path = new google.maps.Polyline({
         zIndex: 1,
         map: $scope.map,
@@ -327,10 +327,13 @@ angular.module('starter.controllers', [])
     }
 
     // Add breadcrumb to current Polyline path.
-    $scope.path.getPath().push(latlng);
+    if($scope.recording) {
+      $scope.path.getPath().push(latlng);
+    }
+    
     $scope.previousLocation = location;
 
-    if (plugin) {
+    if (plugin && $scope.recording) {
       // Update odometer
       plugin.getOdometer(function(value) {
         $scope.$apply(function() {
