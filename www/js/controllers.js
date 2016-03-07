@@ -34,7 +34,9 @@ angular.module('starter.controllers', [])
   $scope.stationaryRadiusMarker = undefined;
   $scope.recording               = false;
 
-  $scope.deviceID = device.uuid;
+  if(typeof device !== 'undefined') {
+    $scope.deviceID = device.uuid;
+  }
 
   $scope.odometer = 0;
 
@@ -226,7 +228,7 @@ angular.module('starter.controllers', [])
         }
     });
   };
-
+/*
   $scope.onMotionChange = function(isMoving, location, taskId) {
     console.log('[js] onMotionChange: ', isMoving, JSON.stringify(location));
 
@@ -248,7 +250,7 @@ angular.module('starter.controllers', [])
     }
     BackgroundGeolocationService.finish(taskId);
   }
-
+*/
   /**
   * Draw google map marker for current location
   */
@@ -296,7 +298,7 @@ angular.module('starter.controllers', [])
     }
     var latlng = new google.maps.LatLng(coords.latitude, coords.longitude);
 
-    if ($scope.previousLocation) {
+    if ($scope.previousLocation && $scope.recording) {
       var prevLocation = $scope.previousLocation;
       // Drop a breadcrumb of where we've been.
       $scope.locationMarkers.push(new google.maps.Marker({
@@ -341,7 +343,7 @@ angular.module('starter.controllers', [])
   /**
   * Draw red stationary-circle on google map
   */
-  $scope.setStationaryMarker = function(location) {
+  /*$scope.setStationaryMarker = function(location) {
     console.log('[js] BackgroundGeoLocation onStationary ' + JSON.stringify(location));
     $scope.setCurrentLocationMarker(location);
 
@@ -364,12 +366,12 @@ angular.module('starter.controllers', [])
     $scope.stationaryRadiusMarker.setCenter(center);
     $scope.stationaryRadiusMarker.setMap($scope.map);
     $scope.map.setCenter(center);
-  };
+  };*/
 
   /**
   * Enable BackgroundGeolocationService
   */
-  $scope.onToggleEnabled = function() {
+  /*$scope.onToggleEnabled = function() {
     var isEnabled = $scope.bgGeo.enabled;
 
     console.log('onToggleEnabled: ', isEnabled);
@@ -379,7 +381,7 @@ angular.module('starter.controllers', [])
     if (!isEnabled) {
       resetGeolocation();    
     }
-  };
+  };*/
 
   /**
   * Start/stop aggressive monitoring / stationary mode
