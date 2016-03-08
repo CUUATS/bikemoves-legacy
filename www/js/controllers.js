@@ -277,13 +277,13 @@ angular.module('starter.controllers', [])
           strokeWeight: 6
         }
       });
-      $scope.locationAccuracyMarker = new google.maps.Circle({
-        zIndex: 9,
-        fillColor: '#3366cc',
-        fillOpacity: 0.4,
-        strokeOpacity: 0,
-        map: $scope.map
-      });
+      //$scope.locationAccuracyMarker = new google.maps.Circle({
+      //  zIndex: 9,
+      //  fillColor: '#3366cc',
+      //  fillOpacity: 0.4,
+      //  strokeOpacity: 0,
+      //  map: $scope.map
+      //});
     }
 
     if (!$scope.path && $scope.recording) {
@@ -319,8 +319,8 @@ angular.module('starter.controllers', [])
 
     // Update our current position marker and accuracy bubble.
     $scope.currentLocationMarker.setPosition(latlng);
-    $scope.locationAccuracyMarker.setCenter(latlng);
-    $scope.locationAccuracyMarker.setRadius(location.coords.accuracy);
+    //$scope.locationAccuracyMarker.setCenter(latlng);
+    //$scope.locationAccuracyMarker.setRadius(location.coords.accuracy);
 
     if (location.sample === true) {
       return;
