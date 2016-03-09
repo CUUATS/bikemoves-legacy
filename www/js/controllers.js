@@ -84,7 +84,7 @@ angular.module('starter.controllers', [])
       $scope.path.setMap(null);
       $scope.path = undefined;
     }
-    
+
   }
 
   // Enable background geolocation
@@ -330,7 +330,7 @@ angular.module('starter.controllers', [])
     if($scope.recording) {
       $scope.path.getPath().push(latlng);
     }
-    
+
     $scope.previousLocation = location;
 
     if (plugin && $scope.recording) {
@@ -382,7 +382,7 @@ angular.module('starter.controllers', [])
       alert('Failed to start tracking with error code: ' + error);
     });
     if (!isEnabled) {
-      resetGeolocation();    
+      resetGeolocation();
     }
   };*/
 
@@ -418,7 +418,7 @@ angular.module('starter.controllers', [])
     });
     confirmPopup.then(function(res) {
       if(res) {
-        
+
         $scope.formData = {};
 
         var tripForm = $ionicPopup.show({
@@ -434,18 +434,18 @@ angular.module('starter.controllers', [])
             }
           ]
         });
-        
+
         tripForm.then(function(res) {
-  
+
           $scope.running = false;
           $scope.recording = false;
           $scope.startButtonIcon  = ($scope.recording) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
           var d = new Date();
           $scope.endTime = d.getTime();
-  
+
           var trips = {};
           if(window.localStorage.getItem('trips') !== null) {
-            trips = JSON.parse(window.localStorage.getItem('trips')); 
+            trips = JSON.parse(window.localStorage.getItem('trips'));
           }
           if($scope.path) {
             console.log($scope.path);
@@ -475,9 +475,9 @@ angular.module('starter.controllers', [])
             }
             window.localStorage['trips'] = JSON.stringify(trips);
           }
-  
+
           console.log(trips[$scope.startTime]);
-  
+
           $http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {tripData: LZString.compressToBase64(JSON.stringify(trips[$scope.startTime]))}).then(
           //$http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {tripData: JSON.stringify(trips[$scope.startTime])}).then(
             function successCallback(response) {
@@ -489,7 +489,7 @@ angular.module('starter.controllers', [])
           resetGeolocation();
         });
 
-          
+
       } else {
 
       }
@@ -589,7 +589,7 @@ angular.module('starter.controllers', [])
         $scope.selectedPath = null;
       }
     });
-      
+
     var points = new google.maps.Polyline({
       zIndex: 1,
       path: $scope.trip.points,
@@ -660,57 +660,30 @@ angular.module('starter.controllers', [])
         return true;
       }
     });
-  
+
   }
 })
 
 .controller('profileCtrl', function($scope, $ionicPopup) {
   var info = {
     sex: window.localStorage['sex'] || '',
-    age: Number(window.localStorage['age']) || 0,
+    age: window.localStorage['age'] || '',
     cyclingExperience: window.localStorage['cyclingExperience'] || ''
   };
-
-  $scope.sexOps = [{
-    text: "Male",
-    value: "Male"
-  }, {
-    text: "Female",
-    value: "Female"
-  }];
-
-  $scope.cycleOps = [{
-    text: "Beginner",
-    value: "Beginner"
-  }, {
-    text: "Intermediate",
-    value: "Intermediate"
-  }, {
-    text: "Expert",
-    value: "Expert"
-  }, {
-    text: "Master",
-    value: "Master"
-  }];
 
   $scope.info = info;
 
   $scope.editInfo = function() {
     var myPopup = $ionicPopup.show({
       title: 'Enter Information',
-      template: '<label class="item item-label"><span class="input-label">Choose Gender</span> \
-        <ion-list><ion-radio ng-repeat="sexOp in sexOps" ng-model="info.sex" value="{{sexOp.value}}" name="sex">{{sexOp.text}}</ion-radio></ion-list></label><br> \
-        <label class="item item-label"><span class="input-label">Choose Age</span> \
-        <input type="number" ng-model="info.age" value="info.age"></label><br> \
-        <label class="item item-label"><span class="input-label">Choose Experience</span> \
-        <ion-radio ng-repeat="cycleOp in cycleOps" ng-model="info.cyclingExperience" value="{{cycleOp.value}}" name="cycle">{{cycleOp.text}}</ion-radio></label>',
+      templateUrl: 'templates/profile_options.html',
       scope: $scope,
       buttons: [{
         text: '<b>OK</b>',
         type: 'button-positive',
         onTap: function(e) {
           window.localStorage['sex'] = info.sex;
-          window.localStorage['age'] = JSON.stringify(info.age);
+          window.localStorage['age'] = info.age;
           window.localStorage['cyclingExperience'] = info.cyclingExperience;
         }
       }]

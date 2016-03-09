@@ -1,9 +1,10 @@
 <ion-view view-title="Profile" ng-controller="profileCtrl">
   <ion-content>
     <div class="list">
-      <a class="item item-thumbnail-left" href="#" ng-click="editInfo()">
+      <a class="item item-thumbnail-left item-button-right" href="#">
         <img src="img/anonymous.png">
-        <p>Sex: {{ info.sex }}</p>
+        <button class="button icon ion-gear-a" ng-click="editInfo()"></button>
+        <p>Gender: {{ info.sex }}</p>
         <p>Age: {{ info.age }}</p>
         <p>Cycling Experience: {{ info.cyclingExperience }}</p>
       </a>
