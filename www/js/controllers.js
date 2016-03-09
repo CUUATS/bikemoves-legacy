@@ -608,7 +608,9 @@ angular.module('starter.controllers', [])
         $scope.selectedPath = null;
       }
     });
-
+    
+    $scope.map.setCenter(new google.maps.LatLng($scope.trip.points[0].lat, $scope.trip.points[0].lng));
+    
     var points = new google.maps.Polyline({
       zIndex: 1,
       path: $scope.trip.points,
