@@ -685,7 +685,7 @@ angular.module('starter.controllers', [])
   }
 })
 
-.controller('profileCtrl', function($scope, $ionicPopup) {
+.controller('profileCtrl', function($scope, $ionicPopup, $http) {
   var info = {
     sex: window.localStorage['sex'] || '',
     age: window.localStorage['age'] || '',
@@ -706,6 +706,13 @@ angular.module('starter.controllers', [])
           window.localStorage['sex'] = info.sex;
           window.localStorage['age'] = info.age;
           window.localStorage['cyclingExperience'] = info.cyclingExperience;
+
+          $http.post('', {deviceID: device.uuid, sex: info.sex, age: info.age, cyclingExperience: info.cyclingExperience})
+            .then(function successCallback(response) {
+              console.log(response);
+            }, function errorCallback(response) {
+              console.log(response);
+            });
         }
       }]
     });
