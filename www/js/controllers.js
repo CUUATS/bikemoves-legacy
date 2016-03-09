@@ -447,13 +447,29 @@ angular.module('starter.controllers', [])
           if(window.localStorage.getItem('trips') !== null) {
             trips = JSON.parse(window.localStorage.getItem('trips'));
           }
+
+          /* Temp test code, delete later
+          $scope.path = new google.maps.Polyline({
+            zIndex: 1,
+            map: $scope.map,
+            geodesic: true,
+            strokeColor: '#2677FF',
+            strokeOpacity: 0.7,
+            strokeWeight: 5
+          });
+          $scope.path.getPath().push(new google.maps.LatLng(37.772, -122.214));
+          $scope.path.getPath().push(new google.maps.LatLng(21.291, -157.821));
+          $scope.path.getPath().push(new google.maps.LatLng(-18.142, 178.431));
+          $scope.path.getPath().push(new google.maps.LatLng(-27.467, 153.027));
+          console.log("hi");
+          console.log($scope.path.getPath().getArray().toString());
+          */
+
           if($scope.path) {
-            console.log($scope.path);
-            console.log($scope.path.getPath());
             trips[$scope.startTime] = {
               title: 'Trip ' + $scope.startTime,
               id: $scope.startTime,
-              points: $scope.path.getPath(),
+              points: $scope.path.getPath().getArray(),
               startTime: $scope.startTime,
               endTime: $scope.endTime,
               deviceID: $scope.deviceID,
@@ -572,7 +588,10 @@ angular.module('starter.controllers', [])
   $scope.month = months[startDate.getMonth()];
   $scope.year = startDate.getFullYear();
   $scope.duration = ($scope.trip.endTime - $scope.trip.startTime) / 1000;
-
+ 
+  var seconds = Math.round($scope.duration % 60);
+  var minutes = Math.floor($scope.duration / 60);
+  $scope.durationString = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
 
   $scope.mapCreated = function(map) {
     $scope.map = map;
