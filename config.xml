@@ -13,8 +13,7 @@
   <preference name="SplashScreen" value="screen"/>
   <preference name="windows-target-version" value="8.1"/>
   <preference name="windows-phone-target-version" value="8.1"/>
-  <preference name="cordova-background-geolocation-license" value="c2b5439fb0b9326683f0094d82ed003f0c047c435eea917d2d29df1d4e9dcbde"/>
-  <preference name="cordova-background-geolocation-orderId" value="2089805441"/>
+  <preference name="cordova-background-geolocation-license" value="da409c55aa530b1c3d0214b63e57f5fedda9322f476974244ea6e8177a7c3632"/>
   <preference name="KeepRunning" value="True"/>
   <preference name="ShowTitle" value="True"/>
   <preference name="InAppBrowserStorageEnabled" value="True"/>
