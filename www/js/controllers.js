@@ -301,7 +301,7 @@ angular.module('starter.controllers', [])
     if ($scope.previousLocation && $scope.recording) {
       var prevLocation = $scope.previousLocation;
       // Drop a breadcrumb of where we've been.
-      $scope.locationMarkers.push(new google.maps.Marker({
+      /*$scope.locationMarkers.push(new google.maps.Marker({
         zIndex: 1,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
@@ -314,7 +314,7 @@ angular.module('starter.controllers', [])
         },
         map: $scope.map,
         position: new google.maps.LatLng(prevLocation.coords.latitude, prevLocation.coords.longitude)
-      }));
+      }));*/
     }
 
     // Update our current position marker and accuracy bubble.
@@ -337,7 +337,8 @@ angular.module('starter.controllers', [])
       // Update odometer
       plugin.getOdometer(function(value) {
         $scope.$apply(function() {
-          $scope.odometer = (value/1000).toFixed(1);
+          var dist_in_km = (value/1000)
+          $scope.odometer = (dist_in_km*0.62137).toFixed(1)
         });
       });
     }
