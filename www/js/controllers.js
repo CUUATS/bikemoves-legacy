@@ -1,4 +1,4 @@
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', [starter.services])
 
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
 
@@ -10,7 +10,7 @@ angular.module('starter.controllers', [])
   //});
 })
 
-.controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup) {
+.controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup, userLocationStorage) {
   var PLAY_BUTTON_CLASS = "ion-play button-balanced",
       PAUSE_BUTTON_CLASS = "ion-pause button-energized",
       STOP_BUTTON_CLASS = "ion-stop button-assertive";
@@ -413,6 +413,15 @@ angular.module('starter.controllers', [])
   $scope.onClickStop = function() {
     if(!$scope.running)
       return;
+    var points = [];
+    var fromGuess = null;
+    var toGuess = null;
+    if($scope.path) {
+      points = $scope.path.getPath().getArray()
+      console.log(points.toString());
+      var closestStartLoc = userLocationStorage.getClosestLocation(points[0][0], points[0][1])
+      var closestEndLoc = userLocationStorage.getClosestLocation(points[points.length-1][0], points[points.length-1][1])
+    }
     var confirmPopup = $ionicPopup.confirm({
       title: 'Complete Route',
       template: 'Are you done recording your route?'
@@ -421,6 +430,12 @@ angular.module('starter.controllers', [])
       if(res) {
 
         $scope.formData = {};
+        if(fromGuess != null) {
+          $scope.formData["from"] = fromGuess
+        }
+        if(toGuess != null) {
+          $scope.formData["to"] = toGuess
+        }
 
         var tripForm = $ionicPopup.show({
           title: 'Tell Us about Your Trip',
@@ -444,6 +459,11 @@ angular.module('starter.controllers', [])
           var d = new Date();
           $scope.endTime = d.getTime();
 
+          if($scope.path) {
+            userLocationStorage.addLocation($scope.formData.from, points[0][0], points[0][1])
+            userLocationStorage.addLocation($scope.formData.to, points[points.length-1][0], points[points.length-1][1])
+          }
+
           var trips = {};
           if(window.localStorage.getItem('trips') !== null) {
             trips = JSON.parse(window.localStorage.getItem('trips'));
@@ -466,32 +486,17 @@ angular.module('starter.controllers', [])
           console.log($scope.path.getPath().getArray().toString());
           */
 
-          if($scope.path) {
-            trips[$scope.startTime] = {
-              title: 'Trip ' + $scope.startTime,
-              id: $scope.startTime,
-              points: $scope.path.getPath().getArray(),
-              startTime: $scope.startTime,
-              endTime: $scope.endTime,
-              deviceID: $scope.deviceID,
-              from: $scope.formData.from,
-              to: $scope.formData.to
-            }
-            window.localStorage['trips'] = JSON.stringify(trips);
+          trips[$scope.startTime] = {
+            title: 'Trip ' + $scope.startTime,
+            id: $scope.startTime,
+            points: points,
+            startTime: $scope.startTime,
+            endTime: $scope.endTime,
+            deviceID: $scope.deviceID,
+            from: $scope.formData.from,
+            to: $scope.formData.to
           }
-          else {
-            trips[$scope.startTime] = {
-              title: 'Trip ' + $scope.startTime,
-              id: $scope.startTime,
-              points: [],
-              startTime: $scope.startTime,
-              endTime: $scope.endTime,
-              deviceID: $scope.deviceID,
-              from: $scope.formData.from,
-              to: $scope.formData.to
-            }
-            window.localStorage['trips'] = JSON.stringify(trips);
-          }
+          window.localStorage['trips'] = JSON.stringify(trips);
 
           console.log(trips[$scope.startTime]);
 
