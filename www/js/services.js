@@ -47,6 +47,8 @@ angular.module('starter.services', [])
     };
     _locations.push([type, lat, lng])
   }
+
+  return service;
 })
 
 /**
