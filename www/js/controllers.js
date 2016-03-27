@@ -418,9 +418,11 @@ angular.module('starter.controllers', [])
     var toGuess = null;
     if($scope.path) {
       points = $scope.path.getPath().getArray()
-      console.log(points.toString());
-      var closestStartLoc = userLocationStorage.getClosestLocation(points[0][0], points[0][1])
-      var closestEndLoc = userLocationStorage.getClosestLocation(points[points.length-1][0], points[points.length-1][1])
+      console.log(points);
+      var closestStartLoc = userLocationStorage.getClosestLocation(points[0].lat, points[0].lng)
+      fromGuess = closestStartLoc
+      var closestEndLoc = userLocationStorage.getClosestLocation(points[points.length-1].lat, points[points.length-1].lng)
+      toGuess = closestEndLoc;
     }
     var confirmPopup = $ionicPopup.confirm({
       title: 'Complete Route',
@@ -430,10 +432,10 @@ angular.module('starter.controllers', [])
       if(res) {
 
         $scope.formData = {};
-        if(fromGuess != null) {
+        if(fromGuess !== null) {
           $scope.formData["from"] = fromGuess
         }
-        if(toGuess != null) {
+        if(toGuess !== null) {
           $scope.formData["to"] = toGuess
         }
 
@@ -458,10 +460,10 @@ angular.module('starter.controllers', [])
           $scope.startButtonIcon  = ($scope.recording) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
           var d = new Date();
           $scope.endTime = d.getTime();
-
+          console.log($scope.path)
           if($scope.path) {
-            userLocationStorage.addLocation($scope.formData.from, points[0][0], points[0][1])
-            userLocationStorage.addLocation($scope.formData.to, points[points.length-1][0], points[points.length-1][1])
+            userLocationStorage.addLocation($scope.formData.from, points[0].lat, points[0].lng)
+            userLocationStorage.addLocation($scope.formData.to, points[points.length-1].lat, points[points.length-1].lng)
           }
 
           var trips = {};
