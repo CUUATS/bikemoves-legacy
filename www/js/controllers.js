@@ -483,14 +483,15 @@ angular.module('starter.controllers', [])
           $scope.path.getPath().push(new google.maps.LatLng(21.291, -157.821));
           $scope.path.getPath().push(new google.maps.LatLng(-18.142, 178.431));
           $scope.path.getPath().push(new google.maps.LatLng(-27.467, 153.027));
-          console.log("hi");
+          $scope.odometer = 2;
           console.log($scope.path.getPath().getArray().toString());
-          */
-
+          */ 
+          
           trips[$scope.startTime] = {
             title: 'Trip ' + $scope.startTime,
             id: $scope.startTime,
             points: points,
+            distance: $scope.odometer,
             startTime: $scope.startTime,
             endTime: $scope.endTime,
             deviceID: $scope.deviceID,
@@ -595,7 +596,9 @@ angular.module('starter.controllers', [])
   $scope.month = months[startDate.getMonth()];
   $scope.year = startDate.getFullYear();
   $scope.duration = ($scope.trip.endTime - $scope.trip.startTime) / 1000;
- 
+  $scope.distance = $scope.trip.distance;
+  $scope.avgSpeed = ($scope.trip.distance / $scope.duration * 3600).toFixed(2);
+
   var seconds = Math.round($scope.duration % 60);
   var minutes = Math.floor($scope.duration / 60);
   $scope.durationString = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
