@@ -1,3 +1,73 @@
+angular.module('starter.services', [])
+.factory('userLocationStorage', function() {
+  var _locations = [] // should contain arrays like ['home', lat, lng]
+  if(window.localStorage.getItem('locations') !== null) {
+    _locations = JSON.parse(window.localStorage.getItem('locations'));
+  }
+  var service = {};
+
+  // http://www.movable-type.co.uk/scripts/latlong.html
+  /*var distance = function(lat1, lng1, lat2, lng2) {
+    var R = 6371000; // metres
+    var φ1 = lat1.toRadians();
+    var φ2 = lat2.toRadians();
+    var Δφ = (lat2-lat1).toRadians();
+    var Δλ = (lon2-lon1).toRadians();
+
+    var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    var d = R * c;
+    return d;
+  }*/
+
+  // http://stackoverflow.com/a/21623256
+  function distance(lat1, lon1, lat2, lon2) {
+    var R = 6371; // Radius of the earth in km
+    var dLat = (lat2 - lat1) * Math.PI / 180;  // deg2rad below
+    var dLon = (lon2 - lon1) * Math.PI / 180;
+    var a = 
+       0.5 - Math.cos(dLat)/2 + 
+       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+       (1 - Math.cos(dLon))/2;
+
+    return R * 2 * Math.asin(Math.sqrt(a));
+  }
+
+  service.getClosestLocation = function(lat, lng) {
+    var closest_idx = -1;
+    var smallest_dist = Number.MAX_VALUE;
+    for (var i = _locations.length - 1; i >= 0; i--) {
+      var curr_dist = distance(_locations[i][1], _locations[i][2], lat, lng)
+      if(curr_dist < smallest_dist) {
+        closest_idx = i;
+        smallest_dist = curr_dist;
+      }
+    };
+    if(closest_idx >= 0) {
+      return [_locations[closest_idx][0], smallest_dist];  
+    }
+    else {
+      return null;
+    }
+  }
+
+  service.addLocation = function(type, lat, lng) {
+    var newLocation = [type, lat, lng]
+    for (var i = _locations.length - 1; i >= 0; i--) {
+      var curr_dist = distance(_locations[i][1], _locations[i][2], newLocation[1], newLocation[2])
+      if(_locations[i][0] == newLocation[0] && curr_dist < 50)
+        return;
+    };
+    _locations.push([type, lat, lng])
+    window.localStorage['locations'] = JSON.stringify(_locations);
+  }
+
+  return service;
+})
+
 /**
 * BackgroundGeolocationService This is a generic singleton wrapper for managing BackgroundGeolocation plugin and its available settings
 * and configuration state in localStorage

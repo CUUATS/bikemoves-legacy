@@ -10,7 +10,7 @@ angular.module('starter.controllers', [])
   //});
 })
 
-.controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup) {
+.controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup, userLocationStorage) {
   var PLAY_BUTTON_CLASS = "ion-play button-balanced",
       PAUSE_BUTTON_CLASS = "ion-pause button-energized",
       STOP_BUTTON_CLASS = "ion-stop button-assertive";
@@ -301,7 +301,7 @@ angular.module('starter.controllers', [])
     if ($scope.previousLocation && $scope.recording) {
       var prevLocation = $scope.previousLocation;
       // Drop a breadcrumb of where we've been.
-      $scope.locationMarkers.push(new google.maps.Marker({
+      /*$scope.locationMarkers.push(new google.maps.Marker({
         zIndex: 1,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
@@ -314,7 +314,7 @@ angular.module('starter.controllers', [])
         },
         map: $scope.map,
         position: new google.maps.LatLng(prevLocation.coords.latitude, prevLocation.coords.longitude)
-      }));
+      }));*/
     }
 
     // Update our current position marker and accuracy bubble.
@@ -337,7 +337,8 @@ angular.module('starter.controllers', [])
       // Update odometer
       plugin.getOdometer(function(value) {
         $scope.$apply(function() {
-          $scope.odometer = (value/1000).toFixed(1);
+          var dist_in_km = (value/1000)
+          $scope.odometer = (dist_in_km*0.62137).toFixed(1)
         });
       });
     }
@@ -412,6 +413,16 @@ angular.module('starter.controllers', [])
   $scope.onClickStop = function() {
     if(!$scope.running)
       return;
+    var points = [];
+    var fromGuess = null;
+    var toGuess = null;
+    if($scope.path) {
+      points = $scope.path.getPath().getArray()
+      var closestStartLoc = userLocationStorage.getClosestLocation(points[0].lat(), points[0].lng())
+      if(closestStartLoc) fromGuess = closestStartLoc[0]
+      var closestEndLoc = userLocationStorage.getClosestLocation(points[points.length-1].lat(), points[points.length-1].lng())
+      if(closestEndLoc) toGuess = closestEndLoc[0];
+    }
     var confirmPopup = $ionicPopup.confirm({
       title: 'Complete Route',
       template: 'Are you done recording your route?'
@@ -420,6 +431,12 @@ angular.module('starter.controllers', [])
       if(res) {
 
         $scope.formData = {};
+        if(fromGuess !== null) {
+          $scope.formData["from"] = fromGuess
+        }
+        if(toGuess !== null) {
+          $scope.formData["to"] = toGuess
+        }
 
         var tripForm = $ionicPopup.show({
           title: 'Tell Us about Your Trip',
@@ -443,6 +460,11 @@ angular.module('starter.controllers', [])
           var d = new Date();
           $scope.endTime = d.getTime();
 
+          if($scope.path) {
+            userLocationStorage.addLocation($scope.formData.from, points[0].lat(), points[0].lng())
+            userLocationStorage.addLocation($scope.formData.to, points[points.length-1].lat(), points[points.length-1].lng())
+          }
+
           var trips = {};
           if(window.localStorage.getItem('trips') !== null) {
             trips = JSON.parse(window.localStorage.getItem('trips'));
@@ -465,32 +487,17 @@ angular.module('starter.controllers', [])
           console.log($scope.path.getPath().getArray().toString());
           */
 
-          if($scope.path) {
-            trips[$scope.startTime] = {
-              title: 'Trip ' + $scope.startTime,
-              id: $scope.startTime,
-              points: $scope.path.getPath().getArray(),
-              startTime: $scope.startTime,
-              endTime: $scope.endTime,
-              deviceID: $scope.deviceID,
-              from: $scope.formData.from,
-              to: $scope.formData.to
-            }
-            window.localStorage['trips'] = JSON.stringify(trips);
+          trips[$scope.startTime] = {
+            title: 'Trip ' + $scope.startTime,
+            id: $scope.startTime,
+            points: points,
+            startTime: $scope.startTime,
+            endTime: $scope.endTime,
+            deviceID: $scope.deviceID,
+            from: $scope.formData.from,
+            to: $scope.formData.to
           }
-          else {
-            trips[$scope.startTime] = {
-              title: 'Trip ' + $scope.startTime,
-              id: $scope.startTime,
-              points: [],
-              startTime: $scope.startTime,
-              endTime: $scope.endTime,
-              deviceID: $scope.deviceID,
-              from: $scope.formData.from,
-              to: $scope.formData.to
-            }
-            window.localStorage['trips'] = JSON.stringify(trips);
-          }
+          window.localStorage['trips'] = JSON.stringify(trips);
 
           console.log(trips[$scope.startTime]);
 
@@ -682,7 +689,7 @@ angular.module('starter.controllers', [])
   }
 })
 
-.controller('profileCtrl', function($scope, $ionicPopup) {
+.controller('profileCtrl', function($scope, $ionicPopup, $http) {
   var info = {
     sex: window.localStorage['sex'] || '',
     age: window.localStorage['age'] || '',
@@ -703,6 +710,13 @@ angular.module('starter.controllers', [])
           window.localStorage['sex'] = info.sex;
           window.localStorage['age'] = info.age;
           window.localStorage['cyclingExperience'] = info.cyclingExperience;
+
+          $http.post('', {deviceID: device.uuid, sex: info.sex, age: info.age, cyclingExperience: info.cyclingExperience})
+            .then(function successCallback(response) {
+              console.log(response);
+            }, function errorCallback(response) {
+              console.log(response);
+            });
         }
       }]
     });
