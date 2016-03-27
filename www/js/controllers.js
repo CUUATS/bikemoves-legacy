@@ -419,9 +419,9 @@ angular.module('starter.controllers', [])
     if($scope.path) {
       points = $scope.path.getPath().getArray()
       var closestStartLoc = userLocationStorage.getClosestLocation(points[0].lat(), points[0].lng())
-      fromGuess = closestStartLoc[0]
+      if(closestStartLoc) fromGuess = closestStartLoc[0]
       var closestEndLoc = userLocationStorage.getClosestLocation(points[points.length-1].lat(), points[points.length-1].lng())
-      toGuess = closestEndLoc[0];
+      if(closestEndLoc) toGuess = closestEndLoc[0];
     }
     var confirmPopup = $ionicPopup.confirm({
       title: 'Complete Route',
