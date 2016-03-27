@@ -665,23 +665,20 @@ angular.module('starter.controllers', [])
 
   $scope.reset = function() {
 
-    $ionicActionSheet.show({
-      destructiveText: 'Delete',
-      cancelText: 'Cancel',
-      cancel: function() {
-      },
-      destructiveButtonClicked: function() {
+    var confirmPopup = $ionicPopup.confirm({
+      title: 'Reset Local Data',
+      template: 'Are you sure you want to delete all saved data (including routes and saved locations)?'
+    });
+
+    confirmPopup.then(function(res) {
+      if (res) {
         window.localStorage.clear();
         $ionicPopup.alert({
           title: 'Data Reset',
           content: 'All data has been reset.'
-        }).then(function(res) {
-          console.log('Test Alert Box');
         });
-        return true;
       }
-    });
-
+    })
   }
 })
 
