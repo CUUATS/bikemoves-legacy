@@ -486,9 +486,33 @@ angular.module('starter.controllers', [])
           $scope.odometer = 2;
           console.log($scope.path.getPath().getArray().toString());
           */ 
-          
+
+          var startDate = new Date($scope.startTime);
+          var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+          $scope.date = startDate.getDate();
+          $scope.day = days[startDate.getDay()];
+          $scope.month = months[startDate.getMonth()];
+          $scope.hour = startDate.getHours();
+          $scope.minutes = startDate.getMinutes();
+          $scope.period = "AM";
+
+          if ($scope.hour >= 12) {
+            $scope.hour -= 12;
+            $scope.period = 'PM';
+          }
+
+          if ($scope.hour == 0) {
+            $scope.hour = 12;
+          }
+
+          if ($scope.minutes < 12)
+          {
+            $scope.minutes = '0' + $scope.minutes;
+          }
+
           trips[$scope.startTime] = {
-            title: 'Trip ' + $scope.startTime,
+            title: $scope.day + ', ' + $scope.month + ' ' + $scope.date + ' at ' + $scope.hour + ":" + $scope.minutes + $scope.period,
             id: $scope.startTime,
             points: points,
             distance: $scope.odometer,
