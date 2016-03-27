@@ -1,6 +1,9 @@
 angular.module('starter.services', [])
 .factory('userLocationStorage', function() {
   var _locations = [] // should contain arrays like ['home', lat, lng]
+  if(window.localStorage.getItem('locations') !== null) {
+    _locations = JSON.parse(window.localStorage.getItem('locations'));
+  }
   var service = {};
 
   // http://www.movable-type.co.uk/scripts/latlong.html
@@ -19,8 +22,8 @@ angular.module('starter.services', [])
     var d = R * c;
     return d;
   }*/
-  
-  // http://stackoverflow.com/questions/5260423/torad-javascript-function-throwing-error
+
+  // http://stackoverflow.com/a/21623256
   function distance(lat1, lon1, lat2, lon2) {
     var R = 6371; // Radius of the earth in km
     var dLat = (lat2 - lat1) * Math.PI / 180;  // deg2rad below
@@ -59,6 +62,7 @@ angular.module('starter.services', [])
         return;
     };
     _locations.push([type, lat, lng])
+    window.localStorage['locations'] = JSON.stringify(_locations);
   }
 
   return service;
