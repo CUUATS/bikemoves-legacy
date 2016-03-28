@@ -1,31 +1,33 @@
 <ion-view view-title="Trip">
-	<div id="map_canvas" style="border: 1px solid rgb(238, 238, 238); border-radius: 3px; width: 100%; height: 50%;">
-			<map on-create="mapCreated(map)"></map>
-	</div>
-	<div class="card">
-		<div class="row">
-			<div class="col col-50" style="text-align: right;">date</div>
-			<div class="col col-50" style="text-align: left;">{{month}} {{date}}, {{year}}</div>
+	<ion-content>
+		<div id="map_canvas" style="border: 1px solid rgb(238, 238, 238); border-radius: 	3px; width: 100%; height: 50%;">
+				<map on-create="mapCreated(map)"></map>
 		</div>
-		<div class="row">
-			<div class="col col-50" style="text-align: right;">duration</div>
-			<div class="col col-50" style="text-align: left;">{{durationString}}</div>
+		<div class="card">
+			<div class="row">
+				<div class="col col-50" style="text-align: right;">date</div>
+				<div class="col col-50" style="text-align: left;">{{month}} {{date}}, 	{{year}}</div>
+			</div>
+			<div class="row">
+				<div class="col col-50" style="text-align: right;">duration</div>
+				<div class="col col-50" style="text-align: left;">{{durationString}}</div>
+			</div>
+			<div class="row">
+				<div class="col col-50" style="text-align: right;">distance</div>
+				<div class="col col-50" style="text-align: left;">{{distance}} miles</div>
+			</div>
+			<div class="row">
+				<div class="col col-50" style="text-align: right;">avg speed</div>
+				<div class="col col-50" style="text-align: left;">{{avgSpeed}} mph</div>
+			</div>
+			<div class="row">
+				<div class="col col-50" style="text-align: right;">from</div>
+				<div class="col col-50" style="text-align: left;">{{trip.from}}</div>
+			</div>
+			<div class="row">
+				<div class="col col-50" style="text-align: right;">to</div>
+				<div class="col col-50" style="text-align: left;">{{trip.to}}</div>
+			</div>
 		</div>
-		<div class="row">
-			<div class="col col-50" style="text-align: right;">distance</div>
-			<div class="col col-50" style="text-align: left;">{{distance}} miles</div>
-		</div>
-		<div class="row">
-			<div class="col col-50" style="text-align: right;">avg speed</div>
-			<div class="col col-50" style="text-align: left;">{{avgSpeed}} mph</div>
-		</div>
-		<div class="row">
-			<div class="col col-50" style="text-align: right;">from</div>
-			<div class="col col-50" style="text-align: left;">{{trip.from}}</div>
-		</div>
-		<div class="row">
-			<div class="col col-50" style="text-align: right;">to</div>
-			<div class="col col-50" style="text-align: left;">{{trip.to}}</div>
-		</div>
-	</div>
+	</ion-content>
 </ion-view>
