@@ -737,6 +737,7 @@ angular.module('starter.controllers', [])
     window.localStorage['sex'] = info.sex;
     window.localStorage['age'] = info.age;
     window.localStorage['cyclingExperience'] = info.cyclingExperience;
+    $scope.modal.hide();
     $scope.modal.remove();
 
     /*$http.post('', {deviceID: device.uuid, sex: info.sex, age: info.age, cyclingExperience: info.cyclingExperience})
