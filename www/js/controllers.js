@@ -485,7 +485,7 @@ angular.module('starter.controllers', [])
           $scope.path.getPath().push(new google.maps.LatLng(-27.467, 153.027));
           $scope.odometer = 2;
           console.log($scope.path.getPath().getArray().toString());
-          */ 
+          */
 
           var startDate = new Date($scope.startTime);
           var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -523,6 +523,9 @@ angular.module('starter.controllers', [])
             to: $scope.formData.to
           }
           window.localStorage['trips'] = JSON.stringify(trips);
+
+          //Update total distance
+          window.localStorage['totalDistProf'] = JSON.stringify((JSON.parse(window.localStorage['totalDistProf']) || 0) + $scope.odometer);
 
           console.log(trips[$scope.startTime]);
 
@@ -642,9 +645,9 @@ angular.module('starter.controllers', [])
         $scope.selectedPath = null;
       }
     });
-    
+
     $scope.map.setCenter(new google.maps.LatLng($scope.trip.points[0].lat, $scope.trip.points[0].lng));
-    
+
     var points = new google.maps.Polyline({
       zIndex: 1,
       path: $scope.trip.points,
@@ -717,10 +720,15 @@ angular.module('starter.controllers', [])
 })
 
 .controller('profileCtrl', function($scope, $ionicPopup, $http) {
+  var totDist = 0;
+  if(localStorage.getItem("totalDistProf") !== null)
+    totDist = JSON.parse(window.localStorage['totalDistProf']);
+
   var info = {
     sex: window.localStorage['sex'] || '',
     age: window.localStorage['age'] || '',
-    cyclingExperience: window.localStorage['cyclingExperience'] || ''
+    cyclingExperience: window.localStorage['cyclingExperience'] || '',
+    totalDist: totDist
   };
 
   $scope.info = info;
@@ -738,12 +746,12 @@ angular.module('starter.controllers', [])
           window.localStorage['age'] = info.age;
           window.localStorage['cyclingExperience'] = info.cyclingExperience;
 
-          $http.post('', {deviceID: device.uuid, sex: info.sex, age: info.age, cyclingExperience: info.cyclingExperience})
+          /*$http.post('', {deviceID: device.uuid, sex: info.sex, age: info.age, cyclingExperience: info.cyclingExperience})
             .then(function successCallback(response) {
               console.log(response);
             }, function errorCallback(response) {
               console.log(response);
-            });
+            });*/
         }
       }]
     });
