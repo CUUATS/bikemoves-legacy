@@ -461,8 +461,10 @@ angular.module('starter.controllers', [])
           $scope.endTime = d.getTime();
 
           if($scope.path) {
-            userLocationStorage.addLocation($scope.formData.from, points[0].lat(), points[0].lng())
-            userLocationStorage.addLocation($scope.formData.to, points[points.length-1].lat(), points[points.length-1].lng())
+            if(points[0]) {
+              userLocationStorage.addLocation($scope.formData.from, points[0].lat(), points[0].lng())
+              userLocationStorage.addLocation($scope.formData.to, points[points.length-1].lat(), points[points.length-1].lng())
+            }
           }
 
           var trips = {};
@@ -525,7 +527,13 @@ angular.module('starter.controllers', [])
           window.localStorage['trips'] = JSON.stringify(trips);
 
           //Update total distance
-          window.localStorage['totalDistProf'] = JSON.stringify((JSON.parse(window.localStorage['totalDistProf']) || 0) + $scope.odometer);
+          if (window.localStorage['totalDistProf'] !== undefined) {
+            window.localStorage['totalDistProf'] = JSON.stringify(Number(JSON.parse(window.localStorage['totalDistProf'])) + $scope.odometer);
+          } else {
+            window.localStorage['totalDistProf'] = JSON.stringify($scope.odometer);
+          }
+          
+          //window.localStorage['totalDistProf'] = JSON.stringify((JSON.parse(window.localStorage['totalDistProf']) || 0) + $scope.odometer);
 
           console.log(trips[$scope.startTime]);
 

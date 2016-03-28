@@ -1,4 +1,9 @@
+<ion-modal-view>
+<ion-header-bar>
+      <h1 class="title">Profile Information</h1>
+</ion-header-bar>
 
+<ion-content>
 <label class="item item-input item-select">
   <div class="input-label">Gender</div>
   <select ng-model="info.sex">
@@ -24,10 +29,17 @@
 </label>
 
 <label class="item item-input item-select">
-  <div class="input-label item-text-wrap">Cycling Experience</div>
-  <select ng-model="info.cyclingExperience">
-    <option>Beginner - Interested but concerned</option>
-    <option>Intermediate - Enthused and confident</option>
-    <option>Advanced - Strong and fearless</option>
+  <div  class="input-label item-text-wrap">Cycling Experience</div>
+  <select style="padding-left: 0px;" ng-model="info.cyclingExperience">
+    <option>Beginner</option>
+    <option>Intermediate</option>
+    <option>Advanced</option>
   </select>
 </label>
+</ion-content>
+
+<ion-footer-bar>
+  <a class="button bar button-positive" ng-click="confirmInfo()" >OK</a>
+</ion-footer-bar>
+
+</ion-modal-view>
