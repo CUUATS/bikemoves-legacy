@@ -719,7 +719,7 @@ angular.module('starter.controllers', [])
   }
 })
 
-.controller('profileCtrl', function($scope, $ionicPopup, $http) {
+.controller('profileCtrl', function($scope, $ionicModal, $http) {
   var totDist = 0;
   if(localStorage.getItem("totalDistProf") !== null)
     totDist = JSON.parse(window.localStorage['totalDistProf']);
@@ -733,27 +733,28 @@ angular.module('starter.controllers', [])
 
   $scope.info = info;
 
-  $scope.editInfo = function() {
-    var myPopup = $ionicPopup.show({
-      title: 'Enter Information',
-      templateUrl: 'templates/profile_options.html',
-      scope: $scope,
-      buttons: [{
-        text: '<b>OK</b>',
-        type: 'button-positive',
-        onTap: function(e) {
-          window.localStorage['sex'] = info.sex;
-          window.localStorage['age'] = info.age;
-          window.localStorage['cyclingExperience'] = info.cyclingExperience;
+  $scope.confirmInfo = function() {
+    window.localStorage['sex'] = info.sex;
+    window.localStorage['age'] = info.age;
+    window.localStorage['cyclingExperience'] = info.cyclingExperience;
+    $scope.modal.remove();
 
-          /*$http.post('', {deviceID: device.uuid, sex: info.sex, age: info.age, cyclingExperience: info.cyclingExperience})
-            .then(function successCallback(response) {
-              console.log(response);
-            }, function errorCallback(response) {
-              console.log(response);
-            });*/
-        }
-      }]
+    /*$http.post('', {deviceID: device.uuid, sex: info.sex, age: info.age, cyclingExperience: info.cyclingExperience})
+      .then(function successCallback(response) {
+        console.log(response);
+      }, function errorCallback(response) {
+        console.log(response);
+      });*/
+  }
+
+  $scope.editInfo = function() {
+
+    $ionicModal.fromTemplateUrl('templates/profile_options.html',
+      {
+        scope: $scope
+      }).then(function(modal) {
+        $scope.modal = modal;
+        modal.show();
     });
   };
 })
