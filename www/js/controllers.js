@@ -528,9 +528,9 @@ angular.module('starter.controllers', [])
 
           //Update total distance
           if (window.localStorage['totalDistProf'] !== undefined) {
-            window.localStorage['totalDistProf'] = JSON.stringify(Number(JSON.parse(window.localStorage['totalDistProf'])) + $scope.odometer);
+            window.localStorage['totalDistProf'] = JSON.stringify(Number(JSON.parse(window.localStorage['totalDistProf'])) + Number($scope.odometer));
           } else {
-            window.localStorage['totalDistProf'] = JSON.stringify($scope.odometer);
+            window.localStorage['totalDistProf'] = JSON.stringify(Number($scope.odometer));
           }
 
           //window.localStorage['totalDistProf'] = JSON.stringify((JSON.parse(window.localStorage['totalDistProf']) || 0) + $scope.odometer);
@@ -736,7 +736,7 @@ angular.module('starter.controllers', [])
 .controller('profileCtrl', function($scope, $ionicModal, $http) {
   var totDist = 0;
   if(localStorage.getItem("totalDistProf") !== null)
-    totDist = JSON.parse(window.localStorage['totalDistProf']);
+    totDist = Number(JSON.parse(window.localStorage['totalDistProf']));
 
   var info = {
     sex: window.localStorage['sex'] || '',
