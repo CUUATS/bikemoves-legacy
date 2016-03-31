@@ -212,7 +212,7 @@ angular.module('starter.controllers', [])
 
               if (this.name) content += 'Name: ' + this.name + '<br>'
 
-              if (this.distance) content += 'Distance: ' + this.distance + ' miles<br>';
+              if (this.distance) content += 'Distance: ' + this.distance.toFixed(2) + ' miles<br>';
 
               $scope.infoWindow.setContent(
                 "<b>Bike Path Information:</b><br>" +
@@ -660,7 +660,7 @@ angular.module('starter.controllers', [])
       }
     });
 
-    $scope.map.setCenter(new google.maps.LatLng($scope.trip.points[0].lat, $scope.trip.points[0].lng));
+    //$scope.map.setCenter(new google.maps.LatLng($scope.trip.points[0].lat, $scope.trip.points[0].lng));
 
     var points = new google.maps.Polyline({
       zIndex: 1,
