@@ -32,7 +32,8 @@ angular.module('starter.controllers', [])
   $scope.currentLocationMarker  = undefined;
   $scope.locationAccuracyMarker = undefined;
   $scope.stationaryRadiusMarker = undefined;
-  $scope.recording               = false;
+  $scope.recording              = false;
+  $scope.accurateLocation       = false;
 
   if(typeof device !== 'undefined') {
     $scope.deviceID = device.uuid;
@@ -568,6 +569,13 @@ angular.module('starter.controllers', [])
     }
     BackgroundGeolocationService.getCurrentPosition(function(location, taskId) {
       $scope.centerOnMe(location);
+      if(location.coords.accuracy < 50) {
+        $scope.accurateLocation = true
+      }
+      else {
+        $scope.accurateLocation = false
+      }
+      console.log($scope.accurateLocation)
       BackgroundGeolocationService.finish(taskId);
     }, function(error) {
       console.error("- getCurrentPostion failed: ", error);
