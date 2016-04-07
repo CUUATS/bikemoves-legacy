@@ -583,6 +583,7 @@ angular.module('starter.controllers', [])
       else {
         $scope.location.isAccurate = false
       }
+      $scope.$apply();
       console.log($scope.location.isAccurate)
       BackgroundGeolocationService.finish(taskId);
     }, function(error) {
