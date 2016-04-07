@@ -577,14 +577,7 @@ angular.module('starter.controllers', [])
     }
     BackgroundGeolocationService.getCurrentPosition(function(location, taskId) {
       $scope.centerOnMe(location);
-      if(location.coords.accuracy < 50) {
-        $scope.location.isAccurate = true
-      }
-      else {
-        $scope.location.isAccurate = false
-      }
-      $scope.$apply();
-      console.log($scope.location.isAccurate)
+      
       BackgroundGeolocationService.finish(taskId);
     }, function(error) {
       console.error("- getCurrentPostion failed: ", error);
@@ -597,6 +590,13 @@ angular.module('starter.controllers', [])
   * Center map button
   */
   $scope.centerOnMe = function (location) {
+    if(location.coords.accuracy < 50) {
+      $scope.location.isAccurate = true
+    } else {
+      $scope.location.isAccurate = false
+    }
+    $scope.$apply();
+    console.log($scope.location.isAccurate)
     $scope.map.setCenter(new google.maps.LatLng(location.coords.latitude, location.coords.longitude));
     $scope.setCurrentLocationMarker(location);
   };
