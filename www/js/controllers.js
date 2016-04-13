@@ -153,6 +153,7 @@ angular.module('starter.controllers', [])
         strokeWeight: 5
       });
       $scope.timestamps = [];
+      $scope.accuracys = [];
     }
     var latlng = new google.maps.LatLng(coords.latitude, coords.longitude);
 
@@ -174,6 +175,7 @@ angular.module('starter.controllers', [])
       $scope.path.getPath().push(latlng);
       var d = new Date();
       $scope.timestamps.push(d.getTime());
+      $scope.accuracys.push(coords.accuracy);
     }
 
     $scope.previousLocation = location;
@@ -318,6 +320,7 @@ angular.module('starter.controllers', [])
             id: $scope.startTime,
             points: points,
             timestamps: $scope.timestamps,
+            accuracys: $scope.accuracys,
             distance: $scope.odometer,
             startTime: $scope.startTime,
             endTime: $scope.endTime,
