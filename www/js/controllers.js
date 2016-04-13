@@ -31,7 +31,6 @@ angular.module('starter.controllers', [])
   $scope.path = undefined;
   $scope.currentLocationMarker = undefined;
   $scope.locationAccuracyMarker = undefined;
-  $scope.stationaryRadiusMarker = undefined;
   $scope.recording = false;
   $scope.location = {
     isAccurate: false
@@ -60,7 +59,7 @@ angular.module('starter.controllers', [])
         });
       });
     }
-    
+
     $scope.bgGeo.isMoving = false;
     $scope.startButtonIcon = PLAY_BUTTON_CLASS;
 
@@ -75,19 +74,11 @@ angular.module('starter.controllers', [])
     }
     $scope.locationMarkers = [];
 
-
-    // Clear red stationaryRadius marker
-    if ($scope.stationaryRadiusMarker) {
-      $scope.stationaryRadiusMarker.setMap(null);
-      $scope.stationaryRadiusMarker = null;
-    }
-
     // Clear blue route PolyLine
     if ($scope.path) {
       $scope.path.setMap(null);
       $scope.path = undefined;
     }
-
   }
 
   // Enable background geolocation
@@ -96,18 +87,6 @@ angular.module('starter.controllers', [])
     alert('Failed to start tracking with error code: ' + error);
   });
   resetGeolocation();
-
-  /**
-   * Show an alert
-   * @param {String} title
-   * @param {String} content
-   */
-  $scope.showAlert = function(title, content) {
-    $ionicPopup.alert({
-      title: title,
-      content: content
-    });
-  };
 
   $scope.mapCreated = function(map) {
     $scope.map = map;
@@ -178,21 +157,6 @@ angular.module('starter.controllers', [])
 
     if ($scope.previousLocation && $scope.recording) {
       var prevLocation = $scope.previousLocation;
-      // Drop a breadcrumb of where we've been.
-      /*$scope.locationMarkers.push(new google.maps.Marker({
-        zIndex: 1,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 7,
-          fillColor: '#11b700',//'26cc77',
-          fillOpacity: 1,
-          strokeColor: '#0d6104',
-          strokeWeight: 1,
-          strokeOpacity: 0.7
-        },
-        map: $scope.map,
-        position: new google.maps.LatLng(prevLocation.coords.latitude, prevLocation.coords.longitude)
-      }));*/
     }
 
     // Update our current position marker and accuracy bubble.
@@ -395,7 +359,6 @@ angular.module('starter.controllers', [])
    * Show Settings screen
    */
   $scope.onClickSettings = function() {
-    BackgroundGeolocationService.playSound('BUTTON_CLICK');
     $state.transitionTo('settings');
   };
   $scope.getCurrentPosition = function() {
