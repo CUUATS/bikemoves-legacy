@@ -560,6 +560,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('profileCtrl', function($scope, $ionicModal, $http) {
+  //Loading data from local storage
   var totDist = 0;
   if (localStorage.getItem("totalDistProf") !== null)
     totDist = Number(JSON.parse(window.localStorage['totalDistProf']));
@@ -573,6 +574,7 @@ angular.module('starter.controllers', [])
 
   $scope.info = info;
 
+  //Save info to local storage after confirm
   $scope.confirmInfo = function() {
     window.localStorage['sex'] = info.sex;
     window.localStorage['age'] = info.age;
@@ -580,7 +582,8 @@ angular.module('starter.controllers', [])
     $scope.modal.hide();
     $scope.modal.remove();
 
-    /*$http.post('', {deviceID: device.uuid, sex: info.sex, age: info.age, cyclingExperience: info.cyclingExperience})
+    /*$http.post('http://api.bikemoves.cuuats.org/v0.1/user', {
+      userData: LZString.compressToBase64(JSON.stringify({deviceID: device.uuid, sex: info.sex, age: info.age, cyclingExperience: info.cyclingExperience}))})
       .then(function successCallback(response) {
         console.log(response);
       }, function errorCallback(response) {
@@ -588,6 +591,7 @@ angular.module('starter.controllers', [])
       });*/
   }
 
+  //Create modal for info edit
   $scope.editInfo = function() {
 
     $ionicModal.fromTemplateUrl('templates/profile_options.html', {
