@@ -455,6 +455,8 @@ angular.module('starter.controllers', [])
   // Total Calories = avgSpeed * (K1 + K2 * avgSpeed ^ 2) * (duration in min)
   $scope.trip.calories = ($scope.avgSpeed * (K1 + K2 * Math.pow($scope.avgSpeed, 2)) * (minutes + seconds / 60)).toFixed(0);
 
+  $scope.greenhouse = ($scope.distance * .8115);
+
   $scope.mapCreated = function(map) {
     $scope.map = map;
 
