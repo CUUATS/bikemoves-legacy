@@ -152,6 +152,7 @@ angular.module('starter.controllers', [])
         strokeOpacity: 0.7,
         strokeWeight: 5
       });
+      $scope.timestamps = [];
     }
     var latlng = new google.maps.LatLng(coords.latitude, coords.longitude);
 
@@ -171,6 +172,8 @@ angular.module('starter.controllers', [])
     // Add breadcrumb to current Polyline path.
     if ($scope.recording) {
       $scope.path.getPath().push(latlng);
+      var d = new Date();
+      $scope.timestamps.push(d.getTime());
     }
 
     $scope.previousLocation = location;
@@ -314,6 +317,7 @@ angular.module('starter.controllers', [])
             title: $scope.day + ', ' + $scope.month + ' ' + $scope.date + ' at ' + $scope.hour + ":" + $scope.minutes + $scope.period,
             id: $scope.startTime,
             points: points,
+            timestamps: $scope.timestamps,
             distance: $scope.odometer,
             startTime: $scope.startTime,
             endTime: $scope.endTime,
