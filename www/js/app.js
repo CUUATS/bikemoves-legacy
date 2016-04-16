@@ -23,6 +23,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       if (window.BackgroundGeolocation) {
         BackgroundGeolocationService.configurePlugin(window.BackgroundGeolocation);
       }
+      cordova.plugins.locationAccuracy.request(
+        function(success) {
+          console.log("Successfully requested accuracy: "+success.message);
+        }, function(error) {
+          console.error("Accuracy request failed: error code="+error.code+"; error message="+error.message);
+        }, 
+          cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY
+      );
     }
   });
 })

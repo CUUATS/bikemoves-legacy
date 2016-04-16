@@ -114,7 +114,6 @@
   <platform name="wp8">
     <splash src="res/screens/wp8/SplashScreenImage.jpg" width="480" height="800"/>
   </platform>
-  <vs:plugin name="com.transistorsoft.cordova.background-geolocation" version="1.0.1" src="C:\Users\kevin\Downloads\cordova-background-geolocation-master\cordova-background-geolocation-master"/>
   <vs:plugin name="org.apache.cordova.geolocation" version="0.3.12"/>
   <icon src="resources\android\icon\drawable-xhdpi-icon.png"/>
 </widget>
