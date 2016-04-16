@@ -168,7 +168,7 @@ angular.module('starter.services', [])
       var smallest_dist = Number.MAX_VALUE;
       for (var i = _locations.length - 1; i >= 0; i--) {
         var curr_dist = distance(_locations[i][1], _locations[i][2], lat, lng)
-        if (curr_dist < smallest_dist) {
+        if (curr_dist < smallest_dist && curr_dist < 1) {
           closest_idx = i;
           smallest_dist = curr_dist;
         }
@@ -184,7 +184,7 @@ angular.module('starter.services', [])
       var newLocation = [type, lat, lng]
       for (var i = _locations.length - 1; i >= 0; i--) {
         var curr_dist = distance(_locations[i][1], _locations[i][2], newLocation[1], newLocation[2])
-        if (_locations[i][0] == newLocation[0] && curr_dist < 50)
+        if (_locations[i][0] == newLocation[0] && curr_dist < 1)
           return;
       };
       _locations.push([type, lat, lng])
