@@ -32,6 +32,10 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
           cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY
       );
     }
+
+    if(window.localStorage['devLog'] === undefined) {
+      window.localStorage['devLog'] = JSON.stringify(new Array())
+    }
   });
 })
 
@@ -102,6 +106,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       'menuContent': {
         templateUrl: 'templates/previous_trip.html',
         controller: 'PreviousTripCtrl'
+      }
+    }
+  })
+
+  .state('app.devlog', {
+    url: '/devlog',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/dev_log.html',
+        controller: 'DevLogCtrl'
       }
     }
   });

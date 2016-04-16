@@ -194,6 +194,22 @@ angular.module('starter.services', [])
     return service;
   })
 
+  .factory('devLogService', function() {
+    var service = {}
+
+    service.get = function() {
+      return JSON.parse(window.localStorage['devLog'])
+    }
+
+    service.push = function(item) {
+      var log = JSON.parse(window.localStorage['devLog'])
+      log.unshift(item)
+      window.localStorage['devLog'] = JSON.stringify(log)
+    }
+
+    return service;
+  })
+
 /**
  * BackgroundGeolocationService This is a generic singleton wrapper for managing BackgroundGeolocation plugin and its available settings
  * and configuration state in localStorage

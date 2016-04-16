@@ -10,7 +10,7 @@ angular.module('starter.controllers', [])
   //});
 })
 
-.controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup, userLocationStorage, mapInfoService) {
+.controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup, userLocationStorage, mapInfoService, devLogService) {
   var PLAY_BUTTON_CLASS = "ion-play button-balanced",
     PAUSE_BUTTON_CLASS = "ion-pause button-energized",
     STOP_BUTTON_CLASS = "ion-stop button-assertive";
@@ -232,11 +232,11 @@ angular.module('starter.controllers', [])
       template: 'Are you done recording your route?'
     });
     confirmPopup.then(function(res) {
-      if (window.localStorage.getItem("dataSubmission") == undefined) {
-        window.localStorage['dataSubmission'] = "true";
-      }
-      var submitData = window.localStorage.getItem("dataSubmission")
-      if (res && submitData) {
+      if (res) {
+        if (window.localStorage.getItem("dataSubmission") == undefined) {
+          window.localStorage['dataSubmission'] = "true";
+        }
+        var submitData = window.localStorage.getItem("dataSubmission")
 
         $scope.formData = {};
         if (fromGuess !== null) {
@@ -246,12 +246,13 @@ angular.module('starter.controllers', [])
           $scope.formData["to"] = toGuess
         }
 
+        var buttonText = (submitData === "true") ? 'Save and Submit' : 'Save'
         var tripForm = $ionicPopup.show({
           title: 'Tell Us about Your Trip',
           templateUrl: 'templates/trip_form.html',
           scope: $scope,
           buttons: [{
-            text: 'Save and Submit',
+            text: buttonText,
             type: 'button-positive',
             onTap: function(e) {
               return $scope.formData;
@@ -345,16 +346,19 @@ angular.module('starter.controllers', [])
 
           console.log(trips[$scope.startTime]);
 
-          $http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {
-            tripData: LZString.compressToBase64(JSON.stringify(trips[$scope.startTime]))
-          }).then(
-            //$http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {tripData: JSON.stringify(trips[$scope.startTime])}).then(
-            function successCallback(response) {
-              console.log(response)
-            },
-            function errorCallback(response) {
-              console.log(response)
-            });
+          if(submitData === "true") {
+            $http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {
+              tripData: LZString.compressToBase64(JSON.stringify(trips[$scope.startTime]))
+            }).then(
+              //$http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {tripData: JSON.stringify(trips[$scope.startTime])}).then(
+              function successCallback(response) {
+                console.log(response)
+              },
+              function errorCallback(response) {
+                console.log(response)
+                devLogService.push(response)
+              });
+          }
 
           resetGeolocation();
         });
@@ -612,4 +616,8 @@ angular.module('starter.controllers', [])
       modal.show();
     });
   };
+})
+
+.controller('DevLogCtrl', function($scope, devLogService) {
+  $scope.devLogs = devLogService.get()
 })
