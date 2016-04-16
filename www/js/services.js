@@ -203,7 +203,8 @@ angular.module('starter.services', [])
 
     service.push = function(item) {
       var log = JSON.parse(window.localStorage['devLog'])
-      log.unshift(item)
+      var currentDate = new Date();
+      log.unshift({data: item, time: currentDate})
       window.localStorage['devLog'] = JSON.stringify(log)
     }
 

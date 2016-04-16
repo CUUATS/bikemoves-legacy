@@ -2,7 +2,8 @@
   <ion-content>
   	<ul class="list">
   	    <li class="item item-text-wrap" ng-repeat="log in devLogs">
-  	      {{log}}
+  	    	<span>{{log.time | date : 'short'}}<span>
+  	      	<p>{{log.data}}</p>
   	    </li>
   	</ul>
   </ion-content>
