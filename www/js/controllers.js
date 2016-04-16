@@ -582,13 +582,20 @@ angular.module('starter.controllers', [])
     $scope.modal.hide();
     $scope.modal.remove();
 
-    /*$http.post('http://api.bikemoves.cuuats.org/v0.1/user', {
-      userData: LZString.compressToBase64(JSON.stringify({deviceID: device.uuid, sex: info.sex, age: info.age, cyclingExperience: info.cyclingExperience}))})
-      .then(function successCallback(response) {
-        console.log(response);
-      }, function errorCallback(response) {
-        console.log(response);
-      });*/
+    $http.post("http://api.bikemoves.cuuats.org/v0.1/user", {
+            userData: LZString.compressToBase64(JSON.stringify({
+                deviceID: $scope.deviceID,
+                gender: info.sex,
+                age: info.age,
+                cycling_experience:info.cyclingExperience
+            }))
+          }).then(
+            function successCallback(response) {
+              console.log(response)
+            },
+            function errorCallback(response) {
+              console.log(response)
+            });
   }
 
   //Create modal for info edit
