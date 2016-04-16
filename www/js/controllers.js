@@ -232,7 +232,11 @@ angular.module('starter.controllers', [])
       template: 'Are you done recording your route?'
     });
     confirmPopup.then(function(res) {
-      if (res) {
+      if (window.localStorage.getItem("dataSubmission") == undefined) {
+        window.localStorage['dataSubmission'] = "true";
+      }
+      var submitData = window.localStorage.getItem("dataSubmission")
+      if (res && submitData) {
 
         $scope.formData = {};
         if (fromGuess !== null) {
