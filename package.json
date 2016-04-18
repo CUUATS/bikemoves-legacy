@@ -25,10 +25,17 @@
     {
       "locator": "https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
       "variables": {
-        "API_KEY_FOR_ANDROID":"AIzaSyBG2GYrfw6VGhDbIf3XyUAo-88rLRJLLe0",
+        "API_KEY_FOR_ANDROID": "AIzaSyBG2GYrfw6VGhDbIf3XyUAo-88rLRJLLe0",
         "API_KEY_FOR_IOS": "AIzaSyCED4XxsiEZadmDJIwPKLLS3pKt-k2_1dI"
       }
+    },
+    {
+      "locator": "https://github.com/transistorsoft/cordova-background-geolocation.git#1.5.1",
+      "id": "com.transistorsoft.cordova.background-geolocation"
     }
   ],
-  "cordovaPlatforms": []
+  "cordovaPlatforms": [
+    "android",
+    "ios"
+  ]
 }
