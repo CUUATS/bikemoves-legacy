@@ -1,7 +1,7 @@
 {
-  "name": "myapp",
-  "version": "1.1.1",
-  "description": "myApp: An Ionic project",
+  "name": "bikemoves",
+  "version": "1.0.0",
+  "description": "BikeMoves Illinois: Bicycle route recording and assistance",
   "dependencies": {
     "gulp": "^3.5.6",
     "gulp-sass": "^2.0.4",
