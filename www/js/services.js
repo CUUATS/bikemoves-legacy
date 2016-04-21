@@ -312,7 +312,7 @@ var BackgroundGeolocationService = (function() {
       dataType: 'boolean',
       inputType: 'select',
       values: ['true', 'false'],
-      defaultValue: 'true'
+      defaultValue: 'false'
     }],
     iOS: [{
       name: 'desiredAccuracy',
