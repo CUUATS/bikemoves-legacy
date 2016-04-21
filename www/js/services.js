@@ -608,12 +608,6 @@ var BackgroundGeolocationService = (function() {
       var me = this;
       var config = this.getConfig();
 
-      config.configureUrl = 'http://192.168.11.120:8080/configure';
-      config.configureInterval = 10000;
-      config.extras = {
-        "foo": "extra data item"
-      };
-
       config.preventSuspend = true;
       config.heartbeatInterval = 30;
 
