@@ -1,129 +1,80 @@
 angular.module('starter.services', [])
 
   .service('mapInfoService', function($http) {
-    this.init = function(map) {
-      var selectedPath;
-      var markers = [];
-      var markersVisible = true;
-
-      var infoWindow = new google.maps.InfoWindow();
-
-      infoWindow.addListener('closeclick', function() {
-        infoWindow.setContent("");
-      });
-
-      infoWindow.addListener('content_changed', function() {
-        if (selectedPath) {
-          selectedPath.setOptions({
-            strokeColor: '#585858'
-          })
-          selectedPath = null;
+    var service = this;
+    service.endpoint = 'http://utility.arcgis.com/usrsvcs/servers/c9e754f1fc35468a9392372c79452704/rest/services/CCRPC/BikeMovesBase/MapServer';
+    service.infoWindow = new google.maps.InfoWindow();
+    service.excludedFields = ['OBJECTID', 'Shape', 'SHAPE'];
+    service.layers = [];
+    service.identifyLayerIds = [];
+    service.identifyLayerNames = ['Bicycle Rack', 'Bicycle Repair and Retail', 'Bicycle Path'];
+    service.init = function(map) {
+      service.map = map;
+      service.getLayerInfo();
+      map.addListener('click', service.mapClick);
+    };
+    service.getLayerInfo = function() {
+      $http({
+        method: 'GET',
+        url: service.endpoint,
+        params: {f: 'json'}
+      }).then(function(res) {
+        if (res.status == 200) {
+          service.layers = res.data.layers;
+          angular.forEach(res.data.layers, function(layer, idx) {
+            if (service.identifyLayerNames.indexOf(layer.name) != -1) {
+              service.identifyLayerIds.push(layer.id);
+            }
+          });
         }
       });
+    };
+    service.getIdentifyParams = function(latLng) {
+      container = service.map.getDiv(),
+        bounds = service.map.getBounds(),
+        ne = bounds.getNorthEast(),
+        sw = bounds.getSouthWest();
 
-      /* Bike rack markers */
-      $http.get('http://utility.arcgis.com/usrsvcs/servers/9e391a972ba14591945243a8f11408d3/rest/services/CCRPC/BicycleRack/MapServer/0/query?outSR=4326&where=SHAPE+IS+NOT+NULL&outFields=*&f=json')
-        .success(function(data) {
-
-          for (var i = 0; i < data.features.length; i++) {
-            var coords = data.features[i].geometry;
-            var properties = data.features[i].attributes;
-
-            var covered = false;
-
-            if (properties.Covered) covered = true;
-
-            var marker = new google.maps.Marker({
-              position: {
-                lat: coords.y,
-                lng: coords.x
-              },
-              map: map,
-              icon: "img/bike_rack.png",
-              owner: properties.Owner,
-              parkName: properties.ParkName,
-              covered: covered
-            });
-
-            marker.addListener('click', function() {
-              var content = '';
-
-              if (this.owner) content += 'Owner: ' + this.owner + '<br>';
-
-              if (this.parkName) content += 'Park Name: ' + this.parkName + '<br>';
-
-              if (this.covered) {
-                content += 'Covered: Yes';
-              } else
-                content += 'Covered: No';
-
-              infoWindow.setContent(
-                "<b>Bike Rack Information:</b><br>" +
-                content
-              );
-
-              infoWindow.open(map, this);
-            });
-
-            markers.push(marker);
-          }
-
-        });
-
-      /* Bike path markers */
-      $http.get('http://utility.arcgis.com/usrsvcs/servers/31e89733946d441187c0c4f692be8cf3/rest/services/CCRPC/BicyclePedestrianNetwork/MapServer/0/query?outSR=4326&where=SHAPE+IS+NOT+NULL&outFields=*&f=json')
-        .success(function(data) {
-          console.log(data);
-          for (var i = 0; i < data.features.length; i++) {
-            var coordlist = data.features[i].geometry.paths[0];
-            var properties = data.features[i].attributes;
-
-            var path = [];
-
-            for (var j = 0; j < coordlist.length; j++) {
-              path.push({
-                lat: coordlist[j][1],
-                lng: coordlist[j][0]
-              });
-            }
-
-            var bikepath = new google.maps.Polyline({
-              path: path,
-              geodesic: true,
-              strokeColor: '#585858',
-              strokeOpacity: .4,
-              strokeWeight: 4,
-              distance: properties.Dx_Miles,
-              name: properties.Name
-            });
-
-            bikepath.setMap(map)
-
-            bikepath.addListener('click', function(event) {
-
-              var content = '';
-
-              if (this.name) content += 'Name: ' + this.name + '<br>'
-
-              if (this.distance) content += 'Distance: ' + this.distance.toFixed(2) + ' miles<br>';
-
-              infoWindow.setContent(
-                "<b>Bike Path Information:</b><br>" +
-                content
-              );
-
-              infoWindow.setPosition(event.latLng);
-
-              infoWindow.open(map, this);
-              selectedPath = this;
-              selectedPath.setOptions({
-                strokeColor: '#FF0000'
-              })
-            });
-          }
-        });
-
-    }
+      return {
+        f: 'json',
+        geometry: [latLng.lng(), latLng.lat()].join(','),
+        geometryType: 'esriGeometryPoint',
+        sr: 4326,
+        layers: 'top:' + service.identifyLayerIds.join(','),
+        tolerance: 5,
+        mapExtent: [sw.lng(), sw.lat(), ne.lng(), ne.lat()].join(','),
+        imageDisplay: [container.offsetWidth, container.offsetHeight, 96].join(','),
+        returnGeometry: false
+      };
+    };
+    service.mapClick = function(e) {
+      if (!service.identifyLayerIds) return;
+      $http({
+        method: 'GET',
+        url: service.endpoint + '/identify',
+        params: service.getIdentifyParams(e.latLng)
+      }).then(function(res) {
+        if (res.status == 200 && res.data.results.length) {
+          service.displayFeatureInfo(res.data.results[0], e.latLng);
+        } else {
+          service.infoWindow.close();
+        }
+      });
+    };
+    service.displayFeatureInfo = function(feature, latLng) {
+      service.infoWindow.setPosition(latLng);
+      service.infoWindow.setContent(service.getFeatureInfoContent(feature));
+      service.infoWindow.open(service.map);
+    };
+    service.getFeatureInfoContent = function(feature) {
+      var content = '<h5>' + feature.value + '</h5>';
+      angular.forEach(feature.attributes, function(value, attr) {
+        if (service.excludedFields.indexOf(attr) == -1 && attr != feature.displayFieldName) {
+          content += '<div><b>' + attr + ':</b> ' + value + '</div>';
+        }
+      });
+      return content;
+    };
   })
 
   .factory('userLocationStorage', function() {
