@@ -23,6 +23,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       if (window.BackgroundGeolocation) {
         BackgroundGeolocationService.configurePlugin(window.BackgroundGeolocation);
       }
+      // Prompt user to turn on high accuracy gps mode if not enabled already
       cordova.plugins.locationAccuracy.request(
         function(success) {
           console.log("Successfully requested accuracy: "+success.message);
@@ -32,7 +33,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
           cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY
       );
     }
-
+    // Initialize devlog
     if(window.localStorage['devLog'] === undefined) {
       window.localStorage['devLog'] = JSON.stringify(new Array())
     }

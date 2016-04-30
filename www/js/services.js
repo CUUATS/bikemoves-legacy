@@ -1,5 +1,6 @@
 angular.module('starter.services', [])
 
+  // Load map markers
   .service('mapInfoService', function($http) {
     this.init = function(map) {
       var selectedPath;
@@ -126,31 +127,15 @@ angular.module('starter.services', [])
     }
   })
 
+  // Tracks user locations for autocomplete of trip submission form
   .factory('userLocationStorage', function() {
-    var _locations = [] // should contain arrays like ['home', lat, lng]
+    var _locations = [] // should contain arrays of form ['home', lat, lng]
     if (window.localStorage.getItem('locations') !== null) {
       _locations = JSON.parse(window.localStorage.getItem('locations'));
     }
     var service = {};
 
-    // http://www.movable-type.co.uk/scripts/latlong.html
-    /*var distance = function(lat1, lng1, lat2, lng2) {
-      var R = 6371000; // metres
-      var φ1 = lat1.toRadians();
-      var φ2 = lat2.toRadians();
-      var Δφ = (lat2-lat1).toRadians();
-      var Δλ = (lon2-lon1).toRadians();
-
-      var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-      var d = R * c;
-      return d;
-    }*/
-
-    // http://stackoverflow.com/a/21623256
+    // http://stackoverflow.com/a/21623256, returns distance in km
     function distance(lat1, lon1, lat2, lon2) {
       var R = 6371; // Radius of the earth in km
       var dLat = (lat2 - lat1) * Math.PI / 180; // deg2rad below
@@ -163,6 +148,7 @@ angular.module('starter.services', [])
       return R * 2 * Math.asin(Math.sqrt(a));
     }
 
+    // Find saved location closest to provided location. Distance must be less than 1 km.
     service.getClosestLocation = function(lat, lng) {
       var closest_idx = -1;
       var smallest_dist = Number.MAX_VALUE;
@@ -180,6 +166,7 @@ angular.module('starter.services', [])
       }
     }
 
+    // Add new location to list of user locations unless a location is saved nearby already
     service.addLocation = function(type, lat, lng) {
       var newLocation = [type, lat, lng]
       for (var i = _locations.length - 1; i >= 0; i--) {
@@ -194,6 +181,7 @@ angular.module('starter.services', [])
     return service;
   })
 
+  // Store devlog entries and provide functions to get and add logs
   .factory('devLogService', function() {
     var service = {}
 

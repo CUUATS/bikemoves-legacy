@@ -10,6 +10,7 @@ angular.module('starter.controllers', [])
   //});
 })
 
+
 .controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup, userLocationStorage, mapInfoService, devLogService) {
   var PLAY_BUTTON_CLASS = "ion-play button-balanced",
     PAUSE_BUTTON_CLASS = "ion-pause button-energized",
@@ -35,12 +36,11 @@ angular.module('starter.controllers', [])
   $scope.location = {
     isAccurate: false
   };
+  $scope.odometer = 0;
 
   if (typeof device !== 'undefined') {
     $scope.deviceID = device.uuid;
   }
-
-  $scope.odometer = 0;
 
   // Add BackgroundGeolocation event-listeners when Platform is ready.
   ionic.Platform.ready(function() {
@@ -48,6 +48,7 @@ angular.module('starter.controllers', [])
     BackgroundGeolocationService.onMotionChange($scope.onMotionChange);
   });
 
+  // Call this to reset all trip data
   var resetGeolocation = function() {
     console.log("geo reset")
       // Reset odometer to 0.
@@ -88,6 +89,7 @@ angular.module('starter.controllers', [])
   });
   resetGeolocation();
 
+  // Stores map when it is created on page
   $scope.mapCreated = function(map) {
     $scope.map = map;
     mapInfoService.init(map);
@@ -105,6 +107,7 @@ angular.module('starter.controllers', [])
    * Draw google map marker for current location
    */
   $scope.setCurrentLocationMarker = function(location) {
+    // Only record point if accuracy is "good"
     if (location.coords.accuracy < 50) {
       $scope.location.isAccurate = true
     } else {
@@ -134,6 +137,7 @@ angular.module('starter.controllers', [])
           strokeWeight: 6
         }
       });
+      // Draws a circle around location indicating location accuracy
       //$scope.locationAccuracyMarker = new google.maps.Circle({
       //  zIndex: 9,
       //  fillColor: '#3366cc',
@@ -214,12 +218,14 @@ angular.module('starter.controllers', [])
     });
   };
 
+  // Stop recording, then save and submit trip
   $scope.onClickStop = function() {
     if (!$scope.running)
       return;
     var points = [];
     var fromGuess = null;
     var toGuess = null;
+    // Try to guess start and end locations
     if ($scope.path) {
       points = $scope.path.getPath().getArray()
       var closestStartLoc = userLocationStorage.getClosestLocation(points[0].lat(), points[0].lng())
@@ -227,17 +233,20 @@ angular.module('starter.controllers', [])
       var closestEndLoc = userLocationStorage.getClosestLocation(points[points.length - 1].lat(), points[points.length - 1].lng())
       if (closestEndLoc) toGuess = closestEndLoc[0];
     }
+
     var confirmPopup = $ionicPopup.confirm({
       title: 'Complete Route',
       template: 'Are you done recording your route?'
     });
     confirmPopup.then(function(res) {
       if (res) {
+        // Check if trip should be posted to server
         if (window.localStorage.getItem("dataSubmission") == undefined) {
           window.localStorage['dataSubmission'] = "true";
         }
         var submitData = window.localStorage.getItem("dataSubmission")
 
+        // Populate form with location guesses
         $scope.formData = {};
         if (fromGuess !== null) {
           $scope.formData["from"] = fromGuess
@@ -268,6 +277,7 @@ angular.module('starter.controllers', [])
           var d = new Date();
           $scope.endTime = d.getTime();
 
+          // Update location predictions with trip data
           if ($scope.path) {
             if (points[0]) {
               userLocationStorage.addLocation($scope.formData.from, points[0].lat(), points[0].lng())
@@ -275,6 +285,7 @@ angular.module('starter.controllers', [])
             }
           }
 
+          // Load past trips into local var
           var trips = {};
           if (window.localStorage.getItem('trips') !== null) {
             trips = JSON.parse(window.localStorage.getItem('trips'));
@@ -297,6 +308,7 @@ angular.module('starter.controllers', [])
           console.log($scope.path.getPath().getArray().toString());
           */
 
+          // Generate trip title
           var startDate = new Date($scope.startTime);
           var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
           var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -320,6 +332,7 @@ angular.module('starter.controllers', [])
             $scope.minutes = '0' + $scope.minutes;
           }
 
+          // Create new trip object
           trips[$scope.startTime] = {
             title: $scope.day + ', ' + $scope.month + ' ' + $scope.date + ' at ' + $scope.hour + ":" + $scope.minutes + $scope.period,
             id: $scope.startTime,
@@ -333,6 +346,7 @@ angular.module('starter.controllers', [])
             from: $scope.formData.from,
             to: $scope.formData.to
           }
+          // Save trip to local storage
           window.localStorage['trips'] = JSON.stringify(trips);
 
           //Update total distance
@@ -342,10 +356,10 @@ angular.module('starter.controllers', [])
             window.localStorage['totalDistProf'] = JSON.stringify(Number($scope.odometer));
           }
 
-          //window.localStorage['totalDistProf'] = JSON.stringify((JSON.parse(window.localStorage['totalDistProf']) || 0) + $scope.odometer);
 
           console.log(trips[$scope.startTime]);
 
+          // Submit trip to server if allowed by user
           if(submitData === "true") {
             $http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {
               tripData: LZString.compressToBase64(JSON.stringify(trips[$scope.startTime]))
@@ -360,12 +374,13 @@ angular.module('starter.controllers', [])
               });
           }
 
+          // Reset trip data
           resetGeolocation();
         });
 
 
       } else {
-
+        // Deal with no response to popup
       }
     });
   }
@@ -376,6 +391,10 @@ angular.module('starter.controllers', [])
   $scope.onClickSettings = function() {
     $state.transitionTo('settings');
   };
+
+  /**
+   * Center map button
+   */
   $scope.getCurrentPosition = function() {
     if (!$scope.map) {
       return;
@@ -391,10 +410,8 @@ angular.module('starter.controllers', [])
     });
   };
 
-  /**
-   * Center map button
-   */
   $scope.centerOnMe = function(location) {
+    // Check if location accuracy is "good" and update ui accordingly
     if (location.coords.accuracy < 50) {
       $scope.location.isAccurate = true
     } else {
@@ -407,16 +424,17 @@ angular.module('starter.controllers', [])
   };
 
 
-  $scope.toggleMarkers = function() {
+  /*$scope.toggleMarkers = function() {
     for (var i = 0; i < $scope.markers.length; i++) {
       $scope.markers[i].setMap($scope.markersVisible ? null : $scope.map);
     }
     $scope.markersVisible = !$scope.markersVisible;
-  }
+  }*/
 })
 
 .controller('PreviousTripsCtrl', function($scope, $ionicActionSheet) {
 
+  // Delete previous trip
   $scope.onItemDelete = function(item) {
     $ionicActionSheet.show({
       destructiveText: 'Delete',
@@ -433,6 +451,7 @@ angular.module('starter.controllers', [])
     });
   };
 
+  // Load previous trips
   if (window.localStorage.getItem('trips') == undefined) {
     var sampleTrips = {};
     window.localStorage['trips'] = JSON.stringify(sampleTrips);
@@ -442,8 +461,12 @@ angular.module('starter.controllers', [])
 })
 
 .controller('PreviousTripCtrl', function($scope, $ionicActionSheet, $stateParams) {
+  // Load previous trips
   $scope.trips = JSON.parse(window.localStorage.getItem('trips'));
+  // Load selected previous trip
   $scope.trip = $scope.trips[$stateParams.previousTripID];
+
+  // Create trip name
   var startDate = new Date($scope.trip.startTime);
   var endDate = new Date($scope.trip.endTime);
   var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -452,6 +475,8 @@ angular.module('starter.controllers', [])
   $scope.day = days[startDate.getDay()];
   $scope.month = months[startDate.getMonth()];
   $scope.year = startDate.getFullYear();
+
+  // Calculate trip stats
   $scope.duration = ($scope.trip.endTime - $scope.trip.startTime) / 1000;
   $scope.distance = $scope.trip.distance;
   $scope.avgSpeed = ($scope.trip.distance / $scope.duration * 3600).toFixed(2);
@@ -468,6 +493,7 @@ angular.module('starter.controllers', [])
 
   $scope.greenhouse = ($scope.distance * .8115);
 
+  // Run when map is loaded
   $scope.mapCreated = function(map) {
     $scope.map = map;
 
@@ -486,8 +512,10 @@ angular.module('starter.controllers', [])
       }
     });
 
+    // Center map on beginning of trip
     $scope.map.setCenter(new google.maps.LatLng($scope.trip.points[0].lat, $scope.trip.points[0].lng));
 
+    // Add trip points to map
     var points = new google.maps.Polyline({
       zIndex: 1,
       path: $scope.trip.points,
@@ -502,7 +530,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('SavedLocationsCtrl', function($scope, $ionicActionSheet) {
+/*.controller('SavedLocationsCtrl', function($scope, $ionicActionSheet) {
   $scope.onItemDelete = function(item) {
     $ionicActionSheet.show({
       destructiveText: 'Delete',
@@ -533,10 +561,11 @@ angular.module('starter.controllers', [])
     window.localStorage['saved_locations'] = JSON.stringify(sampleLocations);
   }
   $scope.locations = JSON.parse(window.localStorage.getItem("saved_locations"));
-})
+})*/
 
 
 .controller('SettingsCtrl', function($scope, $ionicActionSheet, $ionicPopup) {
+  // Load data submission policy
   if (window.localStorage.getItem("dataSubmission") == undefined) {
     window.localStorage['dataSubmission'] = "true";
   }
@@ -548,6 +577,7 @@ angular.module('starter.controllers', [])
     window.localStorage['dataSubmission'] = JSON.stringify($scope.dataSubmission.checked);
   };
 
+  // Reset all app data
   $scope.reset = function() {
 
     var confirmPopup = $ionicPopup.confirm({
@@ -593,6 +623,7 @@ angular.module('starter.controllers', [])
     $scope.modal.hide();
     $scope.modal.remove();
 
+    // Post profile to server when saved
     $http.post("http://api.bikemoves.cuuats.org/v0.1/user", {
             userData: LZString.compressToBase64(JSON.stringify({
                 deviceID: $scope.deviceID,
