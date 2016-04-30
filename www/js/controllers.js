@@ -568,6 +568,9 @@ angular.module('starter.controllers', [])
 })
 
 .controller('profileCtrl', function($scope, $ionicModal, $http) {
+  if (typeof device !== 'undefined') {
+    $scope.deviceID = device.uuid;
+  }
   //Loading data from local storage
   var totDist = 0;
   if (localStorage.getItem("totalDistProf") !== null)
