@@ -98,9 +98,6 @@ angular.module('starter.services', [])
       service.marker.setVisible(true);
       service.marker.showInfoWindow();
     };
-    service.getFeatureInfoContent = function(feature) {
-      return content;
-    };
   })
 
   .factory('userLocationStorage', function() {
