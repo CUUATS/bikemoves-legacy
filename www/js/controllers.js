@@ -10,7 +10,17 @@ angular.module('starter.controllers', [])
   //});
 })
 
-.controller('mapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup, userLocationStorage, mapInfoService, devLogService) {
+.controller('MenuCtrl', ['$scope', '$ionicSideMenuDelegate', function($scope, $ionicSideMenuDelegate) {
+  // Because of the positioning of the map view, we have to hide the side menu
+  // when it is closed.
+  $scope.$watch(function(){
+    return $ionicSideMenuDelegate.getOpenRatio();
+  }, function(newValue, oldValue) {
+    $scope.hideLeft = (newValue == 0);
+  });
+}])
+
+.controller('MapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup, userLocationStorage, mapService, devLogService) {
   var PLAY_BUTTON_CLASS = "ion-play button-balanced",
     PAUSE_BUTTON_CLASS = "ion-pause button-energized",
     STOP_BUTTON_CLASS = "ion-stop button-assertive";
@@ -88,19 +98,6 @@ angular.module('starter.controllers', [])
   });
   resetGeolocation();
 
-  $scope.mapCreated = function(map) {
-    $scope.map = map;
-    mapInfoService.init(map);
-
-    // Add BackgroundGeolocationService event-listeners when Platform is ready.
-    ionic.Platform.ready(function() {
-      var bgGeo = BackgroundGeolocationService.getPlugin();
-      if (!bgGeo) {
-        return;
-      }
-    });
-  };
-
   /**
    * Draw google map marker for current location
    */
@@ -134,13 +131,6 @@ angular.module('starter.controllers', [])
           strokeWeight: 6
         }
       });
-      //$scope.locationAccuracyMarker = new google.maps.Circle({
-      //  zIndex: 9,
-      //  fillColor: '#3366cc',
-      //  fillOpacity: 0.4,
-      //  strokeOpacity: 0,
-      //  map: $scope.map
-      //});
     }
 
     if (!$scope.path && $scope.recording) {
@@ -279,23 +269,6 @@ angular.module('starter.controllers', [])
           if (window.localStorage.getItem('trips') !== null) {
             trips = JSON.parse(window.localStorage.getItem('trips'));
           }
-
-          /* Temp test code, delete later
-          $scope.path = new google.maps.Polyline({
-            zIndex: 1,
-            map: $scope.map,
-            geodesic: true,
-            strokeColor: '#2677FF',
-            strokeOpacity: 0.7,
-            strokeWeight: 5
-          });
-          $scope.path.getPath().push(new google.maps.LatLng(37.772, -122.214));
-          $scope.path.getPath().push(new google.maps.LatLng(21.291, -157.821));
-          $scope.path.getPath().push(new google.maps.LatLng(-18.142, 178.431));
-          $scope.path.getPath().push(new google.maps.LatLng(-27.467, 153.027));
-          $scope.odometer = 2;
-          console.log($scope.path.getPath().getArray().toString());
-          */
 
           var startDate = new Date($scope.startTime);
           var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

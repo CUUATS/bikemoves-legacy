@@ -6,14 +6,13 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'app.directives'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, mapService) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       cordova.plugins.Keyboard.disableScroll(true);
-
     }
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
@@ -28,7 +27,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
           console.log("Successfully requested accuracy: "+success.message);
         }, function(error) {
           console.error("Accuracy request failed: error code="+error.code+"; error message="+error.message);
-        }, 
+        },
           cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY
       );
     }
@@ -36,6 +35,9 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     if(window.localStorage['devLog'] === undefined) {
       window.localStorage['devLog'] = JSON.stringify(new Array())
     }
+
+    mapService.init();
+    var bgGeo = BackgroundGeolocationService.getPlugin();
   });
 })
 
@@ -64,7 +66,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     views: {
       'menuContent': {
         templateUrl: 'templates/map.html',
-        controller: 'mapCtrl'
+        controller: 'MapCtrl'
       }
     }
   })

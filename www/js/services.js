@@ -1,17 +1,39 @@
 angular.module('starter.services', [])
 
-  .service('mapInfoService', function($http) {
+  .service('mapService', function($http) {
     var service = this;
+    service.defautCenter = new plugin.google.maps.LatLng(40.109403, -88.227203);
     service.endpoint = 'http://utility.arcgis.com/usrsvcs/servers/c9e754f1fc35468a9392372c79452704/rest/services/CCRPC/BikeMovesBase/MapServer';
-    service.infoWindow = new google.maps.InfoWindow();
     service.excludedFields = ['OBJECTID', 'Shape', 'SHAPE'];
     service.layers = [];
     service.identifyLayerIds = [];
     service.identifyLayerNames = ['Bicycle Rack', 'Bicycle Repair and Retail', 'Bicycle Path'];
-    service.init = function(map) {
-      service.map = map;
+    service.init = function() {
+      service.container = document.getElementById('map_canvas');
+      service.map = plugin.google.maps.Map.getMap(service.container, {
+        'camera': {
+          'latLng': service.defautCenter,
+          'zoom': 16
+        }
+      });
+      service.map.addEventListener(plugin.google.maps.event.MAP_READY, function() {
+        service.map.addTileOverlay({
+          tileUrlFormat: "http://tiles.bikemoves.me/tiles/<zoom>/<y>/<x>.png"
+        });
+        service.map.addMarker({
+          position: service.defautCenter,
+          visible: false,
+          icon: {
+            url: 'www/img/transparent_marker.png',
+            size: {height: 1, width: 1}
+          }
+        }, function(marker) {
+          service.marker = marker;
+          service.map.on(plugin.google.maps.event.MAP_CLICK, service.mapClick);
+        });
+      });
+
       service.getLayerInfo();
-      map.addListener('click', service.mapClick);
     };
     service.getLayerInfo = function() {
       $http({
@@ -29,50 +51,54 @@ angular.module('starter.services', [])
         }
       });
     };
-    service.getIdentifyParams = function(latLng) {
-      container = service.map.getDiv(),
-        bounds = service.map.getBounds(),
-        ne = bounds.getNorthEast(),
-        sw = bounds.getSouthWest();
-
-      return {
-        f: 'json',
-        geometry: [latLng.lng(), latLng.lat()].join(','),
-        geometryType: 'esriGeometryPoint',
-        sr: 4326,
-        layers: 'top:' + service.identifyLayerIds.join(','),
-        tolerance: 5,
-        mapExtent: [sw.lng(), sw.lat(), ne.lng(), ne.lat()].join(','),
-        imageDisplay: [container.offsetWidth, container.offsetHeight, 96].join(','),
-        returnGeometry: false
-      };
+    service.getIdentifyParams = function(latLng, callback) {
+      service.map.getVisibleRegion(function(bounds) {
+        var ne = bounds.northeast,
+          sw = bounds.southwest;
+        callback({
+          f: 'json',
+          geometry: [latLng.lng, latLng.lat].join(','),
+          geometryType: 'esriGeometryPoint',
+          sr: 4326,
+          layers: 'top:' + service.identifyLayerIds.join(','),
+          tolerance: 10,
+          mapExtent: [sw.lng, sw.lat, ne.lng, ne.lat].join(','),
+          imageDisplay: [service.container.offsetWidth, service.container.offsetHeight, 96].join(','),
+          returnGeometry: false
+        });
+      });
     };
-    service.mapClick = function(e) {
+    service.mapClick = function(latLng) {
       if (!service.identifyLayerIds) return;
-      $http({
-        method: 'GET',
-        url: service.endpoint + '/identify',
-        params: service.getIdentifyParams(e.latLng)
-      }).then(function(res) {
-        if (res.status == 200 && res.data.results.length) {
-          service.displayFeatureInfo(res.data.results[0], e.latLng);
-        } else {
-          service.infoWindow.close();
-        }
+      service.getIdentifyParams(latLng, function(params) {
+        $http({
+          method: 'GET',
+          url: service.endpoint + '/identify',
+          params: params
+        }).then(function(res) {
+          if (res.status == 200 && res.data.results.length) {
+            service.displayFeatureInfo(res.data.results[0], latLng);
+          } else {
+            service.marker.hideInfoWindow();
+            service.marker.setVisible(false);
+          }
+        });
       });
     };
     service.displayFeatureInfo = function(feature, latLng) {
-      service.infoWindow.setPosition(latLng);
-      service.infoWindow.setContent(service.getFeatureInfoContent(feature));
-      service.infoWindow.open(service.map);
-    };
-    service.getFeatureInfoContent = function(feature) {
-      var content = '<h5>' + feature.value + '</h5>';
+      var snippetParts = [];
       angular.forEach(feature.attributes, function(value, attr) {
         if (service.excludedFields.indexOf(attr) == -1 && attr != feature.displayFieldName) {
-          content += '<div><b>' + attr + ':</b> ' + value + '</div>';
+          snippetParts.push(attr + ': ' + value);
         }
       });
+      service.marker.setPosition(latLng);
+      service.marker.setTitle(feature.value);
+      service.marker.setSnippet(snippetParts.join('\n'));
+      service.marker.setVisible(true);
+      service.marker.showInfoWindow();
+    };
+    service.getFeatureInfoContent = function(feature) {
       return content;
     };
   })
@@ -404,18 +430,18 @@ var BackgroundGeolocationService = (function() {
    * callback simply calls upon all the added listeners here
    */
   var fireLocationListeners = function(location, taskId) {
-    console.log('[js] BackgroundGeolocation location received: ', JSON.stringify(location));
-    var me = this;
-    var callback;
-    for (var n = 0, len = $locationListeners.length; n < len; n++) {
-      callback = $locationListeners[n];
-      try {
-        callback.call(me, location);
-      } catch (e) {
-        console.log('error: ' + e.message);
-      }
-    }
-    $plugin.finish(taskId);
+    // console.log('[js] BackgroundGeolocation location received: ', JSON.stringify(location));
+    // var me = this;
+    // var callback;
+    // for (var n = 0, len = $locationListeners.length; n < len; n++) {
+    //   callback = $locationListeners[n];
+    //   try {
+    //     callback.call(me, location);
+    //   } catch (e) {
+    //     console.log('error: ' + e.message);
+    //   }
+    // }
+    // $plugin.finish(taskId);
   };
 
   return {

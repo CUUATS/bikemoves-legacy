@@ -1,19 +1,7 @@
 <ion-view title="Map">
-  <!-- <ion-nav-buttons side="right"> 
-    <label class="toggle toggle-balanced">
-       <input type="checkbox" ng-click="onToggleEnabled()" ng-model="bgGeo.enabled">
-       <div class="track">
-         <div class="handle"></div>
-       </div>
-    </label>
-  </ion-nav-buttons> -->
   <ion-content data-tap-disabled="true" scroll="false">
-    <map on-create="mapCreated(map)"></map>
+    <div id="map_canvas"></div>
   </ion-content>
-  <!-- <ion-footer-bar class="bar-stable">
-    <div class="col col-90 button" ng-click="centerOnMe($event)">Start Route</div>
-    <div class="button icon ion-alert-circled"></div>
-  </ion-footer-bar> -->
   <ion-footer-bar class="bar-stable">
     <a ng-click="getCurrentPosition()" class="button button-icon icon ion-navigate"></a>
     <h1 class="title" style="text-align:center;width: 25%;" ng-show="location.isAccurate">{{odometer}} mi</h1>
