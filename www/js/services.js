@@ -2,7 +2,10 @@ angular.module('starter.services', [])
 
   .service('mapService', function($http) {
     var service = this,
-      DEFAULT_CENTER = new plugin.google.maps.LatLng(40.109403, -88.227203),
+      DEFAULT_LOCATION = {
+        latitude: 40.109403,
+        longitude: -88.227203
+      },
       SERVICE_ENDPOINT = 'http://utility.arcgis.com/usrsvcs/servers/c9e754f1fc35468a9392372c79452704/rest/services/CCRPC/BikeMovesBase/MapServer',
       excludedFields = ['OBJECTID', 'Shape', 'SHAPE'],
       layers = [],
@@ -13,6 +16,7 @@ angular.module('starter.services', [])
       readyQueue = [],
       container,
       map,
+      defaultCenter,
       tileOverlay,
       infoMarker,
       currentLocationCircle,
@@ -95,11 +99,12 @@ angular.module('starter.services', [])
       };
 
     service.init = function() {
+      defaultCenter = location2LatLng(DEFAULT_LOCATION);
       getLayerInfo();
       container = document.getElementById('map_canvas');
       map = plugin.google.maps.Map.getMap(container, {
         'camera': {
-          'latLng': DEFAULT_CENTER,
+          'latLng': defaultCenter,
           'zoom': 16.1
         }
       });
@@ -113,7 +118,7 @@ angular.module('starter.services', [])
         });
         // Info window marker
         map.addMarker({
-          position: DEFAULT_CENTER,
+          position: defaultCenter,
           visible: false,
           icon: {
             url: 'www/img/transparent_marker.png',
@@ -126,7 +131,7 @@ angular.module('starter.services', [])
         });
         // Current position circle
         map.addCircle({
-          center: DEFAULT_CENTER,
+          center: defaultCenter,
           visible: false,
           radius: 12,
           fillColor: '#2677FF',
@@ -138,7 +143,7 @@ angular.module('starter.services', [])
         });
         // Trip path
         map.addPolyline({
-          points: [DEFAULT_CENTER, DEFAULT_CENTER],
+          points: [defaultCenter, defaultCenter],
           visible: false,
           geodesic: true,
           color: '#2677FF',
@@ -228,6 +233,9 @@ angular.module('starter.services', [])
     };
     service.getTrip = function () {
       return currentTrip;
+    };
+    service.getCurrentDistance = function() {
+      return currentTrip.distance;
     };
     service.addLocation = function(location) {
       if (currentTrip.locations.length > 0) {

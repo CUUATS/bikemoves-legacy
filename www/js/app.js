@@ -18,14 +18,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
-    if (window.cordova) {
+    if (window.cordova.plugins.locationAccuracy) {
+      // Request high accuracy geolocation on Android.
       cordova.plugins.locationAccuracy.request(
-        function(success) {
-          console.log("Successfully requested accuracy: "+success.message);
-        }, function(error) {
-          console.error("Accuracy request failed: error code="+error.code+"; error message="+error.message);
-        },
-          cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY
+        angular.noop,
+        angular.noop,
+        cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY
       );
     }
 

@@ -25,12 +25,13 @@ angular.module('starter.controllers', [])
 
 .controller('MapCtrl', [
   '$scope',
+  '$ionicPlatform',
   '$ionicModal',
   '$http',
   '$ionicPopup',
   'mapService',
   'tripService',
-  function($scope, $ionicModal, $http, $ionicPopup, mapService, tripService) {
+  function($scope, $ionicPlatform, $ionicModal, $http, $ionicPopup, mapService, tripService) {
     var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
       STATUS_STOPPED = 'stopped',
       STATUS_RECORDING = 'recording',
@@ -38,7 +39,7 @@ angular.module('starter.controllers', [])
       BG_PLUGIN_SETTINGS = {
           debug: false
         },
-      bgGeo = window.BackgroundGeolocation,
+      bgGeo,
       currentLocation;
 
     $scope.status = {
@@ -46,6 +47,7 @@ angular.module('starter.controllers', [])
       isPaused: status == false,
       isRecording: status == false
     };
+    $scope.odometer = 0;
 
     var setStatus = function(status) {
       console.log('Setting status: ' + status);
@@ -73,6 +75,10 @@ angular.module('starter.controllers', [])
         });
       }
     },
+    updateOdometer = function() {
+      // Convert meters to miles.
+      $scope.odometer = (tripService.getCurrentDistance() * 1609.34).toFixed(1);
+    },
     onLocation = function(e, taskId) {
       var location = angular.merge({
         moving: e.is_moving,
@@ -81,8 +87,8 @@ angular.module('starter.controllers', [])
       console.log(location);
       currentLocation = location;
       if ($scope.status.isRecording) {
-        var dist = tripService.addLocation(location);
-        $scope.odometer = ((dist / 1000) * 0.62137).toFixed(1);
+        tripService.addLocation(location);
+        updateOdometer();
       }
       updateMap();
       bgGeo.finish(taskId);
@@ -208,10 +214,13 @@ angular.module('starter.controllers', [])
       }, {maximumAge: 0})
     };
 
-    // Set up the geolocation plugin.
-    bgGeo.on('location', onLocation, onLocationError);
-    bgGeo.configure(BG_PLUGIN_SETTINGS);
-    $scope.getCurrentPosition();
+    $ionicPlatform.ready(function() {
+      // Set up the geolocation plugin.
+      bgGeo = window.BackgroundGeolocation;
+      bgGeo.on('location', onLocation, onLocationError);
+      bgGeo.configure(BG_PLUGIN_SETTINGS);
+      $scope.getCurrentPosition();
+    });
 }])
 
 .controller('PreviousTripsCtrl', function($scope, $ionicActionSheet) {
