@@ -10,385 +10,237 @@ angular.module('starter.controllers', [])
   //});
 })
 
-.controller('MenuCtrl', ['$scope', '$ionicSideMenuDelegate', function($scope, $ionicSideMenuDelegate) {
-  // Because of the positioning of the map view, we have to hide the side menu
-  // when it is closed.
-  $scope.$watch(function(){
-    return $ionicSideMenuDelegate.getOpenRatio();
-  }, function(newValue, oldValue) {
-    $scope.hideLeft = (newValue == 0);
-  });
+.controller('MenuCtrl', [
+  '$scope',
+  '$ionicSideMenuDelegate',
+  function($scope, $ionicSideMenuDelegate) {
+    // Because of the positioning of the map view, we have to hide the side menu
+    // when it is closed.
+    $scope.$watch(function(){
+      return $ionicSideMenuDelegate.getOpenRatio();
+    }, function(newValue, oldValue) {
+      $scope.hideLeft = (newValue == 0);
+    });
 }])
 
-.controller('MapCtrl', function($scope, $ionicLoading, $ionicModal, $http, $ionicPopup, userLocationStorage, mapService, devLogService) {
-  var PLAY_BUTTON_CLASS = "ion-play button-balanced",
-    PAUSE_BUTTON_CLASS = "ion-pause button-energized",
-    STOP_BUTTON_CLASS = "ion-stop button-assertive";
+.controller('MapCtrl', [
+  '$scope',
+  '$ionicModal',
+  '$http',
+  '$ionicPopup',
+  'mapService',
+  'tripService',
+  function($scope, $ionicModal, $http, $ionicPopup, mapService, tripService) {
+    var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
+      STATUS_STOPPED = 'stopped',
+      STATUS_RECORDING = 'recording',
+      STATUS_PAUSED = 'paused',
+      BG_PLUGIN_SETTINGS = {
+          debug: false
+        },
+      bgGeo = window.BackgroundGeolocation,
+      currentLocation;
 
-  /**
-   * BackgroundGelocation plugin state
-   */
-  $scope.bgGeo = {
-    enabled: (window.localStorage.getItem('bgGeo:enabled') == 'true'),
-    isMoving: (window.localStorage.getItem('bgGeo:isMoving') == 'true')
-  };
-  $scope.startButtonIcon = ($scope.bgGeo.isMoving) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
-  $scope.stopButtonIcon = STOP_BUTTON_CLASS;
-  $scope.map = undefined;
-  $scope.currentLocationMarker = undefined;
-  $scope.previousLocation = undefined;
-  $scope.locationMarkers = [];
-  $scope.path = undefined;
-  $scope.currentLocationMarker = undefined;
-  $scope.locationAccuracyMarker = undefined;
-  $scope.recording = false;
-  $scope.location = {
-    isAccurate: false
-  };
+    $scope.status = {
+      isStopped: status == true,
+      isPaused: status == false,
+      isRecording: status == false
+    };
 
-  if (typeof device !== 'undefined') {
-    $scope.deviceID = device.uuid;
-  }
-
-  $scope.odometer = 0;
-
-  // Add BackgroundGeolocation event-listeners when Platform is ready.
-  ionic.Platform.ready(function() {
-    BackgroundGeolocationService.onLocation($scope.centerOnMe);
-    BackgroundGeolocationService.onMotionChange($scope.onMotionChange);
-  });
-
-  var resetGeolocation = function() {
-    console.log("geo reset")
-      // Reset odometer to 0.
-    var plugin = BackgroundGeolocationService.getPlugin();
-    if (plugin) {
-      plugin.resetOdometer(function() {
-        $scope.$apply(function() {
-          $scope.odometer = 0;
-        });
-      });
-    }
-
-    $scope.bgGeo.isMoving = false;
-    $scope.startButtonIcon = PLAY_BUTTON_CLASS;
-
-    // Clear previousLocation
-    $scope.previousLocation = undefined;
-
-    // Clear location-markers.
-    var marker;
-    for (var n = 0, len = $scope.locationMarkers.length; n < len; n++) {
-      marker = $scope.locationMarkers[n];
-      marker.setMap(null);
-    }
-    $scope.locationMarkers = [];
-
-    // Clear blue route PolyLine
-    if ($scope.path) {
-      $scope.path.setMap(null);
-      $scope.path = undefined;
-    }
-  }
-
-  // Enable background geolocation
-  $scope.bgGeo.enabled = true;
-  BackgroundGeolocationService.setEnabled(true, function() {}, function(error) {
-    alert('Failed to start tracking with error code: ' + error);
-  });
-  resetGeolocation();
-
-  /**
-   * Draw google map marker for current location
-   */
-  $scope.setCurrentLocationMarker = function(location) {
-    if (location.coords.accuracy < 50) {
-      $scope.location.isAccurate = true
-    } else {
-      $scope.location.isAccurate = false
-      return;
-    }
-
-    var plugin = BackgroundGeolocationService.getPlugin();
-
-    // Set currentLocation @property
-    $scope.currentLocation = location;
-
-    var coords = location.coords;
-
-    if (!$scope.currentLocationMarker) {
-      $scope.currentLocationMarker = new google.maps.Marker({
-        map: $scope.map,
-        zIndex: 10,
-        title: 'Current Location',
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 12,
-          fillColor: '#2677FF',
-          fillOpacity: 1,
-          strokeColor: '#ffffff',
-          strokeOpacity: 1,
-          strokeWeight: 6
-        }
-      });
-    }
-
-    if (!$scope.path && $scope.recording) {
-      $scope.path = new google.maps.Polyline({
-        zIndex: 1,
-        map: $scope.map,
-        geodesic: true,
-        strokeColor: '#2677FF',
-        strokeOpacity: 0.7,
-        strokeWeight: 5
-      });
-      $scope.timestamps = [];
-      $scope.accuracys = [];
-    }
-    var latlng = new google.maps.LatLng(coords.latitude, coords.longitude);
-
-    if ($scope.previousLocation && $scope.recording) {
-      var prevLocation = $scope.previousLocation;
-    }
-
-    // Update our current position marker and accuracy bubble.
-    $scope.currentLocationMarker.setPosition(latlng);
-    //$scope.locationAccuracyMarker.setCenter(latlng);
-    //$scope.locationAccuracyMarker.setRadius(location.coords.accuracy);
-
-    if (location.sample === true) {
-      return;
-    }
-
-    // Add breadcrumb to current Polyline path.
-    if ($scope.recording) {
-      $scope.path.getPath().push(latlng);
-      var d = new Date();
-      $scope.timestamps.push(d.getTime());
-      $scope.accuracys.push(coords.accuracy);
-    }
-
-    $scope.previousLocation = location;
-
-    if (plugin && $scope.recording) {
-      // Update odometer
-      plugin.getOdometer(function(value) {
-        $scope.$apply(function() {
-          var dist_in_km = (value / 1000)
-          $scope.odometer = (dist_in_km * 0.62137).toFixed(1)
-        });
-      });
-    }
-  };
-
-  /**
-   * Start/stop aggressive monitoring / stationary mode
-   */
-  $scope.onClickStart = function() {
-    if (!$scope.running) {
-      var d = new Date();
-      $scope.startTime = d.getTime();
-    }
-    if ($scope.recording) {
-      $scope.recording = false;
-    } else {
-      $scope.running = true;
-      $scope.recording = true;
-    }
-    $scope.startButtonIcon = ($scope.recording) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
-    var willStart = !$scope.bgGeo.isMoving;
-    console.log('onClickStart: ', willStart);
-
-    BackgroundGeolocationService.setPace(willStart, function() {
-      $scope.bgGeo.isMoving = willStart;
-    });
-  };
-
-  $scope.onClickStop = function() {
-    if (!$scope.running)
-      return;
-    var points = [];
-    var fromGuess = null;
-    var toGuess = null;
-    if ($scope.path) {
-      points = $scope.path.getPath().getArray()
-      var closestStartLoc = userLocationStorage.getClosestLocation(points[0].lat(), points[0].lng())
-      if (closestStartLoc) fromGuess = closestStartLoc[0]
-      var closestEndLoc = userLocationStorage.getClosestLocation(points[points.length - 1].lat(), points[points.length - 1].lng())
-      if (closestEndLoc) toGuess = closestEndLoc[0];
-    }
-    var confirmPopup = $ionicPopup.confirm({
-      title: 'Complete Route',
-      template: 'Are you done recording your route?'
-    });
-    confirmPopup.then(function(res) {
-      if (res) {
-        if (window.localStorage.getItem("dataSubmission") == undefined) {
-          window.localStorage['dataSubmission'] = "true";
-        }
-        var submitData = window.localStorage.getItem("dataSubmission")
-
-        $scope.formData = {};
-        if (fromGuess !== null) {
-          $scope.formData["from"] = fromGuess
-        }
-        if (toGuess !== null) {
-          $scope.formData["to"] = toGuess
-        }
-
-        var buttonText = (submitData === "true") ? 'Save and Submit' : 'Save'
-        var tripForm = $ionicPopup.show({
-          title: 'Tell Us about Your Trip',
-          templateUrl: 'templates/trip_form.html',
-          scope: $scope,
-          buttons: [{
-            text: buttonText,
-            type: 'button-positive',
-            onTap: function(e) {
-              return $scope.formData;
-            }
-          }]
-        });
-
-        tripForm.then(function(res) {
-
-          $scope.running = false;
-          $scope.recording = false;
-          $scope.startButtonIcon = ($scope.recording) ? PAUSE_BUTTON_CLASS : PLAY_BUTTON_CLASS;
-          var d = new Date();
-          $scope.endTime = d.getTime();
-
-          if ($scope.path) {
-            if (points[0]) {
-              userLocationStorage.addLocation($scope.formData.from, points[0].lat(), points[0].lng())
-              userLocationStorage.addLocation($scope.formData.to, points[points.length - 1].lat(), points[points.length - 1].lng())
-            }
-          }
-
-          var trips = {};
-          if (window.localStorage.getItem('trips') !== null) {
-            trips = JSON.parse(window.localStorage.getItem('trips'));
-          }
-
-          var startDate = new Date($scope.startTime);
-          var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-          var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-          $scope.date = startDate.getDate();
-          $scope.day = days[startDate.getDay()];
-          $scope.month = months[startDate.getMonth()];
-          $scope.hour = startDate.getHours();
-          $scope.minutes = startDate.getMinutes();
-          $scope.period = "AM";
-
-          if ($scope.hour >= 12) {
-            $scope.hour -= 12;
-            $scope.period = 'PM';
-          }
-
-          if ($scope.hour == 0) {
-            $scope.hour = 12;
-          }
-
-          if ($scope.minutes < 12) {
-            $scope.minutes = '0' + $scope.minutes;
-          }
-
-          trips[$scope.startTime] = {
-            title: $scope.day + ', ' + $scope.month + ' ' + $scope.date + ' at ' + $scope.hour + ":" + $scope.minutes + $scope.period,
-            id: $scope.startTime,
-            points: points,
-            timestamps: $scope.timestamps,
-            accuracys: $scope.accuracys,
-            distance: $scope.odometer,
-            startTime: $scope.startTime,
-            endTime: $scope.endTime,
-            deviceID: $scope.deviceID,
-            from: $scope.formData.from,
-            to: $scope.formData.to
-          }
-          window.localStorage['trips'] = JSON.stringify(trips);
-
-          //Update total distance
-          if (window.localStorage['totalDistProf'] !== undefined) {
-            window.localStorage['totalDistProf'] = JSON.stringify(Number(JSON.parse(window.localStorage['totalDistProf'])) + Number($scope.odometer));
-          } else {
-            window.localStorage['totalDistProf'] = JSON.stringify(Number($scope.odometer));
-          }
-
-          //window.localStorage['totalDistProf'] = JSON.stringify((JSON.parse(window.localStorage['totalDistProf']) || 0) + $scope.odometer);
-
-          console.log(trips[$scope.startTime]);
-
-          if(submitData === "true") {
-            $http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {
-              tripData: LZString.compressToBase64(JSON.stringify(trips[$scope.startTime]))
-            }).then(
-              //$http.post("http://api.bikemoves.cuuats.org/v0.1/trip", {tripData: JSON.stringify(trips[$scope.startTime])}).then(
-              function successCallback(response) {
-                console.log(response)
-              },
-              function errorCallback(response) {
-                console.log(response)
-                devLogService.push(response)
-              });
-          }
-
-          resetGeolocation();
-        });
-
-
+    var setStatus = function(status) {
+      console.log('Setting status: ' + status);
+      $scope.status = {
+        isStopped: status == STATUS_STOPPED,
+        isPaused: status == STATUS_PAUSED,
+        isRecording: status == STATUS_RECORDING
+      };
+      tripService.setStatus(status);
+      if (status == STATUS_RECORDING) {
+        bgGeo.start();
+        bgGeo.changePace(true);
+      } else if (status == STATUS_PAUSED) {
+        bgGeo.start();
+        bgGeo.changePace(false);
       } else {
-
+        bgGeo.stop();
       }
-    });
-  }
-
-  /**
-   * Show Settings screen
-   */
-  $scope.onClickSettings = function() {
-    $state.transitionTo('settings');
-  };
-  $scope.getCurrentPosition = function() {
-    if (!$scope.map) {
-      return;
+    },
+    updateMap = function() {
+      if (currentLocation) {
+        mapService.onMapReady(function() {
+          mapService.setCurrentLocation(currentLocation);
+          mapService.setCenter(currentLocation);
+        });
+      }
+    },
+    onLocation = function(e, taskId) {
+      var location = angular.merge({
+        moving: e.is_moving,
+        time: e.timestamp.getTime()
+      }, e.coords);
+      console.log(location);
+      currentLocation = location;
+      if ($scope.status.isRecording) {
+        var dist = tripService.addLocation(location);
+        $scope.odometer = ((dist / 1000) * 0.62137).toFixed(1);
+      }
+      updateMap();
+      bgGeo.finish(taskId);
+    },
+    onLocationError = function(error) {
+      console.error('Location error: ', error);
     }
-    BackgroundGeolocationService.getCurrentPosition(function(location, taskId) {
-      $scope.centerOnMe(location);
+    getDeviceID = function() {
+      return (typeof device !== 'undefined') ? device.uuid : null;
+    },
+    showTripSubmitForm = function(submit, save, resume, discard) {
+      var buttons = [
+        {
+          text: 'Save and Submit',
+          type: 'button-positive',
+          onTap: submit
+        },
+        {
+          text: 'Save',
+          type: 'button-calm',
+          onTap: save
+        },
+        {
+          text: 'Resume',
+          type: 'button-stable',
+          onTap: resume
+        },
+        {
+          text: 'Discard',
+          type: 'button-assertive',
+          onTap: discard
+        }
+      ];
 
-      BackgroundGeolocationService.finish(taskId);
-    }, function(error) {
-      console.error("- getCurrentPostion failed: ", error);
-    }, {
-      maximumAge: 0
-    });
-  };
+      // Hide the save button if automatic submission is enabled.
+      // if (settingsService.get('autoSubmit')) buttons.splice(1);
 
-  /**
-   * Center map button
-   */
-  $scope.centerOnMe = function(location) {
-    if (location.coords.accuracy < 50) {
-      $scope.location.isAccurate = true
-    } else {
-      $scope.location.isAccurate = false
-    }
-    $scope.$apply();
-    console.log($scope.location.isAccurate)
-    $scope.map.setCenter(new google.maps.LatLng(location.coords.latitude, location.coords.longitude));
-    $scope.setCurrentLocationMarker(location);
-  };
+      // Prepopulate the trip form using previously saved trip data.
+      // $scope.formData['from'] = tripService.guessLocationType(trip.locations[0]);
+      // $scope.formData['to'] = tripService.guessLocationType(trip.locations[trip.locations.length - 1]);
 
+      mapService.setClickable(false);
+      var tripForm = $ionicPopup.show({
+        title: 'Tell Us about Your Trip',
+        templateUrl: 'templates/trip_form.html',
+        scope: $scope,
+        buttons: buttons
+      });
 
-  $scope.toggleMarkers = function() {
-    for (var i = 0; i < $scope.markers.length; i++) {
-      $scope.markers[i].setMap($scope.markersVisible ? null : $scope.map);
-    }
-    $scope.markersVisible = !$scope.markersVisible;
-  }
-})
+      tripForm.then(function() {
+        mapService.setClickable(true);
+      });
+    },
+    onSubmitError = function() {
+      $ionicPopup.alert({
+        title: 'Trip Submission Failed',
+        template: 'Sorry, an error occurred while submitting your trip. Please try again later.'
+      });
+    },
+    submitTrip = function() {
+      $http.post(TRIPS_ENDPOINT, {
+        tripData: LZString.compressToBase64(JSON.stringify(trip))
+      }).then(function success(res) {
+        tripService.saveTrip(res.status == 200);
+        if (res.status != 200) onSubmitError();
+      }, function failure() {
+        tripService.saveTrip(false);
+        onSubmitError();
+      });
+    };
+
+    $scope.startRecording = function() {
+      console.log('Tapped record button');
+      bgGeo.getState(function(state) {
+        console.log(state);
+      });
+      setStatus(STATUS_RECORDING);
+    };
+
+    $scope.pauseRecording = function() {
+      console.log('Tapped pause button');
+      setStatus(STATUS_STOPPED);
+    };
+
+    $scope.stopRecording = function() {
+      console.log('Tapped stop button');
+      if (tripService.countLocations() < 2) {
+        tripService.resetTrip();
+        setStatus(STATUS_STOPPED);
+        return;
+      };
+      setStatus(STATUS_PAUSED);
+      showTripSubmitForm(function submit() {
+        // Save and submit the trip.
+        submitTrip();
+        tripService.resetTrip();
+        setStatus(STATUS_STOPPED);
+      }, function save() {
+        // Save the trip, but do not submit.
+        tripService.saveTrip(false);
+        tripService.resetTrip();
+        setStatus(STATUS_STOPPED);
+      }, function resume() {
+        // Resume the trip.
+        setStatus(STATUS_RECORDING);
+      }, function discard() {
+        // Discard the trip.
+        tripService.resetTrip();
+        setStatus(STATUS_STOPPED);
+      });
+    };
+
+    $scope.getCurrentPosition = function() {
+      bgGeo.start();
+      bgGeo.getCurrentPosition(function success(location, taskId) {
+        // Reset background geolocation to its former state.
+        setStatus(tripService.getStatus());
+        // TODO: Determine if bgGeo.stop() before bgGeo.finish(taskId)
+        // causes problems.
+        onLocation(location, taskId);
+      }, function error(errorCode) {
+        console.log('Error code: ' + errorCode)
+      }, {maximumAge: 0})
+    };
+
+    // Set up the geolocation plugin.
+    bgGeo.on('location', onLocation, onLocationError);
+    bgGeo.configure(BG_PLUGIN_SETTINGS);
+    $scope.getCurrentPosition();
+}])
 
 .controller('PreviousTripsCtrl', function($scope, $ionicActionSheet) {
+
+  var formatDate = function(date) {
+    var startDate = new Date($scope.startTime);
+    var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    $scope.date = startDate.getDate();
+    $scope.day = days[startDate.getDay()];
+    $scope.month = months[startDate.getMonth()];
+    $scope.hour = startDate.getHours();
+    $scope.minutes = startDate.getMinutes();
+    $scope.period = "AM";
+
+    if ($scope.hour >= 12) {
+      $scope.hour -= 12;
+      $scope.period = 'PM';
+    }
+
+    if ($scope.hour == 0) {
+      $scope.hour = 12;
+    }
+
+    if ($scope.minutes < 12) {
+      $scope.minutes = '0' + $scope.minutes;
+    }
+    return $scope.day + ', ' + $scope.month + ' ' + $scope.date + ' at ' + $scope.hour + ":" + $scope.minutes + $scope.period
+  };
 
   $scope.onItemDelete = function(item) {
     $ionicActionSheet.show({
@@ -565,7 +417,7 @@ angular.module('starter.controllers', [])
 
     $http.post("http://api.bikemoves.cuuats.org/v0.1/user", {
             userData: LZString.compressToBase64(JSON.stringify({
-                deviceID: $scope.deviceID,
+                deviceID: $getDeviceID(),
                 gender: info.sex,
                 age: info.age,
                 cycling_experience:info.cyclingExperience

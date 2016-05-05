@@ -19,9 +19,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       StatusBar.styleDefault();
     }
     if (window.cordova) {
-      if (window.BackgroundGeolocation) {
-        BackgroundGeolocationService.configurePlugin(window.BackgroundGeolocation);
-      }
       cordova.plugins.locationAccuracy.request(
         function(success) {
           console.log("Successfully requested accuracy: "+success.message);
@@ -37,7 +34,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     }
 
     mapService.init();
-    var bgGeo = BackgroundGeolocationService.getPlugin();
   });
 })
 

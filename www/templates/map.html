@@ -3,12 +3,12 @@
     <div id="map_canvas"></div>
   </ion-content>
   <ion-footer-bar class="bar-stable">
-    <a ng-click="getCurrentPosition()" class="button button-icon icon ion-navigate"></a>
     <h1 class="title" style="text-align:center;width: 25%;" ng-show="location.isAccurate">{{odometer}} mi</h1>
     <h1 class="title" style="text-align:center;color:red" ng-hide="location.isAccurate">Acquiring location</h1>
     <div class="buttons align-right">
-      <button class="button icon {{startButtonIcon}}" ng-show="location.isAccurate" ng-click="onClickStart()" style="width:75px"></button>
-      <button class="button icon {{stopButtonIcon}}" ng-disabled="!recording" ng-click="onClickStop()" style="width:75px"></button>
+      <button class="button icon ion-play button-balanced" ng-if="!status.isRecording" ng-click="startRecording()" style="width:75px"></button>
+      <button class="button icon ion-pause button-energized" ng-if="status.isRecording" ng-click="pauseRecording()" style="width:75px"></button>
+      <button class="button icon ion-stop button-assertive" ng-disabled="!status.isRecording" ng-click="stopRecording()" style="width:75px"></button>
     </div>
   </ion-footer-bar>
 </ion-view>
