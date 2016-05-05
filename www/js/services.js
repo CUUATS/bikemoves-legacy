@@ -135,7 +135,6 @@ angular.module('starter.services', [])
           visible: false,
           icon: 'green'
         }, function(marker) {
-          console.log('Added current location marker');
           currentLocationMarker = marker;
           checkReady();
         });
@@ -177,6 +176,14 @@ angular.module('starter.services', [])
     };
     service.setClickable = function(clickable) {
       map.setClickable(clickable);
+    };
+    service.setTripLocations = function(locations) {
+      var latLngs = [];
+      angular.forEach(locations, function(location, idx) {
+        latLngs.push(location2LatLng(location));
+      });
+      tripPolyline.setPoints(latLngs);
+      tripPolyline.setVisible(true);
     };
     service.resetMap = function() {
 

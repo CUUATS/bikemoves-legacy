@@ -72,6 +72,11 @@ angular.module('starter.controllers', [])
         mapService.onMapReady(function() {
           mapService.setCurrentLocation(currentLocation);
           mapService.setCenter(currentLocation);
+
+          var trip = tripService.getTrip();
+          if (trip.locations.length > 1) {
+            mapService.setTripLocations(trip.locations);
+          }
         });
       }
     },
