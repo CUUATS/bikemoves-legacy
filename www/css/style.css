@@ -7,3 +7,12 @@
 .scroll {
   height: 100%;
 }
+.bikemoves-play,
+.bikemoves-pause,
+.bikemoves-stop {
+  margin-left: 10px;
+  width: 75px;
+}
+.bikemoves-odometer {
+  padding-left: 15px;
+}

@@ -2,12 +2,17 @@
   <ion-content data-tap-disabled="true" scroll="false">
     <div id="map_canvas"></div>
   </ion-content>
-  <ion-footer-bar class="bar-stable">
-    <h1 class="title" style="text-align:center;width: 25%;">{{odometer}} mi</h1>
+  <ion-footer-bar class="bar-stable" align-title="left">
+    <a ng-click="getCurrentPosition()"
+      class="button button-icon icon ion-navigate bikemoves-locate"></a>
+    <h1 class="title bikemoves-odometer">{{odometer}} mi</h1>
     <div class="buttons align-right">
-      <button class="button icon ion-play button-balanced" ng-if="!status.isRecording" ng-click="startRecording()" style="width:75px"></button>
-      <button class="button icon ion-pause button-energized" ng-if="status.isRecording" ng-click="pauseRecording()" style="width:75px"></button>
-      <button class="button icon ion-stop button-assertive" ng-disabled="!status.isRecording" ng-click="stopRecording()" style="width:75px"></button>
+      <button class="button icon ion-play button-balanced bikemoves-play"
+        ng-if="!status.isRecording" ng-click="startRecording()"></button>
+      <button class="button icon ion-pause button-energized bikemoves-pause"
+        ng-if="status.isRecording" ng-click="pauseRecording()"></button>
+      <button class="button icon ion-stop button-assertive bikemoves-stop"
+        ng-disabled="!status.isRecording" ng-click="stopRecording()"></button>
     </div>
   </ion-footer-bar>
 </ion-view>
