@@ -19,7 +19,7 @@ angular.module('starter.services', [])
       defaultCenter,
       tileOverlay,
       infoMarker,
-      currentLocationCircle,
+      currentLocationMarker,
       tripPolyline,
       location2LatLng = function(location) {
         return new plugin.google.maps.LatLng(location.latitude, location.longitude);
@@ -129,16 +129,14 @@ angular.module('starter.services', [])
           map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
           checkReady();
         });
-        // Current position circle
-        map.addCircle({
-          center: defaultCenter,
+        // Current position marker
+        map.addMarker({
+          position: defaultCenter,
           visible: false,
-          radius: 12,
-          fillColor: '#2677FF',
-          strokeColor: '#ffffff',
-          strokeWidth: 6
-        }, function(circle) {
-          currentLocationCircle = circle;
+          icon: 'green'
+        }, function(marker) {
+          console.log('Added current location marker');
+          currentLocationMarker = marker;
           checkReady();
         });
         // Trip path
@@ -162,8 +160,8 @@ angular.module('starter.services', [])
       }
     };
     service.setCurrentLocation = function(location) {
-      currentLocationCircle.setCenter(location2LatLng(location));
-      currentLocationCircle.setVisible(true);
+      currentLocationMarker.setPosition(location2LatLng(location));
+      currentLocationMarker.setVisible(true);
     };
     service.setCenter = function(location, duration) {
       if (typeof duration === 'undefined') var duration = 0;
