@@ -37,10 +37,16 @@ angular.module('starter.controllers', [])
       STATUS_RECORDING = 'recording',
       STATUS_PAUSED = 'paused',
       BG_PLUGIN_SETTINGS = {
-          debug: false
+          debug: false,
+          desiredAccuracy: 10, // 10 meters
+          distanceFilter: 50, // Generate update events every 50 meters
+          disableElasticity: true, // Do not auto-adjust distanceFilter
+          activityType: 'Fitness', // iOS activity type
+          stopTimeout: 99999 // Keep tracking for 3 minutes while stationary
         },
       bgGeo,
-      currentLocation;
+      currentLocation,
+      tripSubmitModal;
 
     var setStatus = function(status, callback, initial) {
       console.log('Seting status: ' + status);
@@ -142,49 +148,6 @@ angular.module('starter.controllers', [])
     getDeviceID = function() {
       return (typeof device !== 'undefined') ? device.uuid : null;
     },
-    showTripSubmitForm = function(submit, save, resume, discard) {
-      var buttons = [
-        {
-          text: 'Save and Submit',
-          type: 'button-positive',
-          onTap: submit
-        },
-        {
-          text: 'Save',
-          type: 'button-calm',
-          onTap: save
-        },
-        {
-          text: 'Resume',
-          type: 'button-stable',
-          onTap: resume
-        },
-        {
-          text: 'Discard',
-          type: 'button-assertive',
-          onTap: discard
-        }
-      ];
-
-      // Hide the save button if automatic submission is enabled.
-      // if (settingsService.get('autoSubmit')) buttons.splice(1);
-
-      // Prepopulate the trip form using previously saved trip data.
-      // $scope.formData['from'] = tripService.guessLocationType(trip.locations[0]);
-      // $scope.formData['to'] = tripService.guessLocationType(trip.locations[trip.locations.length - 1]);
-
-      mapService.setClickable(false);
-      var tripForm = $ionicPopup.show({
-        title: 'Tell Us about Your Trip',
-        templateUrl: 'templates/trip_form.html',
-        scope: $scope,
-        buttons: buttons
-      });
-
-      tripForm.then(function() {
-        mapService.setClickable(true);
-      });
-    },
     onSubmitError = function() {
       $ionicPopup.alert({
         title: 'Trip Submission Failed',
@@ -215,30 +178,46 @@ angular.module('starter.controllers', [])
 
     $scope.stopRecording = function() {
       console.log('Tapped stop button');
-      if (tripService.countLocations() < 2) {
-        tripService.resetTrip();
-        setStatus(STATUS_STOPPED);
-        return;
-      };
+      // if (tripService.countLocations() < 2) {
+      //   tripService.resetTrip();
+      //   setStatus(STATUS_STOPPED);
+      //   return;
+      // };
       setStatus(STATUS_PAUSED);
-      showTripSubmitForm(function submit() {
-        // Save and submit the trip.
-        submitTrip();
-        tripService.resetTrip();
-        setStatus(STATUS_STOPPED);
-      }, function save() {
-        // Save the trip, but do not submit.
-        tripService.saveTrip(false);
-        tripService.resetTrip();
-        setStatus(STATUS_STOPPED);
-      }, function resume() {
-        // Resume the trip.
-        setStatus(STATUS_RECORDING);
-      }, function discard() {
-        // Discard the trip.
-        tripService.resetTrip();
-        setStatus(STATUS_STOPPED);
-      });
+      mapService.setClickable(false);
+      tripSubmitModal.show();
+    };
+
+    $scope.submitTrip = function() {
+      submitTrip();
+      tripService.resetTrip();
+      updateMap();
+      setStatus(STATUS_STOPPED);
+      tripSubmitModal.hide();
+      mapService.setClickable(true);
+    };
+
+    $scope.saveTrip = function() {
+      tripService.saveTrip(false);
+      tripService.resetTrip();
+      updateMap();
+      setStatus(STATUS_STOPPED);
+      tripSubmitModal.hide();
+      mapService.setClickable(true);
+    };
+
+    $scope.resumeTrip = function() {
+      setStatus(STATUS_RECORDING);
+      tripSubmitModal.hide();
+      mapService.setClickable(true);
+    };
+
+    $scope.discardTrip = function() {
+      tripService.resetTrip();
+      updateMap();
+      setStatus(STATUS_STOPPED);
+      tripSubmitModal.hide();
+      mapService.setClickable(true);
     };
 
     $scope.getCurrentPosition = function() {
@@ -255,6 +234,17 @@ angular.module('starter.controllers', [])
     $ionicPlatform.ready(function() {
       setStatus(tripService.getStatus(), angular.noop, true);
       $scope.odometer = tripService.getCurrentDistance();
+
+      $ionicModal.fromTemplateUrl('templates/trip_form.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+      }).then(function(modal) {
+        tripSubmitModal = modal;
+      });
+      $scope.$on('$destroy', function() {
+        tripSubmitModal.remove();
+      });
+
       // Set up the geolocation plugin.
       bgGeo = window.BackgroundGeolocation;
       bgGeo.onLocation(onLocation, onLocationError);
