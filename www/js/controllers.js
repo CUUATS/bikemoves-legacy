@@ -42,7 +42,9 @@ angular.module('starter.controllers', [])
       bgGeo,
       currentLocation;
 
-    var setStatus = function(status, initial) {
+    var setStatus = function(status, callback, initial) {
+      console.log('Seting status: ' + status);
+      if (!angular.isDefined(callback)) var callback = angular.noop;
       $scope.status = {
         isStopped: status == STATUS_STOPPED,
         isPaused: status == STATUS_PAUSED,
@@ -52,15 +54,38 @@ angular.module('starter.controllers', [])
 
       tripService.setStatus(status);
       if (status == STATUS_RECORDING) {
-        bgGeo.start();
-        bgGeo.changePace(true);
+        setGeolocationEnabled(true, function() {
+          setMoving(true, callback);
+        });
       } else if (status == STATUS_PAUSED) {
-        bgGeo.start();
-        bgGeo.changePace(false);
+        setGeolocationEnabled(true, function() {
+          setMoving(false, callback);
+        });
       } else {
-        bgGeo.stop();
+        setGeolocationEnabled(false, callback);
       }
-      console.log('Set status: ' + status);
+    },
+    setGeolocationEnabled = function(on, callback) {
+      if (!angular.isDefined(callback)) var callback = angular.noop;
+      bgGeo.getState(function(state) {
+        if (state.enabled === on) {
+          callback();
+        } else if (on) {
+          bgGeo.start(callback);
+        } else {
+          bgGeo.stop(callback);
+        }
+      });
+    },
+    setMoving = function(moving, callback) {
+      if (!angular.isDefined(callback)) var callback = angular.noop;
+      bgGeo.getState(function(state) {
+        if (state.isMoving === moving) {
+          callback();
+        } else {
+          bgGeo.changePace(moving, callback);
+        }
+      });
     },
     updateMap = function() {
       if (currentLocation) {
@@ -105,7 +130,15 @@ angular.module('starter.controllers', [])
     },
     onLocationError = function(error) {
       console.error('Location error: ', error);
-    }
+    },
+    onMotionChange = function(isMoving, location, taskId) {
+      if (isMoving) {
+        console.log('Device has just started MOVING', location);
+      } else {
+        console.log('Device has just STOPPED', location);
+      }
+      bgGeo.finish(taskId);
+    },
     getDeviceID = function() {
       return (typeof device !== 'undefined') ? device.uuid : null;
     },
@@ -177,7 +210,7 @@ angular.module('starter.controllers', [])
 
     $scope.pauseRecording = function() {
       console.log('Tapped pause button');
-      setStatus(STATUS_STOPPED);
+      setStatus(STATUS_PAUSED);
     };
 
     $scope.stopRecording = function() {
@@ -209,21 +242,23 @@ angular.module('starter.controllers', [])
     };
 
     $scope.getCurrentPosition = function() {
-      bgGeo.start();
-      bgGeo.getCurrentPosition(function success(e, taskId) {
-        // Reset background geolocation to its former state.
-        setStatus(tripService.getStatus());
-      }, function error(errorCode) {
-        console.log('Error code: ' + errorCode)
-      }, {maximumAge: 0});
+      setGeolocationEnabled(true, function() {
+        bgGeo.getCurrentPosition(function success(e, taskId) {
+          // Reset background geolocation to its former state.
+          setStatus(tripService.getStatus());
+        }, function error(errorCode) {
+          console.log('Error code: ' + errorCode)
+        }, {maximumAge: 0});
+      });
     };
 
     $ionicPlatform.ready(function() {
-      setStatus(tripService.getStatus(), true);
+      setStatus(tripService.getStatus(), angular.noop, true);
       $scope.odometer = tripService.getCurrentDistance();
       // Set up the geolocation plugin.
       bgGeo = window.BackgroundGeolocation;
-      bgGeo.on('location', onLocation, onLocationError);
+      bgGeo.onLocation(onLocation, onLocationError);
+      bgGeo.onMotionChange(onMotionChange);
       bgGeo.configure(BG_PLUGIN_SETTINGS);
       $scope.getCurrentPosition();
     });
