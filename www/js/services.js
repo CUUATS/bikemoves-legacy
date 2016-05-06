@@ -223,11 +223,15 @@ angular.module('starter.services', [])
           locations: [],
           submitted: false
         };
-      }
+      },
       trips = get(TRIPS_KEY, {}),
       distance = get(DISTANCE_KEY, 0),
       currentTrip = get(CURRENT_TRIP_KEY, newTrip()),
-      status = get(STATUS_KEY, 'stopped');
+      status = get(STATUS_KEY, 'stopped'),
+      getPreviousLocation = function(offset) {
+        if (typeof offset === 'undefined') var offset = 0;
+        return currentTrip.locations[currentTrip.locations.length - (1 + offset)];
+      };
 
     service.getStatus = function() {
       return status;
@@ -242,14 +246,31 @@ angular.module('starter.services', [])
     service.getCurrentDistance = function() {
       return currentTrip.distance;
     };
+    service.evaluateLocation = function(location) {
+      // Determine whether the current location should:
+      // -1: Be discarded
+      //  0: Replace the current location
+      //  1: Be added
+      if (currentTrip.locations.length == 0) return 1;
+      var prev = getPreviousLocation(),
+        dist = getDistance(getPreviousLocation(), location);
+      if (dist > prev.accuracy && dist > location.accuracy) return 1;
+      if (location.accuracy > prev.accuracy) return 0;
+      return -1;
+    };
+    service.replaceLocation = function(location) {
+      if (currentTrip.distance)
+        currentTrip.distance -= getDistance(getPreviousLocation(), getPreviousLocation(1));
+      currentTrip.locations[currentTrip.locations.length - 1] = location;
+      if (currentTrip.locations.length > 0)
+        currentTrip.distance += getDistance(getPreviousLocation(), getPreviousLocation(1));
+      set(CURRENT_TRIP_KEY, currentTrip);
+    };
     service.addLocation = function(location) {
-      if (currentTrip.locations.length > 0) {
-        currentTrip.distance += getDistance(
-          currentTrip.locations[currentTrip.locations.length - 1], location);
-      }
+      if (currentTrip.locations.length > 0)
+        currentTrip.distance += getDistance(getPreviousLocation(), location);
       currentTrip.locations.push(location);
       set(CURRENT_TRIP_KEY, currentTrip);
-      return currentTrip.distance;
     };
     service.countLocations = function() {
       return currentTrip.locations.length;

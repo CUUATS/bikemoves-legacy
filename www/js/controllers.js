@@ -42,20 +42,14 @@ angular.module('starter.controllers', [])
       bgGeo,
       currentLocation;
 
-    $scope.status = {
-      isStopped: status == true,
-      isPaused: status == false,
-      isRecording: status == false
-    };
-    $scope.odometer = 0;
-
-    var setStatus = function(status) {
-      console.log('Setting status: ' + status);
+    var setStatus = function(status, initial) {
       $scope.status = {
         isStopped: status == STATUS_STOPPED,
         isPaused: status == STATUS_PAUSED,
         isRecording: status == STATUS_RECORDING
       };
+      if (initial) return;
+
       tripService.setStatus(status);
       if (status == STATUS_RECORDING) {
         bgGeo.start();
@@ -66,6 +60,7 @@ angular.module('starter.controllers', [])
       } else {
         bgGeo.stop();
       }
+      console.log('Set status: ' + status);
     },
     updateMap = function() {
       if (currentLocation) {
@@ -84,18 +79,28 @@ angular.module('starter.controllers', [])
       // Convert meters to miles.
       $scope.odometer = (tripService.getCurrentDistance() * 1609.34).toFixed(1);
     },
-    onLocation = function(e, taskId) {
-      var location = angular.merge({
+    makeLocation = function(e) {
+      return angular.merge({
         moving: e.is_moving,
         time: e.timestamp.getTime()
       }, e.coords);
-      console.log(location);
-      currentLocation = location;
-      if ($scope.status.isRecording) {
-        tripService.addLocation(location);
-        updateOdometer();
+    },
+    onLocation = function(e, taskId) {
+      var location = makeLocation(e),
+        evaluation = tripService.evaluateLocation(location);
+      console.log(evaluation + ': ' + JSON.stringify(location));
+      if (evaluation > -1) {
+        currentLocation = location;
+        if ($scope.status.isRecording) {
+          if (evaluation == 0) {
+            tripService.replaceLocation(location);
+          } else {
+            tripService.addLocation(location);
+          }
+          updateOdometer();
+        }
+        updateMap();
       }
-      updateMap();
       bgGeo.finish(taskId);
     },
     onLocationError = function(error) {
@@ -167,9 +172,6 @@ angular.module('starter.controllers', [])
 
     $scope.startRecording = function() {
       console.log('Tapped record button');
-      bgGeo.getState(function(state) {
-        console.log(state);
-      });
       setStatus(STATUS_RECORDING);
     };
 
@@ -208,18 +210,17 @@ angular.module('starter.controllers', [])
 
     $scope.getCurrentPosition = function() {
       bgGeo.start();
-      bgGeo.getCurrentPosition(function success(location, taskId) {
+      bgGeo.getCurrentPosition(function success(e, taskId) {
         // Reset background geolocation to its former state.
         setStatus(tripService.getStatus());
-        // TODO: Determine if bgGeo.stop() before bgGeo.finish(taskId)
-        // causes problems.
-        onLocation(location, taskId);
       }, function error(errorCode) {
         console.log('Error code: ' + errorCode)
-      }, {maximumAge: 0})
+      }, {maximumAge: 0});
     };
 
     $ionicPlatform.ready(function() {
+      setStatus(tripService.getStatus(), true);
+      $scope.odometer = tripService.getCurrentDistance();
       // Set up the geolocation plugin.
       bgGeo = window.BackgroundGeolocation;
       bgGeo.on('location', onLocation, onLocationError);
