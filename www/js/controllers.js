@@ -54,7 +54,17 @@ angular.module('starter.controllers', [])
       currentLocation,
       tripSubmitModal;
 
-    var setStatus = function(status, callback, initial) {
+    var getStatusFromScope = function() {
+      if ($scope.status.isRecording) return STATUS_RECORDING;
+      if ($scope.status.isPaused) return STATUS_PAUSED;
+      return STATUS_STOPPED;
+    },
+    getStatusFromState = function(state) {
+      // Get the current status from the geolocation plugin state.
+      return (state.enabled) ? (
+        (state.isMoving) ? STATUS_RECORDING : STATUS_PAUSED) : STATUS_STOPPED;
+    },
+    setStatus = function(status, callback, initial) {
       console.log('Seting status: ' + status);
       if (!angular.isDefined(callback)) var callback = angular.noop;
       $scope.status = {
@@ -64,7 +74,6 @@ angular.module('starter.controllers', [])
       };
       if (initial) return;
 
-      tripService.setStatus(status);
       if (status == STATUS_RECORDING) {
         setGeolocationEnabled(true, function() {
           setMoving(true, callback);
@@ -218,10 +227,11 @@ angular.module('starter.controllers', [])
     };
 
     $scope.getCurrentPosition = function() {
+      var currentStatus =
       setGeolocationEnabled(true, function() {
         bgGeo.getCurrentPosition(function success(e, taskId) {
           // Reset background geolocation to its former state.
-          setStatus(tripService.getStatus());
+          setStatus(getStatusFromScope());
         }, function error(errorCode) {
           console.log('Error code: ' + errorCode)
         }, {maximumAge: 0});
@@ -230,7 +240,6 @@ angular.module('starter.controllers', [])
 
     $ionicPlatform.ready(function() {
       // Set initial state.
-      setStatus(tripService.getStatus(), angular.noop, true);
       updateOdometer();
 
       // Create the modal window for trip submission.
@@ -252,7 +261,14 @@ angular.module('starter.controllers', [])
       bgGeo.onLocation(onLocation, onLocationError);
       bgGeo.onMotionChange(onMotionChange);
       bgGeo.configure(BG_PLUGIN_SETTINGS);
-      $scope.getCurrentPosition();
+      bgGeo.getState(function(state) {
+        if (state.enabled === false) {
+          tripService.resetTrip();
+          updateOdometer();
+        }
+        setStatus(getStatusFromState(state), angular.noop, true);
+        $scope.getCurrentPosition();
+      });
     });
 }])
 

@@ -194,7 +194,6 @@ angular.module('starter.services', [])
     var service = this;
     var TRIPS_KEY = 'bikemoves:trips',
       CURRENT_TRIP_KEY = 'bikemoves:currenttrip',
-      STATUS_KEY = 'bikemoves:status',
       DISTANCE_KEY = 'bikemoves:totaldistance',
       NEAR_THESHOLD = 500, // Maximum distance for location guesses, in meters
       get = function(key, defaultValue) {
@@ -236,18 +235,10 @@ angular.module('starter.services', [])
       trips = get(TRIPS_KEY, {}),
       distance = get(DISTANCE_KEY, 0),
       currentTrip = get(CURRENT_TRIP_KEY, newTrip()),
-      status = get(STATUS_KEY, 'stopped'),
       getPreviousLocation = function() {
         return currentTrip.locations[currentTrip.locations.length - 1];
       };
 
-    service.getStatus = function() {
-      return status;
-    };
-    service.setStatus = function(newStatus) {
-      status = newStatus
-      set(STATUS_KEY, newStatus);
-    };
     service.getTrip = function () {
       return currentTrip;
     };
