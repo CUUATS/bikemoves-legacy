@@ -165,18 +165,22 @@ angular.module('starter.controllers', [])
       return (typeof device !== 'undefined') ? device.uuid : null;
     },
     onSubmitError = function() {
+      mapService.setClickable(false);
       $ionicPopup.alert({
         title: 'Trip Submission Failed',
         template: 'Sorry, an error occurred while submitting your trip. Please try again later.'
+      }).then(function() {
+        mapService.setClickable(true);
       });
     },
     submitTrip = function() {
       $http.post(TRIPS_ENDPOINT, {
-        tripData: LZString.compressToBase64(JSON.stringify(trip))
+        tripData: LZString.compressToBase64(JSON.stringify(tripService.getTrip()))
       }).then(function success(res) {
         tripService.saveTrip(res.status == 200);
         if (res.status != 200) onSubmitError();
-      }, function failure() {
+      }, function failure(res) {
+        console.log(res);
         tripService.saveTrip(false);
         onSubmitError();
       });

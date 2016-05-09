@@ -262,7 +262,7 @@ angular.module('starter.services', [])
           submitted: false
         };
       },
-      trips = storageService.get(TRIPS_KEY, {}),
+      trips = storageService.get(TRIPS_KEY, []),
       distance = storageService.get(DISTANCE_KEY, 0),
       currentTrip = storageService.get(CURRENT_TRIP_KEY, newTrip()),
       getPreviousLocation = function() {
@@ -303,7 +303,7 @@ angular.module('starter.services', [])
     service.saveTrip = function(submitted) {
       currentTrip.submitted = submitted;
       trips.push(currentTrip);
-      distance += trip.distance;
+      distance += currentTrip.distance;
       storageService.set(TRIPS_KEY, trips);
       storageService.set(DISTANCE_KEY, distance);
     };
@@ -338,7 +338,7 @@ angular.module('starter.services', [])
       return location_type;
     };
     service.clearAll = function() {
-      trips = {};
+      trips = [];
       distance = 0;
       storageService.set(TRIPS_KEY, trips);
       storageService.set(DISTANCE_KEY, distance);
