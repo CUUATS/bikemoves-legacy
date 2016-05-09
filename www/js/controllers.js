@@ -200,7 +200,6 @@ angular.module('starter.controllers', [])
       updateMap();
       setStatus(STATUS_STOPPED);
       tripSubmitModal.hide();
-      mapService.setClickable(true);
     };
 
     $scope.saveTrip = function() {
@@ -209,13 +208,11 @@ angular.module('starter.controllers', [])
       updateMap();
       setStatus(STATUS_STOPPED);
       tripSubmitModal.hide();
-      mapService.setClickable(true);
     };
 
     $scope.resumeTrip = function() {
       setStatus(STATUS_RECORDING);
       tripSubmitModal.hide();
-      mapService.setClickable(true);
     };
 
     $scope.discardTrip = function() {
@@ -223,7 +220,6 @@ angular.module('starter.controllers', [])
       updateMap();
       setStatus(STATUS_STOPPED);
       tripSubmitModal.hide();
-      mapService.setClickable(true);
     };
 
     $scope.getCurrentPosition = function() {
@@ -246,6 +242,10 @@ angular.module('starter.controllers', [])
         animation: 'slide-in-up'
       }).then(function(modal) {
         tripSubmitModal = modal;
+      });
+      $scope.$on('modal.hidden', function(e) {
+        console.log(e);
+        mapService.setClickable(true);
       });
       $scope.$on('$destroy', function() {
         tripSubmitModal.remove();
