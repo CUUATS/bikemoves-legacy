@@ -392,40 +392,6 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('SavedLocationsCtrl', function($scope, $ionicActionSheet) {
-  $scope.onItemDelete = function(item) {
-    $ionicActionSheet.show({
-      destructiveText: 'Delete',
-      cancelText: 'Cancel',
-      cancel: function() {},
-      destructiveButtonClicked: function(index) {
-        $scope.locations.splice($scope.locations.indexOf(item), 1);
-        window.localStorage['saved_locations'] = JSON.stringify($scope.locations);
-        return true;
-      }
-    });
-  };
-
-  if (window.localStorage.getItem("saved_locations") == undefined) {
-    var sampleLocations = [{
-      title: 'Home',
-      id: 1
-    }, {
-      title: 'School',
-      id: 2
-    }, {
-      title: 'Grocery Store',
-      id: 3
-    }, {
-      title: 'Work',
-      id: 4
-    }];
-    window.localStorage['saved_locations'] = JSON.stringify(sampleLocations);
-  }
-  $scope.locations = JSON.parse(window.localStorage.getItem("saved_locations"));
-})
-
-
 .controller('SettingsCtrl', [
   '$scope',
   '$ionicPopup',
