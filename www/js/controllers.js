@@ -108,7 +108,7 @@ angular.module('starter.controllers', [])
     },
     updateOdometer = function() {
       // Convert meters to miles.
-      $scope.odometer = (tripService.getCurrentDistance() * 1609.34).toFixed(1);
+      $scope.odometer = (tripService.getCurrentDistance() * 0.000621371).toFixed(1);
     },
     makeLocation = function(e) {
       return angular.merge({
