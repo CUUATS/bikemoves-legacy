@@ -190,6 +190,20 @@ angular.module('starter.services', [])
     };
   })
 
+  .service('settingService', function() {
+    var service = this;
+    var TRIPS_KEY = 'bikemoves:trips',
+      CURRENT_TRIP_KEY = 'bikemoves:currenttrip',
+      DISTANCE_KEY = 'bikemoves:totaldistance',
+      NEAR_THESHOLD = 500, // Maximum distance for location guesses, in meters
+      get = function(key, defaultValue) {
+        var value = window.localStorage.getItem(key);
+        return (value === null) ? defaultValue : JSON.parse(value);
+      },
+      set = function(key, value) {
+        window.localStorage[key] = JSON.stringify(value);
+      },
+
   .service('tripService', function() {
     var service = this;
     var TRIPS_KEY = 'bikemoves:trips',

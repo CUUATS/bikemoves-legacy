@@ -239,9 +239,6 @@ angular.module('starter.controllers', [])
     };
 
     $ionicPlatform.ready(function() {
-      // Set initial state.
-      updateOdometer();
-
       // Create the modal window for trip submission.
       $ionicModal.fromTemplateUrl('templates/trip_form.html', {
         scope: $scope,
@@ -261,11 +258,12 @@ angular.module('starter.controllers', [])
       bgGeo.onLocation(onLocation, onLocationError);
       bgGeo.onMotionChange(onMotionChange);
       bgGeo.configure(BG_PLUGIN_SETTINGS);
+
+      // Set the initial state.
       bgGeo.getState(function(state) {
-        if (state.enabled === false) {
-          tripService.resetTrip();
-          updateOdometer();
-        }
+        console.log(JSON.stringify(state));
+        if (state.enabled === false) tripService.resetTrip();
+        updateOdometer();
         setStatus(getStatusFromState(state), angular.noop, true);
         $scope.getCurrentPosition();
       });
