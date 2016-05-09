@@ -263,7 +263,7 @@ angular.module('starter.services', [])
       var prev = getPreviousLocation(),
         dist = getDistance(getPreviousLocation(), location);
       if (dist > prev.accuracy && dist > location.accuracy) return 1;
-      if (location.accuracy > prev.accuracy) return 0;
+      if (location.accuracy < prev.accuracy) return 0;
       return -1;
     };
     service.replaceLocation = function(location) {
