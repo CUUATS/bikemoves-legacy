@@ -229,9 +229,11 @@ angular.module('starter.controllers', [])
     };
 
     $ionicPlatform.ready(function() {
+      // Set initial state.
       setStatus(tripService.getStatus(), angular.noop, true);
-      $scope.odometer = tripService.getCurrentDistance();
+      updateOdometer();
 
+      // Create the modal window for trip submission.
       $ionicModal.fromTemplateUrl('templates/trip_form.html', {
         scope: $scope,
         animation: 'slide-in-up'
