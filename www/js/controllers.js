@@ -31,7 +31,8 @@ angular.module('starter.controllers', [])
   '$ionicPopup',
   'mapService',
   'tripService',
-  function($scope, $ionicPlatform, $ionicModal, $http, $ionicPopup, mapService, tripService) {
+  'settingsService',
+  function($scope, $ionicPlatform, $ionicModal, $http, $ionicPopup, mapService, tripService, settingsService) {
     var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
       STATUS_STOPPED = 'stopped',
       STATUS_RECORDING = 'recording',
@@ -227,7 +228,6 @@ angular.module('starter.controllers', [])
     };
 
     $scope.getCurrentPosition = function() {
-      var currentStatus =
       setGeolocationEnabled(true, function() {
         bgGeo.getCurrentPosition(function success(e, taskId) {
           // Reset background geolocation to its former state.
@@ -266,6 +266,11 @@ angular.module('starter.controllers', [])
         updateOdometer();
         setStatus(getStatusFromState(state), angular.noop, true);
         $scope.getCurrentPosition();
+      });
+
+      // Set up the view.
+      $scope.$on('$ionicView.enter', function(e) {
+        $scope.settings = settingsService.getSettings();
       });
     });
 }])
@@ -417,36 +422,41 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('SettingsCtrl', function($scope, $ionicActionSheet, $ionicPopup) {
-  if (window.localStorage.getItem("dataSubmission") == undefined) {
-    window.localStorage['dataSubmission'] = "true";
-  }
+.controller('SettingsCtrl', [
+  '$scope',
+  '$ionicPopup',
+  'settingsService',
+  'tripService',
+  function($scope, $ionicPopup, settingsService, tripService) {
+    var reloadSettings = function() {
+      $scope.settings = settingsService.getSettings();
+    };
 
-  $scope.dataSubmission = {
-    checked: JSON.parse(window.localStorage['dataSubmission'])
-  };
-  $scope.dataSubmissionChange = function() {
-    window.localStorage['dataSubmission'] = JSON.stringify($scope.dataSubmission.checked);
-  };
+    $scope.updateSettings = function() {
+      settingsService.updateSettings($scope.settings);
+    };
 
-  $scope.reset = function() {
+    $scope.reset = function() {
+      var confirmPopup = $ionicPopup.confirm({
+        title: 'Reset Saved Data',
+        template: 'Are you sure you want to delete all saved data, including settings and saved trips?'
+      });
 
-    var confirmPopup = $ionicPopup.confirm({
-      title: 'Reset Local Data',
-      template: 'Are you sure you want to delete all saved data (including routes and saved locations)?'
-    });
+      confirmPopup.then(function(res) {
+        if (res) {
+          settingsService.clearAll();
+          reloadSettings();
+          tripService.clearAll();
+          $ionicPopup.alert({
+            title: 'Data Reset',
+            content: 'All data have been reset.'
+          });
+        }
+      })
+    };
 
-    confirmPopup.then(function(res) {
-      if (res) {
-        window.localStorage.clear();
-        $ionicPopup.alert({
-          title: 'Data Reset',
-          content: 'All data has been reset.'
-        });
-      }
-    })
-  }
-})
+    reloadSettings();
+}])
 
 .controller('profileCtrl', function($scope, $ionicModal, $http) {
   //Loading data from local storage

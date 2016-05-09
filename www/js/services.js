@@ -190,33 +190,49 @@ angular.module('starter.services', [])
     };
   })
 
-  .service('settingService', function() {
-    var service = this;
-    var TRIPS_KEY = 'bikemoves:trips',
-      CURRENT_TRIP_KEY = 'bikemoves:currenttrip',
-      DISTANCE_KEY = 'bikemoves:totaldistance',
-      NEAR_THESHOLD = 500, // Maximum distance for location guesses, in meters
-      get = function(key, defaultValue) {
-        var value = window.localStorage.getItem(key);
-        return (value === null) ? defaultValue : JSON.parse(value);
-      },
-      set = function(key, value) {
-        window.localStorage[key] = JSON.stringify(value);
-      },
+  .service('storageService', function() {
+    var service = this,
+      KEY_PREFIX = 'bikemoves:';
 
-  .service('tripService', function() {
-    var service = this;
-    var TRIPS_KEY = 'bikemoves:trips',
-      CURRENT_TRIP_KEY = 'bikemoves:currenttrip',
-      DISTANCE_KEY = 'bikemoves:totaldistance',
+    service.get = function(key, defaultValue) {
+      var value = window.localStorage.getItem(KEY_PREFIX + key);
+      return (value === null) ? defaultValue : JSON.parse(value);
+    };
+
+    service.set = function(key, value) {
+      window.localStorage[KEY_PREFIX + key] = JSON.stringify(value);
+    };
+  })
+
+  .service('settingsService', function(storageService) {
+    var service = this,
+      SETTINGS_KEY = 'settings',
+      DEFAULT_SETTINGS = {
+        autoSubmit: true
+      },
+      settings = storageService.get(SETTINGS_KEY, DEFAULT_SETTINGS);
+
+    service.getSettings = function() {
+      return angular.copy(settings);
+    };
+
+    service.updateSettings = function(newSettings) {
+      angular.merge(settings, newSettings);
+      storageService.set(SETTINGS_KEY, settings);
+    };
+
+    service.clearAll = function() {
+      settings = angular.copy(DEFAULT_SETTINGS);
+      storageService.set(SETTINGS_KEY, settings);
+    };
+  })
+
+  .service('tripService', function(storageService) {
+    var service = this,
+      TRIPS_KEY = 'trips',
+      CURRENT_TRIP_KEY = 'currenttrip',
+      DISTANCE_KEY = 'totaldistance',
       NEAR_THESHOLD = 500, // Maximum distance for location guesses, in meters
-      get = function(key, defaultValue) {
-        var value = window.localStorage.getItem(key);
-        return (value === null) ? defaultValue : JSON.parse(value);
-      },
-      set = function(key, value) {
-        window.localStorage[key] = JSON.stringify(value);
-      },
       getDistance = function(loc1, loc2) {
         var R = 6371000, // Radius of the earth in meters
           dLat = (loc2.latitude - loc1.latitude) * Math.PI / 180, // deg2rad below
@@ -246,9 +262,9 @@ angular.module('starter.services', [])
           submitted: false
         };
       },
-      trips = get(TRIPS_KEY, {}),
-      distance = get(DISTANCE_KEY, 0),
-      currentTrip = get(CURRENT_TRIP_KEY, newTrip()),
+      trips = storageService.get(TRIPS_KEY, {}),
+      distance = storageService.get(DISTANCE_KEY, 0),
+      currentTrip = storageService.get(CURRENT_TRIP_KEY, newTrip()),
       getPreviousLocation = function() {
         return currentTrip.locations[currentTrip.locations.length - 1];
       };
@@ -274,12 +290,12 @@ angular.module('starter.services', [])
     service.replaceLocation = function(location) {
       currentTrip.locations[currentTrip.locations.length - 1] = location;
       currentTrip.distance += getTripDistance(currentTrip);
-      set(CURRENT_TRIP_KEY, currentTrip);
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
     };
     service.addLocation = function(location) {
       currentTrip.locations.push(location);
       currentTrip.distance += getTripDistance(currentTrip);
-      set(CURRENT_TRIP_KEY, currentTrip);
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
     };
     service.countLocations = function() {
       return currentTrip.locations.length;
@@ -288,12 +304,12 @@ angular.module('starter.services', [])
       currentTrip.submitted = submitted;
       trips.push(currentTrip);
       distance += trip.distance;
-      set(TRIPS_KEY, trips);
-      set(DISTANCE_KEY, distance);
+      storageService.set(TRIPS_KEY, trips);
+      storageService.set(DISTANCE_KEY, distance);
     };
     service.resetTrip = function() {
       currentTrip = newTrip();
-      set(CURRENT_TRIP_KEY, currentTrip);
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
     };
     service.getTrips = function() {
       return trips;
@@ -320,6 +336,12 @@ angular.module('starter.services', [])
         }
       });
       return location_type;
+    };
+    service.clearAll = function() {
+      trips = {};
+      distance = 0;
+      storageService.set(TRIPS_KEY, trips);
+      storageService.set(DISTANCE_KEY, distance);
     };
   })
 

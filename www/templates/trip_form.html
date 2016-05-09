@@ -37,7 +37,7 @@
     </div>
     <div class="padding-horizontal">
       <button class="button button-block icon-left ion-share button-positive" ng-click="submitTrip()">Save and Submit</button>
-      <button class="button button-block icon-left ion-folder button-calm" ng-click="saveTrip()">Save</button>
+      <button class="button button-block icon-left ion-folder button-calm" ng-if="!settings.autoSubmit" ng-click="saveTrip()">Save</button>
       <button class="button button-block icon-left ion-play button-stable" ng-click="resumeTrip()">Resume</button>
       <button class="button button-block icon-left ion-trash-b button-assertive" ng-click="discardTrip()">Discard</button>
     </div>
