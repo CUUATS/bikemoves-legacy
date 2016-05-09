@@ -184,11 +184,6 @@ angular.module('starter.controllers', [])
 
     $scope.stopRecording = function() {
       console.log('Tapped stop button');
-      // if (tripService.countLocations() < 2) {
-      //   tripService.resetTrip();
-      //   setStatus(STATUS_STOPPED);
-      //   return;
-      // };
       setStatus(STATUS_PAUSED);
       mapService.setClickable(false);
       tripSubmitModal.show();
