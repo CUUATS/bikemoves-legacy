@@ -215,6 +215,15 @@ angular.module('starter.services', [])
 
         return R * 2 * Math.asin(Math.sqrt(a));
       },
+      getTripDistance = function(trip) {
+        var locationCount = trip.locations.length,
+          distance = 0;
+        for (var i = 1; i < locationCount; i++) {
+          distance += getDistance(
+            trip.locations[i], trip.locations[i - 1]);
+        }
+        return distance;
+      },
       newTrip = function() {
         return {
           origin: null,
@@ -228,9 +237,8 @@ angular.module('starter.services', [])
       distance = get(DISTANCE_KEY, 0),
       currentTrip = get(CURRENT_TRIP_KEY, newTrip()),
       status = get(STATUS_KEY, 'stopped'),
-      getPreviousLocation = function(offset) {
-        if (typeof offset === 'undefined') var offset = 0;
-        return currentTrip.locations[currentTrip.locations.length - (1 + offset)];
+      getPreviousLocation = function() {
+        return currentTrip.locations[currentTrip.locations.length - 1];
       };
 
     service.getStatus = function() {
@@ -259,17 +267,13 @@ angular.module('starter.services', [])
       return -1;
     };
     service.replaceLocation = function(location) {
-      if (currentTrip.distance)
-        currentTrip.distance -= getDistance(getPreviousLocation(), getPreviousLocation(1));
       currentTrip.locations[currentTrip.locations.length - 1] = location;
-      if (currentTrip.locations.length > 0)
-        currentTrip.distance += getDistance(getPreviousLocation(), getPreviousLocation(1));
+      currentTrip.distance += getTripDistance(currentTrip);
       set(CURRENT_TRIP_KEY, currentTrip);
     };
     service.addLocation = function(location) {
-      if (currentTrip.locations.length > 0)
-        currentTrip.distance += getDistance(getPreviousLocation(), location);
       currentTrip.locations.push(location);
+      currentTrip.distance += getTripDistance(currentTrip);
       set(CURRENT_TRIP_KEY, currentTrip);
     };
     service.countLocations = function() {

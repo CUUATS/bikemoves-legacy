@@ -244,7 +244,6 @@ angular.module('starter.controllers', [])
         tripSubmitModal = modal;
       });
       $scope.$on('modal.hidden', function(e) {
-        console.log(e);
         mapService.setClickable(true);
       });
       $scope.$on('$destroy', function() {
