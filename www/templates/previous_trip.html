@@ -4,15 +4,15 @@
 		<div class="card">
 			<div class="row">
 				<div class="col col-50 bikemoves-list-label">Date</div>
-				<div class="col col-50 bikemoves-list-value">{{formatDate(trip.startTime)}}</div>
+				<div class="col col-50 bikemoves-list-value">{{date}}</div>
 			</div>
 			<div class="row">
 				<div class="col col-50 bikemoves-list-label">Start Time</div>
-				<div class="col col-50 bikemoves-list-value">{{formatTime(trip.startTime)}}</div>
+				<div class="col col-50 bikemoves-list-value">{{time}}</div>
 			</div>
 			<div class="row">
 				<div class="col col-50 bikemoves-list-label">Duration</div>
-				<div class="col col-50 bikemoves-list-value">{{formatDuration(duration)}}</div>
+				<div class="col col-50 bikemoves-list-value">{{duration}}</div>
 			</div>
 			<div class="row">
 				<div class="col col-50 bikemoves-list-label">Distance</div>
@@ -22,13 +22,13 @@
 				<div class="col col-50 bikemoves-list-label">Average Speed</div>
 				<div class="col col-50 bikemoves-list-value">{{avgSpeed}} MPH</div>
 			</div>
-			<div class="row" ng-if="trip.origin">
+			<div class="row" ng-if="origin">
 				<div class="col col-50 bikemoves-list-label">From</div>
-				<div class="col col-50 bikemoves-list-value">{{trip.origin}}</div>
+				<div class="col col-50 bikemoves-list-value">{{origin}}</div>
 			</div>
-			<div class="row" ng-if="trip.destination">
+			<div class="row" ng-if="destination">
 				<div class="col col-50 bikemoves-list-label">To</div>
-				<div class="col col-50 bikemoves-list-value">{{trip.destination}}</div>
+				<div class="col col-50 bikemoves-list-value">{{destination}}</div>
 			</div>
 			<div class="row">
 				<div class="col col-50 bikemoves-list-label">Calories</div>

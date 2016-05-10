@@ -46,3 +46,24 @@
   font-weight: bold;
   text-align: left;
 }
+.icon-large {
+  font-size: 10em;
+}
+.text-large {
+  font-size: 2em;
+  line-height: 1.2em;
+  padding: 1em;
+}
+.no-content {
+  background-color: #dddddd;
+  height: 100%;
+  text-align: center;
+}
+.no-content .icon-large {
+  color: #bbbbbb;
+  text-shadow: 2px 2px rgba(255, 255, 255, 0.5);
+}
+.no-content .text-large {
+  color: #666666;
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.8);
+}

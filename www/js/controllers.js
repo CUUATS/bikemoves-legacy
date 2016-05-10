@@ -316,38 +316,36 @@ angular.module('bikemoves.controllers', [])
         var str = value.toString();
         if (str.length >= places) return str;
         return Array(places + 1 - str.length).join('0') + str;
-      };
-    $scope.trip = tripService.getTripByIndex($stateParams.tripIndex);
-    $scope.duration = new Date($scope.trip.endTime)
-      - new Date($scope.trip.startTime); // In milliseconds
-    $scope.distance = $scope.trip.distance * 0.000621371; // In miles
-    $scope.avgSpeed = ($scope.trip.distance / $scope.duration * HOUR).toFixed(2);
+      },
+      formatDuration = function(millisec) {
+        return zeroPad(Math.floor(millisec / HOUR), 2) + ':' +
+          zeroPad(Math.floor((millisec % HOUR) / MINUTE), 2) + ':' +
+          zeroPad(Math.round((millisec % MINUTE) / SECOND), 2);
+      },
+      trip = tripService.getTripByIndex($stateParams.tripIndex),
+      duration = new Date(trip.endTime) - new Date(trip.startTime), // In milliseconds
+      distance = trip.distance * 0.000621371, // In miles
+      speed = distance / (duration / HOUR); // In MPH
+
+    $scope.origin = trip.origin;
+    $scope.destination = trip.destination;
+    $scope.date = moment(trip.startDate).format('dddd, MMMM D, YYYY');
+    $scope.time = moment(trip.startDate).format('h:mm A');
+    $scope.distance = distance.toFixed(1);
+    $scope.duration = formatDuration(duration);
+    $scope.avgSpeed = speed.toFixed(1);
     // Total Calories = avgSpeed * (K1 + K2 * avgSpeed ^ 2) * (duration in min)
     $scope.calories = (
-      ($scope.avgSpeed * (K1 + K2 * Math.pow($scope.avgSpeed, 2))) / 67.78 *
-      ($scope.duration / MINUTE)
+      (speed * (K1 + K2 * Math.pow(speed, 2))) / 67.78 * (duration / MINUTE)
     ).toFixed(0);
-    $scope.ghg = ($scope.distance * .8115);
-    $scope.formatDate = function(timestamp) {
-      return moment(timestamp).format('dddd, MMMM D, YYYY');
-    };
-    $scope.formatTime = function(timestamp) {
-      return moment(timestamp).format('h:mm A');
-    };
-    $scope.formatDuration = function(millisec) {
-      return zeroPad(Math.floor(millisec / HOUR), 2) + ':' +
-        zeroPad(Math.floor((millisec % HOUR) / MINUTE), 2) + ':' +
-        zeroPad(Math.round((millisec % MINUTE) / SECOND), 2);
-    };
+    $scope.ghg = (distance * .8115).toFixed(1);
 
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
       mapService.resetMap('previous');
-      if ($scope.trip.locations.length > 1) {
-        mapService.setTripLocations($scope.trip.locations);
+      if (trip.locations.length > 0) {
+        mapService.setTripLocations(trip.locations);
         mapService.zoomToTripPolyline();
-      } else if ($scope.trip.locations.length == 1) {
-        mapService.setCenter($scope.trip.locations[0]);
       }
     });
 }])

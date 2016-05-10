@@ -186,9 +186,8 @@ angular.module('bikemoves.services', [])
       tripPolyline.setVisible(true);
     };
     service.zoomToTripPolyline = function() {
-      if (!tripPolyline.points) return;
       map.moveCamera({
-        'target': new plugin.google.maps.LatLngBounds(tripPolyline.points)
+        'target': tripPolyline.getPoints()
       });
     };
     service.resetMap = function(mapType) {
@@ -322,7 +321,7 @@ angular.module('bikemoves.services', [])
     };
     service.saveTrip = function(submitted) {
       currentTrip.submitted = submitted;
-      trips.unshift(currentTrip);
+      trips.unshift(angular.copy(currentTrip));
       distance += currentTrip.distance;
       storageService.set(TRIPS_KEY, trips);
       storageService.set(DISTANCE_KEY, distance);
