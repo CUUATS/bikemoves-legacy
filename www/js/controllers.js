@@ -287,22 +287,11 @@ angular.module('starter.controllers', [])
   '$ionicActionSheet',
   'tripService',
   function($scope, $ionicActionSheet, tripService) {
-    var service = this,
-      DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-      MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
+    var service = this;
     $scope.formatDate = function(timestamp) {
-      var dt = new Date(timestamp),
-        date = dt.getDate(),
-        day = DAYS[dt.getDay()],
-        month = MONTHS[dt.getMonth()],
-        hour = dt.getHours() % 12,
-        minutes = dt.getMinutes(),
-        period = (dt.getHours() < 12) ? "AM" : 'PM';
-
-      if (hour == 0) hour = 12;
-      if (minutes < 10) minutes = '0' + minutes;
-      return day + ', ' + month + ' ' + date + ' at ' + hour + ":" + minutes + period;
+      return moment(timestamp).calendar(moment(), {
+        sameElse: 'dddd, MMMM D, YYYY at h:mm A'
+      })
     };
 
     // Set up the view.
