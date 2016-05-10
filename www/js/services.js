@@ -1,4 +1,4 @@
-angular.module('starter.services', [])
+angular.module('bikemoves.services', [])
 
   .service('mapService', function($http) {
     var service = this,
@@ -322,6 +322,9 @@ angular.module('starter.services', [])
     };
     service.getTrips = function() {
       return trips;
+    };
+    service.getTripByIndex = function(idx) {
+      return trips[idx];
     };
     service.getTotalDistance = function() {
       return distance;

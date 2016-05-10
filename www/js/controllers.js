@@ -1,4 +1,4 @@
-angular.module('starter.controllers', [])
+angular.module('bikemoves.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
 
@@ -284,14 +284,13 @@ angular.module('starter.controllers', [])
 
 .controller('PreviousTripsCtrl', [
   '$scope',
-  '$ionicActionSheet',
   'tripService',
-  function($scope, $ionicActionSheet, tripService) {
+  function($scope, tripService) {
     var service = this;
     $scope.formatDate = function(timestamp) {
       return moment(timestamp).calendar(moment(), {
-        sameElse: 'dddd, MMMM D, YYYY at h:mm A'
-      })
+        sameElse: 'dddd, MMMM D, YYYY [at] h:mm A'
+      });
     };
 
     // Set up the view.
@@ -300,66 +299,45 @@ angular.module('starter.controllers', [])
     });
 }])
 
-.controller('PreviousTripCtrl', function($scope, $ionicActionSheet, $stateParams) {
-  $scope.trips = JSON.parse(window.localStorage.getItem('trips'));
-  $scope.trip = $scope.trips[$stateParams.previousTripID];
-  var startDate = new Date($scope.trip.startTime);
-  var endDate = new Date($scope.trip.endTime);
-  var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  $scope.date = startDate.getDate();
-  $scope.day = days[startDate.getDay()];
-  $scope.month = months[startDate.getMonth()];
-  $scope.year = startDate.getFullYear();
-  $scope.duration = ($scope.trip.endTime - $scope.trip.startTime) / 1000;
-  $scope.distance = $scope.trip.distance;
-  $scope.avgSpeed = ($scope.trip.distance / $scope.duration * 3600).toFixed(2);
-
-  var seconds = Math.round($scope.duration % 60);
-  var minutes = Math.floor($scope.duration / 60);
-  $scope.durationString = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-
-  //Constants for rider of 187 lb on road bike
-  var K1 = 3.509;
-  var K2 = .2581;
-  // Total Calories = avgSpeed * (K1 + K2 * avgSpeed ^ 2) * (duration in min)
-  $scope.trip.calories = (($scope.avgSpeed * (K1 + K2 * Math.pow($scope.avgSpeed, 2))) / 67.78 * (minutes + seconds / 60)).toFixed(0);
-
-  $scope.greenhouse = ($scope.distance * .8115);
-
-  $scope.mapCreated = function(map) {
-    $scope.map = map;
-
-    $scope.infoWindow = new google.maps.InfoWindow();
-
-    $scope.infoWindow.addListener('closeclick', function() {
-      $scope.infoWindow.setContent("");
-    });
-
-    $scope.infoWindow.addListener('content_changed', function() {
-      if ($scope.selectedPath) {
-        $scope.selectedPath.setOptions({
-          strokeColor: '#585858'
-        })
-        $scope.selectedPath = null;
-      }
-    });
-
-    $scope.map.setCenter(new google.maps.LatLng($scope.trip.points[0].lat, $scope.trip.points[0].lng));
-
-    var points = new google.maps.Polyline({
-      zIndex: 1,
-      path: $scope.trip.points,
-      map: $scope.map,
-      geodesic: true,
-      strokeColor: '#2677FF',
-      strokeOpacity: 0.7,
-      strokeWeight: 5
-    });
-
-  };
-
-})
+.controller('PreviousTripCtrl', [
+  '$scope',
+  '$stateParams',
+  'tripService',
+  function($scope, $stateParams, tripService) {
+    var SECOND = 1000,
+      MINUTE = SECOND * 60,
+      HOUR = MINUTE * 60,
+      // Constants for rider of 187 lb on road bike
+      K1 = 3.509,
+      K2 = .2581,
+      zeroPad = function(value, places) {
+        var str = value.toString();
+        if (str.length >= places) return str;
+        return Array(places + 1 - str.length).join('0') + str;
+      };
+    $scope.trip = tripService.getTripByIndex($stateParams.tripIndex);
+    $scope.duration = new Date($scope.trip.endTime)
+      - new Date($scope.trip.startTime); // In milliseconds
+    $scope.distance = $scope.trip.distance * 0.000621371; // In miles
+    $scope.avgSpeed = ($scope.trip.distance / $scope.duration * HOUR).toFixed(2);
+    // Total Calories = avgSpeed * (K1 + K2 * avgSpeed ^ 2) * (duration in min)
+    $scope.calories = (
+      ($scope.avgSpeed * (K1 + K2 * Math.pow($scope.avgSpeed, 2))) / 67.78 *
+      ($scope.duration / MINUTE)
+    ).toFixed(0);
+    $scope.ghg = ($scope.distance * .8115);
+    $scope.formatDate = function(timestamp) {
+      return moment(timestamp).format('dddd, MMMM D, YYYY');
+    };
+    $scope.formatTime = function(timestamp) {
+      return moment(timestamp).format('h:mm A');
+    };
+    $scope.formatDuration = function(millisec) {
+      return zeroPad(Math.floor(millisec / HOUR), 2) + ':' +
+        zeroPad(Math.floor((millisec % HOUR) / MINUTE), 2) + ':' +
+        zeroPad(Math.round((millisec % MINUTE) / SECOND), 2);
+    };
+}])
 
 .controller('SettingsCtrl', [
   '$scope',

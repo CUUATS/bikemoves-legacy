@@ -1,40 +1,44 @@
 <ion-view view-title="Trip">
 	<ion-content>
-		<div id="map_canvas" style="border: 1px solid rgb(238, 238, 238); border-radius: 	3px; width: 100%; height: 50%;">
+		<div id="map_canvas" style="border: 1px solid rgb(238, 238, 238); width: 100%; height: 50%;">
 				<map on-create="mapCreated(map)"></map>
 		</div>
 		<div class="card">
 			<div class="row">
-				<div class="col col-50" style="text-align: right;">Date</div>
-				<div class="col col-50" style="text-align: left;">{{month}} {{date}}, {{year}}</div>
+				<div class="col col-50 bikemoves-list-label">Date</div>
+				<div class="col col-50 bikemoves-list-value">{{formatDate(trip.startTime)}}</div>
 			</div>
 			<div class="row">
-				<div class="col col-50" style="text-align: right;">Duration</div>
-				<div class="col col-50" style="text-align: left;">{{durationString}}</div>
+				<div class="col col-50 bikemoves-list-label">Start Time</div>
+				<div class="col col-50 bikemoves-list-value">{{formatTime(trip.startTime)}}</div>
 			</div>
 			<div class="row">
-				<div class="col col-50" style="text-align: right;">Distance</div>
-				<div class="col col-50" style="text-align: left;">{{distance}} miles</div>
+				<div class="col col-50 bikemoves-list-label">Duration</div>
+				<div class="col col-50 bikemoves-list-value">{{formatDuration(duration)}}</div>
 			</div>
 			<div class="row">
-				<div class="col col-50" style="text-align: right;">Average Speed</div>
-				<div class="col col-50" style="text-align: left;">{{avgSpeed}} mph</div>
+				<div class="col col-50 bikemoves-list-label">Distance</div>
+				<div class="col col-50 bikemoves-list-value">{{distance}} miles</div>
 			</div>
 			<div class="row">
-				<div class="col col-50" style="text-align: right;">From</div>
-				<div class="col col-50" style="text-align: left;">{{trip.from}}</div>
+				<div class="col col-50 bikemoves-list-label">Average Speed</div>
+				<div class="col col-50 bikemoves-list-value">{{avgSpeed}} MPH</div>
+			</div>
+			<div class="row" ng-if="{{trip.from}}">
+				<div class="col col-50 bikemoves-list-label">From</div>
+				<div class="col col-50 bikemoves-list-value">{{trip.from}}</div>
+			</div>
+			<div class="row" ng-if="{{trip.to}}">
+				<div class="col col-50 bikemoves-list-label">To</div>
+				<div class="col col-50 bikemoves-list-value">{{trip.to}}</div>
 			</div>
 			<div class="row">
-				<div class="col col-50" style="text-align: right;">To</div>
-				<div class="col col-50" style="text-align: left;">{{trip.to}}</div>
+				<div class="col col-50 bikemoves-list-label">Calories</div>
+				<div class="col col-50 bikemoves-list-value">{{calories}} Cal</div>
 			</div>
 			<div class="row">
-				<div class="col col-50" style="text-align: right;">Calories</div>
-				<div class="col col-50" style="text-align: left;">{{trip.calories}} Cal</div>
-			</div>
-			<div class="row">
-				<div class="col col-50" style="text-align: right;">Greenhouse Gas Reduced</div>
-				<div class="col col-50" style="text-align: left;">{{greenhouse}} lb</div>
+				<div class="col col-50 bikemoves-list-label">Greenhouse Gas Reduced</div>
+				<div class="col col-50 bikemoves-list-value">{{ghg}} lb</div>
 			</div>
 		</div>
 	</ion-content>
