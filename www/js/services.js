@@ -321,7 +321,7 @@ angular.module('bikemoves.services', [])
     };
     service.saveTrip = function(submitted) {
       currentTrip.submitted = submitted;
-      trips.unshift(angular.copy(currentTrip));
+      trips.unshift(currentTrip);
       distance += currentTrip.distance;
       storageService.set(TRIPS_KEY, trips);
       storageService.set(DISTANCE_KEY, distance);

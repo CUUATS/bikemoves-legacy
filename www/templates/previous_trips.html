@@ -1,7 +1,7 @@
   <ion-view view-title="Previous Trips">
     <ion-content>
       <ion-list ng-if="trips.length > 0">
-        <ion-item ng-repeat="trip in trips" href="#/app/previous_trips/{{$index}}">
+        <ion-item ng-repeat="trip in trips track by $index" href="#/app/previous_trips/{{$index}}">
           {{formatDate(trip.startTime)}}
         </ion-item>
       </ion-list>
