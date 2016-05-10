@@ -329,8 +329,8 @@ angular.module('bikemoves.controllers', [])
 
     $scope.origin = trip.origin;
     $scope.destination = trip.destination;
-    $scope.date = moment(trip.startDate).format('dddd, MMMM D, YYYY');
-    $scope.time = moment(trip.startDate).format('h:mm A');
+    $scope.date = moment(trip.startTime).format('dddd, MMMM D, YYYY');
+    $scope.time = moment(trip.startTime).format('h:mm A');
     $scope.distance = distance.toFixed(1);
     $scope.duration = formatDuration(duration);
     $scope.avgSpeed = speed.toFixed(1);
@@ -342,11 +342,13 @@ angular.module('bikemoves.controllers', [])
 
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
-      mapService.resetMap('previous');
-      if (trip.locations.length > 0) {
-        mapService.setTripLocations(trip.locations);
-        mapService.zoomToTripPolyline();
-      }
+      mapService.onMapReady(function() {
+        mapService.resetMap('previous');
+        if (trip.locations.length > 0) {
+          mapService.setTripLocations(trip.locations);
+          mapService.zoomToTripPolyline();
+        }
+      });
     });
 }])
 
