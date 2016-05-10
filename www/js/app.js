@@ -75,16 +75,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     }
   })
 
-  .state('app.saved_locations', {
-    url: '/settings/saved_locations',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/saved_locations.html',
-        controller: 'SavedLocationsCtrl'
-      }
-    }
-  })
-
   .state('app.previous_trips', {
     cache: false,
     url: '/previous_trips',
