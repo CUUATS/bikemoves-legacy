@@ -2,7 +2,7 @@
     <ion-content>
       <ion-list>
         <ion-item ng-repeat="trip in trips" href="#/app/previous_trips/{{trip.id}}">
-          {{trip.title}}
+          {{formatDate(trip.startTime)}}
 
           <ion-option-button class="button-assertive"
                              ng-click="onItemDelete(trip)">

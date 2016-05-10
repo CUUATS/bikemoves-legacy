@@ -76,7 +76,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   })
 
   .state('app.previous_trips', {
-    cache: false,
     url: '/previous_trips',
     views: {
       'menuContent': {

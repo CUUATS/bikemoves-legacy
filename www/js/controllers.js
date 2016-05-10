@@ -174,7 +174,7 @@ angular.module('starter.controllers', [])
       });
     },
     submitTrip = function() {
-      $http.post(TRIPS_ENDPOINT, {
+      return $http.post(TRIPS_ENDPOINT, {
         tripData: LZString.compressToBase64(JSON.stringify(tripService.getTrip()))
       }).then(function success(res) {
         tripService.saveTrip(res.status == 200);
@@ -206,11 +206,12 @@ angular.module('starter.controllers', [])
     };
 
     $scope.submitTrip = function() {
-      submitTrip();
-      tripService.resetTrip();
-      updateMap();
       setStatus(STATUS_STOPPED);
       tripSubmitModal.hide();
+      submitTrip().finally(function () {
+        tripService.resetTrip();
+        updateMap();
+      });
     };
 
     $scope.saveTrip = function() {
@@ -281,57 +282,50 @@ angular.module('starter.controllers', [])
     });
 }])
 
-.controller('PreviousTripsCtrl', function($scope, $ionicActionSheet) {
+.controller('PreviousTripsCtrl', [
+  '$scope',
+  '$ionicActionSheet',
+  'tripService',
+  function($scope, $ionicActionSheet, tripService) {
+    var service = this,
+      DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-  var formatDate = function(date) {
-    var startDate = new Date($scope.startTime);
-    var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    $scope.date = startDate.getDate();
-    $scope.day = days[startDate.getDay()];
-    $scope.month = months[startDate.getMonth()];
-    $scope.hour = startDate.getHours();
-    $scope.minutes = startDate.getMinutes();
-    $scope.period = "AM";
+    $scope.formatDate = function(timestamp) {
+      var dt = new Date(timestamp),
+        date = dt.getDate(),
+        day = DAYS[dt.getDay()],
+        month = MONTHS[dt.getMonth()],
+        hour = dt.getHours() % 12,
+        minutes = dt.getMinutes(),
+        period = (dt.getHours() < 12) ? "AM" : 'PM';
 
-    if ($scope.hour >= 12) {
-      $scope.hour -= 12;
-      $scope.period = 'PM';
-    }
+      if (hour == 0) hour = 12;
+      if (minutes < 10) minutes = '0' + minutes;
+      return day + ', ' + month + ' ' + date + ' at ' + hour + ":" + minutes + period;
+    };
 
-    if ($scope.hour == 0) {
-      $scope.hour = 12;
-    }
+    $scope.onItemDelete = function(item) {
+      $ionicActionSheet.show({
+        destructiveText: 'Delete',
+        cancelText: 'Cancel',
+        cancel: function() {
+          // add cancel code..
+        },
+        destructiveButtonClicked: function(index) {
+          delete $scope.trips[item.id];
+          console.log(index);
+          window.localStorage['trips'] = JSON.stringify($scope.trips);
+          return true;
+        }
+      });
+    };
 
-    if ($scope.minutes < 12) {
-      $scope.minutes = '0' + $scope.minutes;
-    }
-    return $scope.day + ', ' + $scope.month + ' ' + $scope.date + ' at ' + $scope.hour + ":" + $scope.minutes + $scope.period
-  };
-
-  $scope.onItemDelete = function(item) {
-    $ionicActionSheet.show({
-      destructiveText: 'Delete',
-      cancelText: 'Cancel',
-      cancel: function() {
-        // add cancel code..
-      },
-      destructiveButtonClicked: function(index) {
-        delete $scope.trips[item.id];
-        console.log(index);
-        window.localStorage['trips'] = JSON.stringify($scope.trips);
-        return true;
-      }
+    // Set up the view.
+    $scope.$on('$ionicView.enter', function(e) {
+      $scope.trips = tripService.getTrips();
     });
-  };
-
-  if (window.localStorage.getItem('trips') == undefined) {
-    var sampleTrips = {};
-    window.localStorage['trips'] = JSON.stringify(sampleTrips);
-  }
-  $scope.trips = JSON.parse(window.localStorage.getItem('trips'));
-
-})
+}])
 
 .controller('PreviousTripCtrl', function($scope, $ionicActionSheet, $stateParams) {
   $scope.trips = JSON.parse(window.localStorage.getItem('trips'));

@@ -311,7 +311,7 @@ angular.module('starter.services', [])
     };
     service.saveTrip = function(submitted) {
       currentTrip.submitted = submitted;
-      trips.push(currentTrip);
+      trips.unshift(currentTrip);
       distance += currentTrip.distance;
       storageService.set(TRIPS_KEY, trips);
       storageService.set(DISTANCE_KEY, distance);
