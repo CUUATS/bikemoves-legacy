@@ -6,6 +6,7 @@ angular.module('bikemoves.services', [])
         latitude: 40.109403,
         longitude: -88.227203
       },
+      DEFAULT_ZOOM = 16.1,
       SERVICE_ENDPOINT = 'http://utility.arcgis.com/usrsvcs/servers/c9e754f1fc35468a9392372c79452704/rest/services/CCRPC/BikeMovesBase/MapServer',
       excludedFields = ['OBJECTID', 'Shape', 'SHAPE'],
       layers = [],
@@ -101,11 +102,10 @@ angular.module('bikemoves.services', [])
     service.init = function() {
       defaultCenter = location2LatLng(DEFAULT_LOCATION);
       getLayerInfo();
-      container = document.getElementById('map_canvas');
-      map = plugin.google.maps.Map.getMap(container, {
+      map = plugin.google.maps.Map.getMap({
         'camera': {
           'latLng': defaultCenter,
-          'zoom': 16.1
+          'zoom': DEFAULT_ZOOM
         }
       });
       map.addEventListener(plugin.google.maps.event.MAP_READY, function() {
@@ -185,8 +185,19 @@ angular.module('bikemoves.services', [])
       tripPolyline.setPoints(latLngs);
       tripPolyline.setVisible(true);
     };
-    service.resetMap = function() {
-
+    service.zoomToTripPolyline = function() {
+      if (!tripPolyline.points) return;
+      map.moveCamera({
+        'target': new plugin.google.maps.LatLngBounds(tripPolyline.points)
+      });
+    };
+    service.resetMap = function(mapType) {
+      var containerId = (mapType == 'current') ? 'current-map' : 'previous-map';
+      container = document.getElementById(containerId);
+      map.setDiv(container);
+      if (infoMarker) infoMarker.setVisible(false);
+      if (currentLocationMarker) currentLocationMarker.setVisible(false);
+      if (tripPolyline) tripPolyline.setVisible(false);
     };
   })
 

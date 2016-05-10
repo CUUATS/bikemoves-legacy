@@ -18,9 +18,13 @@
 .recording-status-recording {
   background-color: #28a54c;
 }
-#map_canvas {
+#current-map {
   display: block;
   height: calc(100% - 40px);
+  width: 100%;
+}
+#previous-map {
+  height: 50%;
   width: 100%;
 }
 .scroll {

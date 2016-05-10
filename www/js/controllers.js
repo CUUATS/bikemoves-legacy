@@ -272,12 +272,13 @@ angular.module('bikemoves.controllers', [])
         if (state.enabled === false) tripService.resetTrip();
         updateOdometer();
         setStatus(getStatusFromState(state), angular.noop, true);
-        $scope.getCurrentPosition();
       });
 
       // Set up the view.
       $scope.$on('$ionicView.enter', function(e) {
         $scope.settings = settingsService.getSettings();
+        mapService.resetMap('current');
+        $scope.getCurrentPosition();
       });
     });
 }])
@@ -302,8 +303,9 @@ angular.module('bikemoves.controllers', [])
 .controller('PreviousTripCtrl', [
   '$scope',
   '$stateParams',
+  'mapService',
   'tripService',
-  function($scope, $stateParams, tripService) {
+  function($scope, $stateParams, mapService, tripService) {
     var SECOND = 1000,
       MINUTE = SECOND * 60,
       HOUR = MINUTE * 60,
@@ -337,6 +339,17 @@ angular.module('bikemoves.controllers', [])
         zeroPad(Math.floor((millisec % HOUR) / MINUTE), 2) + ':' +
         zeroPad(Math.round((millisec % MINUTE) / SECOND), 2);
     };
+
+    // Set up the view.
+    $scope.$on('$ionicView.enter', function(e) {
+      mapService.resetMap('previous');
+      if ($scope.trip.locations.length > 1) {
+        mapService.setTripLocations($scope.trip.locations);
+        mapService.zoomToTripPolyline();
+      } else if ($scope.trip.locations.length == 1) {
+        mapService.setCenter($scope.trip.locations[0]);
+      }
+    });
 }])
 
 .controller('SettingsCtrl', [
