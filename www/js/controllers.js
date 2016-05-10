@@ -276,9 +276,11 @@ angular.module('bikemoves.controllers', [])
 
       // Set up the view.
       $scope.$on('$ionicView.enter', function(e) {
-        $scope.settings = settingsService.getSettings();
-        mapService.resetMap('current');
-        $scope.getCurrentPosition();
+        mapService.onMapReady(function() {
+          $scope.settings = settingsService.getSettings();
+          mapService.resetMap('current');
+          $scope.getCurrentPosition();
+        });
       });
     });
 }])
