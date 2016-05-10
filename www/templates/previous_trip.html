@@ -24,13 +24,13 @@
 				<div class="col col-50 bikemoves-list-label">Average Speed</div>
 				<div class="col col-50 bikemoves-list-value">{{avgSpeed}} MPH</div>
 			</div>
-			<div class="row" ng-if="{{trip.from}}">
+			<div class="row" ng-if="{{trip.origin}}">
 				<div class="col col-50 bikemoves-list-label">From</div>
-				<div class="col col-50 bikemoves-list-value">{{trip.from}}</div>
+				<div class="col col-50 bikemoves-list-value">{{trip.origin}}</div>
 			</div>
-			<div class="row" ng-if="{{trip.to}}">
+			<div class="row" ng-if="{{trip.destination}}">
 				<div class="col col-50 bikemoves-list-label">To</div>
-				<div class="col col-50 bikemoves-list-value">{{trip.to}}</div>
+				<div class="col col-50 bikemoves-list-value">{{trip.destination}}</div>
 			</div>
 			<div class="row">
 				<div class="col col-50 bikemoves-list-label">Calories</div>
