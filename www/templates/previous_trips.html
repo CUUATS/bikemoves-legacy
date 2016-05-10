@@ -1,16 +1,8 @@
   <ion-view view-title="Previous Trips">
     <ion-content>
       <ion-list>
-        <ion-item ng-repeat="trip in trips" href="#/app/previous_trips/{{trip.id}}">
+        <ion-item ng-repeat="trip in trips" href="#/app/previous_trips/{{$index}}">
           {{formatDate(trip.startTime)}}
-
-          <ion-option-button class="button-assertive"
-                             ng-click="onItemDelete(trip)">
-            Delete
-          </ion-option-button>
-
-          <ion-reorder-button class="ion-navicon" on-reorder="moveItem(item, $fromIndex, $toIndex)"></ion-reorder-button>
-
         </ion-item>
       </ion-list>
     </ion-content>

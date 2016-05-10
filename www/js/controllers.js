@@ -305,22 +305,6 @@ angular.module('starter.controllers', [])
       return day + ', ' + month + ' ' + date + ' at ' + hour + ":" + minutes + period;
     };
 
-    $scope.onItemDelete = function(item) {
-      $ionicActionSheet.show({
-        destructiveText: 'Delete',
-        cancelText: 'Cancel',
-        cancel: function() {
-          // add cancel code..
-        },
-        destructiveButtonClicked: function(index) {
-          delete $scope.trips[item.id];
-          console.log(index);
-          window.localStorage['trips'] = JSON.stringify($scope.trips);
-          return true;
-        }
-      });
-    };
-
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
       $scope.trips = tripService.getTrips();
