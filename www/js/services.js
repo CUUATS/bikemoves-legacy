@@ -255,10 +255,12 @@ angular.module('starter.services', [])
       },
       newTrip = function() {
         return {
-          origin: null,
           destination: null,
           distance: 0,
+          endTime: null,
           locations: [],
+          origin: null,
+          startTime: null,
           submitted: false
         };
       },
@@ -297,8 +299,15 @@ angular.module('starter.services', [])
       currentTrip.distance += getTripDistance(currentTrip);
       storageService.set(CURRENT_TRIP_KEY, currentTrip);
     };
-    service.countLocations = function() {
-      return currentTrip.locations.length;
+    service.setStartTime = function(timestamp) {
+      if (!angular.isDefined(timestamp)) var timestamp = (new Date()).getTime();
+      currentTrip.startTime = timestamp;
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
+    };
+    service.setEndTime = function(timestamp) {
+      if (!angular.isDefined(timestamp)) var timestamp = (new Date()).getTime();
+      currentTrip.endTime = timestamp;
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
     };
     service.saveTrip = function(submitted) {
       currentTrip.submitted = submitted;

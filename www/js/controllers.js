@@ -189,6 +189,7 @@ angular.module('starter.controllers', [])
     $scope.startRecording = function() {
       console.log('Tapped record button');
       setStatus(STATUS_RECORDING);
+      tripService.setStartTime();
     };
 
     $scope.pauseRecording = function() {
@@ -199,6 +200,7 @@ angular.module('starter.controllers', [])
     $scope.stopRecording = function() {
       console.log('Tapped stop button');
       setStatus(STATUS_PAUSED);
+      tripService.setEndTime();
       mapService.setClickable(false);
       tripSubmitModal.show();
     };
