@@ -377,15 +377,14 @@ angular.module('bikemoves.controllers', [])
 
 .controller('profileCtrl', [
   '$scope',
-  '$ionicModal',
+  '$ionicPopup',
   '$http',
   'profileService',
   'tripService',
-  function($scope, $ionicModal, $http, profileService, tripService) {
+  function($scope, $ionicPopup, $http, profileService, tripService) {
     var ENDPOINT = 'http://api.bikemoves.me/v0.1/user',
-      saveProfile = function() {
-        profileService.setProfile($scope.profile);
-        profileEditModal.hide();
+      saveProfile = function(profile) {
+        profileService.setProfile(profile);
       },
       submitProfile = function() {
         $http.post(ENDPOINT, {
@@ -396,30 +395,43 @@ angular.module('bikemoves.controllers', [])
         }).catch(function errorCallback(response) {
           console.log(response)
         });
-      },
-      profileEditModal;
-
-    $scope.profile = profileService.getProfile();
-
-    $ionicModal.fromTemplateUrl('templates/profile_options.html', {
-      scope: $scope
-    }).then(function(modal) {
-      profileEditModal = modal;
-    });
-
-    $scope.editProfile = function() {
-      profileEditModal.show();
-    };
+      };
 
     $scope.saveProfile = function() {
-      saveProfile();
+      $scope.dirty = false;
+      saveProfile($scope.profile);
       submitProfile();
     };
 
+    $scope.profileChanged = function() {
+      $scope.dirty = true;
+    };
+
     $scope.$on('$ionicView.enter', function(e) {
+      $scope.dirty = false;
+      $scope.profile = profileService.getProfile();
       var distance = tripService.getTotalDistance() * 0.000621371;
       $scope.distance =  distance.toFixed(1);
       $scope.ghg = (distance * .8115).toFixed(1);
+    });
+
+    $scope.$on('$ionicView.beforeLeave', function(e) {
+      // TODO: Prevent the view from changing until the popup has been
+      // dismissed. See: https://github.com/driftyco/ionic/issues/3791
+      var profile = angular.copy($scope.profile);
+      if ($scope.dirty) {
+        $ionicPopup.confirm({
+           title: 'Save Your Profile',
+           template: 'Do you want to save the changes to your profile?',
+           cancelText: 'Discard',
+           okText: 'Save'
+        }).then(function(res) {
+          if (res) {
+            saveProfile(profile);
+            submitProfile();
+          }
+        });
+      }
     });
 }])
 

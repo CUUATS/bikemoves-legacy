@@ -301,6 +301,7 @@ angular.module('bikemoves.services', [])
     };
 
     service.setProfile = function(newProfile) {
+      profile = newProfile;
       storageService.set(PROFILE_KEY, newProfile);
     };
 
