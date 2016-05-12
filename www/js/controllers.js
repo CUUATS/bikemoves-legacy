@@ -298,10 +298,12 @@ angular.module('bikemoves.controllers', [])
 
 .controller('PreviousTripCtrl', [
   '$scope',
+  '$state',
   '$stateParams',
+  '$ionicPopup',
   'mapService',
   'tripService',
-  function($scope, $stateParams, mapService, tripService) {
+  function($scope, $state, $stateParams, $ionicPopup, mapService, tripService) {
     var SECOND = 1000,
       MINUTE = SECOND * 60,
       HOUR = MINUTE * 60,
@@ -317,6 +319,9 @@ angular.module('bikemoves.controllers', [])
         return zeroPad(Math.floor(millisec / HOUR), 2) + ':' +
           zeroPad(Math.floor((millisec % HOUR) / MINUTE), 2) + ':' +
           zeroPad(Math.round((millisec % MINUTE) / SECOND), 2);
+      },
+      deleteTrip = function() {
+        tripService.deleteTrip($stateParams.tripIndex);
       },
       trip = tripService.getTripByIndex($stateParams.tripIndex),
       duration = new Date(trip.endTime) - new Date(trip.startTime), // In milliseconds
@@ -335,6 +340,22 @@ angular.module('bikemoves.controllers', [])
       (speed * (K1 + K2 * Math.pow(speed, 2))) / 67.78 * (duration / MINUTE)
     ).toFixed(0);
     $scope.ghg = (distance * .8115).toFixed(1);
+
+    $scope.deleteTrip = function() {
+      mapService.setClickable(false);
+      $ionicPopup.confirm({
+         title: 'Delete Trip',
+         template: 'Are you sure you want to delete this trip?',
+         okText: 'Delete',
+         okType: 'button-assertive'
+      }).then(function(res) {
+        mapService.setClickable(true);
+        if (res) {
+          deleteTrip();
+          $state.go('app.previous_trips');
+        }
+      });
+    };
 
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {

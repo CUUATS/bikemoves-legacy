@@ -406,6 +406,12 @@ angular.module('bikemoves.services', [])
     service.getTripByIndex = function(idx) {
       return trips[idx];
     };
+    service.deleteTrip = function(idx) {
+      distance -= service.getTripByIndex(idx).distance;
+      trips.splice(idx, 1);
+      storageService.set(TRIPS_KEY, trips);
+      storageService.set(DISTANCE_KEY, distance);
+    };
     service.getTotalDistance = function() {
       return distance;
     };
