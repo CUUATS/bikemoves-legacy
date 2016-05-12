@@ -95,7 +95,7 @@ angular.module('bikemoves.services', [])
         infoMarker.showInfoWindow();
       },
       mapClick = function(latLng) {
-        if (!identifyLayerIds) return;
+        if (!identifyLayerIds || mapType != service.MAP_TYPE_CURRENT) return;
         getIdentifyParams(latLng, function(params) {
           $http({
             method: 'GET',
@@ -233,6 +233,8 @@ angular.module('bikemoves.services', [])
       map.setDiv(container);
 
       // Show/hide map elements.
+      if (tileOverlay)
+        tileOverlay.setVisible(mapType == service.MAP_TYPE_CURRENT);
       if (infoMarker) infoMarker.setVisible(false);
       if (currentLocationMarker) currentLocationMarker.setVisible(false);
       if (tripPolyline) tripPolyline.setVisible(false);
@@ -242,11 +244,7 @@ angular.module('bikemoves.services', [])
         angular.isDefined(currentMapCamera)) {
           if (angular.isDefined(currentLocation))
             service.setCurrentLocation(currentLocation);
-          map.moveCamera(currentMapCamera, function() {
-            map.setVisible(true);
-        });
-      } else {
-        map.setVisible(true);
+          map.moveCamera(currentMapCamera);
       }
     };
   })
