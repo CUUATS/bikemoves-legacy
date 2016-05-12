@@ -184,6 +184,15 @@ angular.module('bikemoves.controllers', [])
         tripService.saveTrip(false);
         onSubmitError();
       });
+    },
+    initView = function() {
+      console.log('Entered map view');
+      mapService.onMapReady(function() {
+        $scope.settings = settingsService.getSettings();
+        console.log('Resetting the map');
+        mapService.resetMap('current');
+        $scope.getCurrentPosition();
+      });
     };
 
     $scope.startRecording = function() {
@@ -276,12 +285,11 @@ angular.module('bikemoves.controllers', [])
 
       // Set up the view.
       $scope.$on('$ionicView.enter', function(e) {
-        mapService.onMapReady(function() {
-          $scope.settings = settingsService.getSettings();
-          mapService.resetMap('current');
-          $scope.getCurrentPosition();
-        });
+        initView();
       });
+
+      // iOS does not fire the "enter" event on first load.
+      if (ionic.Platform.isIOS()) initView();
     });
 }])
 

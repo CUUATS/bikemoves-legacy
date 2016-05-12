@@ -101,8 +101,9 @@ angular.module('bikemoves.services', [])
 
     service.init = function() {
       defaultCenter = location2LatLng(DEFAULT_LOCATION);
+      container = document.getElementById('current-map');
       getLayerInfo();
-      map = plugin.google.maps.Map.getMap({
+      map = plugin.google.maps.Map.getMap(container, {
         'camera': {
           'latLng': defaultCenter,
           'zoom': DEFAULT_ZOOM
@@ -192,8 +193,10 @@ angular.module('bikemoves.services', [])
     };
     service.resetMap = function(mapType) {
       var containerId = (mapType == 'current') ? 'current-map' : 'previous-map';
-      container = document.getElementById(containerId);
-      map.setDiv(container);
+      if (container.id != containerId) {
+        container = document.getElementById(containerId);
+        map.setDiv(container);
+      }
       if (infoMarker) infoMarker.setVisible(false);
       if (currentLocationMarker) currentLocationMarker.setVisible(false);
       if (tripPolyline) tripPolyline.setVisible(false);
