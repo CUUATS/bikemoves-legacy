@@ -165,10 +165,8 @@ angular.module('bikemoves.controllers', [])
       });
     },
     initView = function() {
-      console.log('Entered map view');
       mapService.onMapReady(function() {
         $scope.settings = settingsService.getSettings();
-        console.log('Resetting the map');
         mapService.resetMap('current');
         $scope.getCurrentPosition();
       });

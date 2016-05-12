@@ -213,10 +213,8 @@ angular.module('bikemoves.services', [])
     };
     service.resetMap = function(mapType) {
       var containerId = (mapType == 'current') ? 'current-map' : 'previous-map';
-      if (container.id != containerId) {
-        container = document.getElementById(containerId);
-        map.setDiv(container);
-      }
+      container = document.getElementById(containerId);
+      map.setDiv(container);
       if (infoMarker) infoMarker.setVisible(false);
       if (currentLocationMarker) currentLocationMarker.setVisible(false);
       if (tripPolyline) tripPolyline.setVisible(false);
