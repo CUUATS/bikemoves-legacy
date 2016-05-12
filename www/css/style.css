@@ -19,12 +19,8 @@
 .bikemoves-odometer {
   padding-left: 15px;
 }
-.bikemoves-list-label {
-  text-align: right;
-}
 .bikemoves-list-value {
   font-weight: bold;
-  text-align: left;
 }
 .icon-large {
   font-size: 10em;

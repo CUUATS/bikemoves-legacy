@@ -318,7 +318,7 @@ angular.module('bikemoves.controllers', [])
 
     $scope.origin = trip.origin;
     $scope.destination = trip.destination;
-    $scope.date = moment(trip.startTime).format('dddd, MMMM D, YYYY');
+    $scope.date = moment(trip.startTime).format('MMM D, YYYY');
     $scope.time = moment(trip.startTime).format('h:mm A');
     $scope.distance = distance.toFixed(1);
     $scope.duration = formatDuration(duration);
