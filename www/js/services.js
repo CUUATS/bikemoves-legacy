@@ -22,6 +22,9 @@ angular.module('bikemoves.services', [])
       infoMarker,
       currentLocationMarker,
       tripPolyline,
+      mapType,
+      currentMapCamera,
+      currentLocation,
       location2LatLng = function(location) {
         return new plugin.google.maps.LatLng(location.latitude, location.longitude);
       },
@@ -108,6 +111,11 @@ angular.module('bikemoves.services', [])
           });
         });
       },
+      cameraChange = function(camera) {
+        if (mapType == service.MAP_TYPE_CURRENT) {
+          currentMapCamera = camera;
+        }
+      },
       checkReady = function() {
         readyCount += 1;
         if (readyCount == 4) {
@@ -118,6 +126,9 @@ angular.module('bikemoves.services', [])
           });
         }
       };
+
+    service.MAP_TYPE_CURRENT = 'current';
+    service.MAP_TYPE_PREVIOUS = 'previous';
 
     service.init = function() {
       defaultCenter = location2LatLng(DEFAULT_LOCATION);
@@ -130,6 +141,8 @@ angular.module('bikemoves.services', [])
         }
       });
       map.addEventListener(plugin.google.maps.event.MAP_READY, function() {
+        // Set up camera tracking for the current trip map.
+        map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);
         // Tile overlay
         map.addTileOverlay({
           tileUrlFormat: "http://tiles.bikemoves.me/tiles/<zoom>/<y>/<x>.png"
@@ -180,6 +193,7 @@ angular.module('bikemoves.services', [])
       }
     };
     service.setCurrentLocation = function(location) {
+      currentLocation = location;
       currentLocationMarker.setPosition(location2LatLng(location));
       currentLocationMarker.setVisible(true);
     };
@@ -211,13 +225,29 @@ angular.module('bikemoves.services', [])
         'target': tripPolyline.getPoints()
       });
     };
-    service.resetMap = function(mapType) {
-      var containerId = (mapType == 'current') ? 'current-map' : 'previous-map';
+    service.resetMap = function(newMapType) {
+      mapType = newMapType;
+      var containerId = (mapType == service.MAP_TYPE_CURRENT) ?
+        'current-map' : 'previous-map';
       container = document.getElementById(containerId);
       map.setDiv(container);
+
+      // Show/hide map elements.
       if (infoMarker) infoMarker.setVisible(false);
       if (currentLocationMarker) currentLocationMarker.setVisible(false);
       if (tripPolyline) tripPolyline.setVisible(false);
+
+      // Reset the camera if this is the current map.
+      if (mapType == service.MAP_TYPE_CURRENT &&
+        angular.isDefined(currentMapCamera)) {
+          if (angular.isDefined(currentLocation))
+            service.setCurrentLocation(currentLocation);
+          map.moveCamera(currentMapCamera, function() {
+            map.setVisible(true);
+        });
+      } else {
+        map.setVisible(true);
+      }
     };
   })
 

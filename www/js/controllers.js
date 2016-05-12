@@ -167,8 +167,8 @@ angular.module('bikemoves.controllers', [])
     initView = function() {
       mapService.onMapReady(function() {
         $scope.settings = settingsService.getSettings();
-        mapService.resetMap('current');
-        $scope.getCurrentPosition();
+        mapService.resetMap(mapService.MAP_TYPE_CURRENT);
+        if (!angular.isDefined(currentLocation)) $scope.getCurrentPosition();
       });
     };
 
@@ -330,7 +330,7 @@ angular.module('bikemoves.controllers', [])
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
       mapService.onMapReady(function() {
-        mapService.resetMap('previous');
+        mapService.resetMap(mapService.MAP_TYPE_PREVIOUS);
         if (trip.locations.length > 0) {
           mapService.setTripLocations(trip.locations);
           mapService.zoomToTripPolyline();
