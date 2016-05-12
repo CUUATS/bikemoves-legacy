@@ -371,12 +371,12 @@ angular.module('bikemoves.services', [])
     };
     service.replaceLocation = function(location) {
       currentTrip.locations[currentTrip.locations.length - 1] = location;
-      currentTrip.distance += getTripDistance(currentTrip);
+      currentTrip.distance = getTripDistance(currentTrip);
       storageService.set(CURRENT_TRIP_KEY, currentTrip);
     };
     service.addLocation = function(location) {
       currentTrip.locations.push(location);
-      currentTrip.distance += getTripDistance(currentTrip);
+      currentTrip.distance = getTripDistance(currentTrip);
       storageService.set(CURRENT_TRIP_KEY, currentTrip);
     };
     service.setStartTime = function(timestamp) {
