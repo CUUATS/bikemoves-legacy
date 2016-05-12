@@ -6,7 +6,7 @@
 <ion-content>
 <label class="item item-input item-select">
   <div class="input-label">Gender</div>
-  <select ng-model="info.sex">
+  <select ng-model="profile.sex">
     <option>Male</option>
     <option>Female</option>
     <option>Other</option>
@@ -15,7 +15,7 @@
 
 <label class="item item-input item-select">
   <div class="input-label">Age</div>
-  <select ng-model="info.age">
+  <select ng-model="profile.age">
     <option>Under 15</option>
     <option>15 to 19</option>
     <option>20 to 24</option>
@@ -30,7 +30,7 @@
 
 <label class="item item-input item-select">
   <div  class="input-label item-text-wrap">Cycling Experience</div>
-  <select style="padding-left: 0px;" ng-model="info.cyclingExperience">
+  <select style="padding-left: 0px;" ng-model="profile.cyclingExperience">
     <option>Beginner</option>
     <option>Intermediate</option>
     <option>Advanced</option>
@@ -39,7 +39,7 @@
 </ion-content>
 
 <ion-footer-bar>
-  <a class="button bar button-positive" ng-click="confirmInfo()" >OK</a>
+  <a class="button bar button-positive" ng-click="saveProfile()" >OK</a>
 </ion-footer-bar>
 
 </ion-modal-view>

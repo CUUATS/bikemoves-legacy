@@ -260,6 +260,30 @@ angular.module('bikemoves.services', [])
     };
   })
 
+  .service('profileService', function(storageService) {
+    var service = this,
+      PROFILE_KEY = 'profile',
+      DEFAULT_PROFILE = {
+        age: null,
+        cyclingExperience: null,
+        sex: null
+      },
+      profile = storageService.get(PROFILE_KEY, DEFAULT_PROFILE);
+
+    service.getProfile = function() {
+      return angular.copy(profile);
+    };
+
+    service.setProfile = function(newProfile) {
+      storageService.set(PROFILE_KEY, newProfile);
+    };
+
+    service.clearAll = function() {
+      profile = angular.copy(DEFAULT_PROFILE);
+      storageService.set(PROFILE_KEY, profile);
+    };
+  })
+
   .service('tripService', function(storageService) {
     var service = this,
       TRIPS_KEY = 'trips',

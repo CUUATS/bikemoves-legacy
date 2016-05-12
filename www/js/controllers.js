@@ -163,9 +163,6 @@ angular.module('bikemoves.controllers', [])
       }
       bgGeo.finish(taskId);
     },
-    getDeviceID = function() {
-      return (typeof device !== 'undefined') ? device.uuid : null;
-    },
     onSubmitError = function() {
       mapService.setClickable(false);
       $ionicPopup.alert({
@@ -177,7 +174,10 @@ angular.module('bikemoves.controllers', [])
     },
     submitTrip = function() {
       return $http.post(TRIPS_ENDPOINT, {
-        tripData: LZString.compressToBase64(JSON.stringify(tripService.getTrip()))
+        data: LZString.compressToBase64(JSON.stringify({
+          deviceID: window.device.uuid,
+          trip: tripService.getTrip()
+        }))
       }).then(function success(res) {
         tripService.saveTrip(res.status == 200);
         if (res.status != 200) onSubmitError();
@@ -400,56 +400,53 @@ angular.module('bikemoves.controllers', [])
     reloadSettings();
 }])
 
-.controller('profileCtrl', function($scope, $ionicModal, $http) {
-  //Loading data from local storage
-  var totDist = 0;
-  if (localStorage.getItem("totalDistProf") !== null)
-    totDist = Number(JSON.parse(window.localStorage['totalDistProf']));
+.controller('profileCtrl', [
+  '$scope',
+  '$ionicModal',
+  '$http',
+  'profileService',
+  'tripService',
+  function($scope, $ionicModal, $http, profileService, tripService) {
+    var ENDPOINT = 'http://api.bikemoves.me/v0.1/user',
+      saveProfile = function() {
+        profileService.setProfile($scope.profile);
+        profileEditModal.hide();
+      },
+      submitProfile = function() {
+        $http.post(ENDPOINT, {
+          data: LZString.compressToBase64(JSON.stringify({
+            deviceID: window.device.uuid,
+            profile: profileService.getProfile()
+          }))
+        }).catch(function errorCallback(response) {
+          console.log(response)
+        });
+      },
+      profileEditModal;
 
-  var info = {
-    sex: window.localStorage['sex'] || '',
-    age: window.localStorage['age'] || '',
-    cyclingExperience: window.localStorage['cyclingExperience'] || '',
-    totalDist: totDist
-  };
-
-  $scope.info = info;
-
-  //Save info to local storage after confirm
-  $scope.confirmInfo = function() {
-    window.localStorage['sex'] = info.sex;
-    window.localStorage['age'] = info.age;
-    window.localStorage['cyclingExperience'] = info.cyclingExperience;
-    $scope.modal.hide();
-    $scope.modal.remove();
-
-    $http.post("http://api.bikemoves.cuuats.org/v0.1/user", {
-            userData: LZString.compressToBase64(JSON.stringify({
-                deviceID: $getDeviceID(),
-                gender: info.sex,
-                age: info.age,
-                cycling_experience:info.cyclingExperience
-            }))
-          }).then(
-            function successCallback(response) {
-              console.log(response)
-            },
-            function errorCallback(response) {
-              console.log(response)
-            });
-  }
-
-  //Create modal for info edit
-  $scope.editInfo = function() {
+    $scope.profile = profileService.getProfile();
 
     $ionicModal.fromTemplateUrl('templates/profile_options.html', {
       scope: $scope
     }).then(function(modal) {
-      $scope.modal = modal;
-      modal.show();
+      profileEditModal = modal;
     });
-  };
-})
+
+    $scope.editProfile = function() {
+      profileEditModal.show();
+    };
+
+    $scope.saveProfile = function() {
+      saveProfile();
+      submitProfile();
+    };
+
+    $scope.$on('$ionicView.enter', function(e) {
+      var distance = tripService.getTotalDistance() * 0.000621371;
+      $scope.distance =  distance.toFixed(1);
+      $scope.ghg = (distance * .8115).toFixed(1);
+    });
+}])
 
 .controller('DevLogCtrl', function($scope, devLogService) {
   $scope.devLogs = devLogService.get()
