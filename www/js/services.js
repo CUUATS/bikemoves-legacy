@@ -246,25 +246,21 @@ angular.module('bikemoves.services', [])
       CURRENT_TRIP_KEY = 'currenttrip',
       DISTANCE_KEY = 'totaldistance',
       NEAR_THESHOLD = 500, // Maximum distance for location guesses, in meters
+      toGeoJSON = function(locations) {
+        if (angular.isArray(locations))
+          return turf.linestring(locations.map(function(location) {
+            return [location.longitude, location.latitude];
+          }));
+        return turf.point([locations.longitude, locations.latitude]);
+      },
       getDistance = function(loc1, loc2) {
-        var R = 6371000, // Radius of the earth in meters
-          dLat = (loc2.latitude - loc1.latitude) * Math.PI / 180, // deg2rad below
-          dLon = (loc2.longitude - loc1.longitude) * Math.PI / 180,
-          a = 0.5 - Math.cos(dLat) / 2 +
-            Math.cos(loc1.latitude * Math.PI / 180) *
-            Math.cos(loc2.latitude * Math.PI / 180) *
-            (1 - Math.cos(dLon)) / 2;
-
-        return R * 2 * Math.asin(Math.sqrt(a));
+        return turf.distance(
+          toGeoJSON(loc1), toGeoJSON(loc2), 'kilometers') * 1000;
       },
       getTripDistance = function(trip) {
-        var locationCount = trip.locations.length,
-          distance = 0;
-        for (var i = 1; i < locationCount; i++) {
-          distance += getDistance(
-            trip.locations[i], trip.locations[i - 1]);
-        }
-        return distance;
+        if (trip.locations.length < 2) return 0;
+        return turf.lineDistance(
+          toGeoJSON(trip.locations), 'kilometers') * 1000;
       },
       newTrip = function() {
         return {
