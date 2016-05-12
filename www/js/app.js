@@ -40,15 +40,13 @@ angular.module('bikemoves', [
   .state('app', {
     url: '/app',
     abstract: true,
-    templateUrl: 'templates/menu.html',
-    controller: 'AppCtrl'
+    templateUrl: 'templates/menu.html'
   })
-
 
   .state('app.profile', {
     url: '/profile',
     views: {
-      'menuContent': {
+      'tab-profile': {
         templateUrl: 'templates/profile.html'
       }
     }
@@ -57,7 +55,7 @@ angular.module('bikemoves', [
   .state('app.map', {
     url: '/map',
     views: {
-      'menuContent': {
+      'tab-map': {
         templateUrl: 'templates/map.html',
         controller: 'MapCtrl'
       }
@@ -67,7 +65,7 @@ angular.module('bikemoves', [
   .state('app.settings', {
     url: '/settings',
     views: {
-      'menuContent': {
+      'tab-settings': {
         templateUrl: 'templates/settings.html',
         controller: "SettingsCtrl"
       }
@@ -77,7 +75,7 @@ angular.module('bikemoves', [
   .state('app.previous_trips', {
     url: '/previous_trips',
     views: {
-      'menuContent': {
+      'tab-previous-trips': {
         templateUrl: 'templates/previous_trips.html',
         controller: 'PreviousTripsCtrl'
       }
@@ -87,7 +85,7 @@ angular.module('bikemoves', [
   .state('app.single', {
     url: '/previous_trips/:tripIndex',
     views: {
-      'menuContent': {
+      'tab-previous-trips': {
         templateUrl: 'templates/previous_trip.html',
         controller: 'PreviousTripCtrl'
       }
@@ -97,7 +95,7 @@ angular.module('bikemoves', [
   .state('app.devlog', {
     url: '/devlog',
     views: {
-      'menuContent': {
+      'tab-settings': {
         templateUrl: 'templates/dev_log.html',
         controller: 'DevLogCtrl'
       }
