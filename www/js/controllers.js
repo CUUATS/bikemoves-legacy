@@ -56,6 +56,7 @@ angular.module('bikemoves.controllers', [])
         isPaused: status == STATUS_PAUSED,
         isRecording: status == STATUS_RECORDING
       };
+      // Disable other tabs while recording.
       // TODO: Find a way around this $parent nonsense.
       $scope.$parent.$parent.$parent.isRecording = (status == STATUS_RECORDING);
       if (initial) return;
