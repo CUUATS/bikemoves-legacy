@@ -1,5 +1,11 @@
 angular.module('bikemoves.controllers', [])
 
+.controller('AppCtrl', [
+  '$scope',
+  function($scope) {
+    $scope.isRecording = false;
+}])
+
 .controller('MapCtrl', [
   '$scope',
   '$ionicPlatform',
@@ -50,6 +56,8 @@ angular.module('bikemoves.controllers', [])
         isPaused: status == STATUS_PAUSED,
         isRecording: status == STATUS_RECORDING
       };
+      // TODO: Find a way around this $parent nonsense.
+      $scope.$parent.$parent.$parent.isRecording = (status == STATUS_RECORDING);
       if (initial) return;
 
       if (status == STATUS_RECORDING) {
