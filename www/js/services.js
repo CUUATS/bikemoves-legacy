@@ -54,9 +54,29 @@ angular.module('bikemoves.services', [])
             tolerance: 10,
             mapExtent: [sw.lng, sw.lat, ne.lng, ne.lat].join(','),
             imageDisplay: [container.offsetWidth, container.offsetHeight, 96].join(','),
-            returnGeometry: false
+            returnGeometry: true
           });
         });
+      },
+      snapToFeature = function(feature, latLng) {
+        if (feature.geometryType == 'esriGeometryPoint') {
+          return new plugin.google.maps.LatLng(feature.geometry.y, feature.geometry.x);
+        } else if (feature.geometryType == 'esriGeometryPolyline') {
+          var point,
+            distance = Infinity;
+          angular.forEach(feature.geometry.paths, function(path, idx) {
+            var tapPoint = turf.point([latLng.lng, latLng.lat]),
+              newPoint = turf.pointOnLine(turf.linestring(path), tapPoint),
+              newDist = turf.distance(tapPoint, newPoint);
+            if (newDist < distance) {
+              point = newPoint;
+              distance = newDist;
+            }
+          });
+          return new plugin.google.maps.LatLng(
+            point.geometry.coordinates[1], point.geometry.coordinates[0]);
+        }
+        return latLng;
       },
       displayFeatureInfo = function(feature, latLng) {
         var snippetParts = [];
@@ -65,7 +85,7 @@ angular.module('bikemoves.services', [])
             snippetParts.push(attr + ': ' + value);
           }
         });
-        infoMarker.setPosition(latLng);
+        infoMarker.setPosition(snapToFeature(feature, latLng));
         infoMarker.setTitle(feature.value);
         infoMarker.setSnippet(snippetParts.join('\n'));
         infoMarker.setVisible(true);
