@@ -463,4 +463,17 @@ angular.module('bikemoves.controllers', [])
         });
       }
     });
+}])
+
+.controller('LegalCtrl', [
+  '$scope',
+  'mapService',
+  function($scope, mapService) {
+    mapService.onMapReady(function() {
+      mapService.getLegalText(function(text) {
+        $scope.$apply(function() {
+          $scope.googleText = text;
+        });
+      });
+    });
 }]);

@@ -247,6 +247,9 @@ angular.module('bikemoves.services', [])
           map.moveCamera(currentMapCamera);
       }
     };
+    service.getLegalText = function(callback) {
+      map.getLicenseInfo(callback);
+    };
   })
 
   .service('storageService', function() {

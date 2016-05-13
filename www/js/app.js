@@ -100,6 +100,25 @@ angular.module('bikemoves', [
         templateUrl: 'templates/privacy.html'
       }
     }
+  })
+
+  .state('app.legal', {
+    url: '/legal',
+    views: {
+      'tab-settings': {
+        templateUrl: 'templates/legal.html',
+        controller: 'LegalCtrl'
+      }
+    }
+  })
+
+  .state('app.credits', {
+    url: '/credits',
+    views: {
+      'tab-settings': {
+        templateUrl: 'templates/credits.html'
+      }
+    }
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/map');
