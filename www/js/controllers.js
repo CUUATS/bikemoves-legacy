@@ -20,11 +20,11 @@ angular.module('bikemoves.controllers', [])
       STATUS_STOPPED = 'stopped',
       STATUS_RECORDING = 'recording',
       STATUS_PAUSED = 'paused',
-      BG_PLUGIN_SETTINGS = {
+      BG_DEFAULT_SETTINGS = {
           activityType: 'Fitness', // iOS activity type
           autoSync: false, // Do not automatically post to the server
           debug: false, // Disable debug notifications
-          desiredAccuracy: 0, // Highest accuracy
+          desiredAccuracy: 10, // Overridden by settings.
           distanceFilter: 20, // Generate update events every 20 meters
           disableElasticity: true, // Do not auto-adjust distanceFilter
           fastestLocationUpdateInterval: 1000, // Prevent updates more than once per second (Android)
@@ -95,6 +95,12 @@ angular.module('bikemoves.controllers', [])
         }
       });
     },
+    getGeolocationSettings = function() {
+      var settings = settingsService.getSettings();
+      return angular.merge({}, BG_DEFAULT_SETTINGS, {
+        desiredAccuracy: [100, 10, 0][settings.accuracyLevel]
+      });
+    },
     updateMap = function() {
       if (currentLocation) {
         mapService.onMapReady(function() {
@@ -157,7 +163,9 @@ angular.module('bikemoves.controllers', [])
       };
     },
     setTripMetadata = function() {
+      var geoSettings = getGeolocationSettings();
       tripService.setTripMetadata({
+        desiredAccuracy: geoSettings.desiredAccuracy,
         origin: $scope.tripInfo.origin,
         destination: $scope.tripInfo.destination,
         transit: $scope.tripInfo.transit
@@ -188,6 +196,7 @@ angular.module('bikemoves.controllers', [])
       });
     },
     initView = function() {
+      bgGeo.setConfig(getGeolocationSettings());
       mapService.onMapReady(function() {
         $scope.settings = settingsService.getSettings();
         mapService.resetMap(mapService.MAP_TYPE_CURRENT);
@@ -276,7 +285,7 @@ angular.module('bikemoves.controllers', [])
       bgGeo = window.BackgroundGeolocation;
       bgGeo.onLocation(onLocation, onLocationError);
       bgGeo.onMotionChange(onMotionChange);
-      bgGeo.configure(BG_PLUGIN_SETTINGS);
+      bgGeo.configure(getGeolocationSettings());
 
       // Set the initial state.
       bgGeo.getState(function(state) {

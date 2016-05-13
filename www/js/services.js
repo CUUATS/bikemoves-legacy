@@ -270,6 +270,7 @@ angular.module('bikemoves.services', [])
     var service = this,
       SETTINGS_KEY = 'settings',
       DEFAULT_SETTINGS = {
+        accuracyLevel: 1,
         autoSubmit: true
       },
       settings = storageService.get(SETTINGS_KEY, DEFAULT_SETTINGS);
@@ -338,6 +339,7 @@ angular.module('bikemoves.services', [])
       },
       newTrip = function() {
         return {
+          desiredAccuracy: null,
           destination: null,
           distance: 0,
           endTime: null,

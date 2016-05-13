@@ -1,6 +1,15 @@
 <ion-view view-title="Settings">
   <ion-content>
     <div class="item item-divider">
+      GPS Accuracy
+    </div>
+    <div class="item range range-positive">
+      <i class="icon ion-wifi"></i>&nbsp;Low
+      <input ng-model="settings.accuracyLevel" ng-change="updateSettings()"
+        type="range" name="accuracyLevel" min="0" max="2">
+      <i class="icon ion-location"></i>&nbsp;High
+    </div>
+    <div class="item item-divider">
       Trip Data
     </div>
     <a class="item item-icon-right" href="#/app/privacy">
