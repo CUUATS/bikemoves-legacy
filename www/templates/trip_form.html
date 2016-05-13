@@ -11,7 +11,7 @@
         <div class="input-label">
           From:
         </div>
-        <select ng-model="formData.from">
+        <select ng-model="tripInfo.origin">
           <option>Home</option>
           <option>Work</option>
           <option>K-12 School</option>
@@ -24,7 +24,7 @@
         <div class="input-label">
           To:
         </div>
-        <select ng-model="formData.to">
+        <select ng-model="tripInfo.destination">
           <option>Home</option>
           <option>Work</option>
           <option>K-12 School</option>
@@ -33,7 +33,7 @@
           <option>Other</option>
         </select>
       </label>
-      <ion-checkbox ng-model="formData.transit">I rode a bus during part of this trip.</ion-checkbox>
+      <ion-checkbox ng-model="tripInfo.transit">I rode a bus during part of this trip.</ion-checkbox>
     </div>
     <div class="padding-horizontal">
       <button class="button button-block icon-left ion-share button-positive" ng-click="submitTrip()">Save and Submit</button>

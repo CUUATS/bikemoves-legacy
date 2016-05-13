@@ -344,7 +344,8 @@ angular.module('bikemoves.services', [])
           locations: [],
           origin: null,
           startTime: null,
-          submitted: false
+          submitted: false,
+          transit: false
         };
       },
       trips = storageService.get(TRIPS_KEY, []),
@@ -392,6 +393,10 @@ angular.module('bikemoves.services', [])
       currentTrip.endTime = timestamp;
       storageService.set(CURRENT_TRIP_KEY, currentTrip);
     };
+    service.setTripMetadata = function(metadata) {
+      angular.merge(currentTrip, metadata);
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
+    };
     service.saveTrip = function(submitted) {
       currentTrip.submitted = submitted;
       trips.unshift(currentTrip);
@@ -418,25 +423,34 @@ angular.module('bikemoves.services', [])
     service.getTotalDistance = function() {
       return distance;
     };
-    service.guessLocationType = function(location) {
-      var location_type,
-        min_distance = NEAR_THESHOLD;
+    service.guessLocationType = function(od) {
+      if (currentTrip.locations.length == 0) return null;
+
+      var location = (od == 'origin') ?
+          currentTrip.locations[0] :
+          currentTrip.locations[currentTrip.locations.length - 1],
+        locationType = null,
+        minDistance = NEAR_THESHOLD;
 
       angular.forEach(trips, function(trip, idx) {
-        var origin = trip.locations[0],
-          destination = trip.locations[trip.locations.length - 1],
-          originDistance = getDistance(location, origin),
-          destinationDistance = getDistance(location, origin);
-        if (originDistance < min_distance) {
-          location_type = trip.origin;
-          min_distance = originDistance;
+        if (trip.locations.length == 0) return;
+        if (trip.origin) {
+          var originDist = getDistance(location, trip.locations[0]);
+          if (originDist < minDistance) {
+            locationType = trip.origin;
+            minDistance = originDist;
+          }
         }
-        if (destinationDistance < min_distance) {
-          location_type = trip.destination;
-          min_distance = destinationDistance;
+        if (trip.destination) {
+          var destinationDist = getDistance(
+            location, trip.locations[trip.locations.length - 1]);
+          if (destinationDist < minDistance) {
+            locationType = trip.destination;
+            minDistance = destinationDist;
+          }
         }
       });
-      return location_type;
+      return locationType;
     };
     service.clearAll = function() {
       trips = [];

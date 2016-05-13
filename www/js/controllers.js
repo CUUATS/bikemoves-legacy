@@ -149,6 +149,20 @@ angular.module('bikemoves.controllers', [])
       }
       bgGeo.finish(taskId);
     },
+    prepopulateTripForm = function() {
+      $scope.tripInfo = {
+        origin: tripService.guessLocationType('origin'),
+        destination: tripService.guessLocationType('destination'),
+        transit: false
+      };
+    },
+    setTripMetadata = function() {
+      tripService.setTripMetadata({
+        origin: $scope.tripInfo.origin,
+        destination: $scope.tripInfo.destination,
+        transit: $scope.tripInfo.transit
+      });
+    },
     onSubmitError = function() {
       mapService.setClickable(false);
       $ionicPopup.alert({
@@ -196,6 +210,7 @@ angular.module('bikemoves.controllers', [])
       console.log('Tapped stop button');
       setStatus(STATUS_PAUSED);
       tripService.setEndTime();
+      prepopulateTripForm();
       mapService.setClickable(false);
       tripSubmitModal.show();
     };
@@ -203,6 +218,7 @@ angular.module('bikemoves.controllers', [])
     $scope.submitTrip = function() {
       setStatus(STATUS_STOPPED);
       tripSubmitModal.hide();
+      setTripMetadata();
       submitTrip().finally(function () {
         tripService.resetTrip();
         updateMap();
@@ -210,6 +226,7 @@ angular.module('bikemoves.controllers', [])
     };
 
     $scope.saveTrip = function() {
+      setTripMetadata();
       tripService.saveTrip(false);
       tripService.resetTrip();
       updateMap();
