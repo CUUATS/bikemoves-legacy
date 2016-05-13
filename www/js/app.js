@@ -93,12 +93,11 @@ angular.module('bikemoves', [
     }
   })
 
-  .state('app.devlog', {
-    url: '/devlog',
+  .state('app.privacy', {
+    url: '/privacy',
     views: {
       'tab-settings': {
-        templateUrl: 'templates/dev_log.html',
-        controller: 'DevLogCtrl'
+        templateUrl: 'templates/privacy.html'
       }
     }
   });

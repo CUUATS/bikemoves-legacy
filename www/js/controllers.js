@@ -463,8 +463,4 @@ angular.module('bikemoves.controllers', [])
         });
       }
     });
-}])
-
-.controller('DevLogCtrl', function($scope, devLogService) {
-  $scope.devLogs = devLogService.get()
-})
+}]);

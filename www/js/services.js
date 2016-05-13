@@ -441,21 +441,4 @@ angular.module('bikemoves.services', [])
       storageService.set(TRIPS_KEY, trips);
       storageService.set(DISTANCE_KEY, distance);
     };
-  })
-
-  .factory('devLogService', function() {
-    var service = {}
-
-    service.get = function() {
-      return JSON.parse(window.localStorage['devLog'])
-    }
-
-    service.push = function(item) {
-      var log = JSON.parse(window.localStorage['devLog'])
-      var currentDate = new Date();
-      log.unshift({data: item, time: currentDate})
-      window.localStorage['devLog'] = JSON.stringify(log)
-    }
-
-    return service;
   });

@@ -1,15 +1,19 @@
 <ion-view view-title="Settings">
   <ion-content>
-
+    <div class="item item-divider">
+      Trip Data
+    </div>
+    <a class="item item-icon-right" href="#/app/privacy">
+      Privacy information
+      <i class="icon ion-chevron-right icon-accessory"></i>
+    </a>
     <ion-toggle ng-model="settings.autoSubmit"
                  ng-change="updateSettings()">
-      Automatically Submit Data
+      Automatically submit trips
     </ion-toggle>
-
-    <ion-item href="#/app/devlog">Developer log</ion-item>
-
     <ion-item href="#" ng-click="reset()">
-      Reset All Data
+      Reset all data
     </ion-item>
+
   </ion-content>
 </ion-view>
