@@ -4,6 +4,9 @@
   </ion-nav-buttons>
   <ion-content>
     <div class="list">
+      <div class="item item-divider">
+        Demographics
+      </div>
       <label class="item item-input item-select">
         <div class="input-label">Gender</div>
         <select ng-model="profile.sex" ng-change="profileChanged()">
@@ -34,10 +37,14 @@
           <option>Advanced</option>
         </select>
       </label>
+      <div class="item item-divider">
+        Statistics
+      </div>
       <div class="item">
-        <h3>Statistics</h3>
-        <p>Total Distance: {{ distance }} miles</p>
-        <p>Total GHG Reduced: {{ ghg }} lb</p>
+        Total Distance: <strong>{{ distance }} miles</strong>
+      </div>
+      <div class="item">
+        Total GHG Reduced: <strong>{{ ghg }} lb</strong>
       </div>
     </div>
   </ion-content>
