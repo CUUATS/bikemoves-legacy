@@ -455,6 +455,8 @@ angular.module('bikemoves.controllers', [])
       };
 
     $scope.saveProfile = function() {
+      // Prevent save action from firing twice when the save button is tapped.
+      if (!$scope.dirty) return;
       $scope.dirty = false;
       saveProfile($scope.profile);
       submitProfile();
