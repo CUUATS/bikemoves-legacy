@@ -181,11 +181,12 @@ angular.module('bikemoves.controllers', [])
       });
     },
     submitTrip = function() {
+      var trip = angular.merge({
+        deviceUUID: window.device.uuid
+      }, tripService.getTrip());
+      console.log(JSON.stringify(trip));
       return $http.post(TRIPS_ENDPOINT, {
-        data: LZString.compressToBase64(JSON.stringify({
-          deviceID: window.device.uuid,
-          trip: tripService.getTrip()
-        }))
+        data: LZString.compressToBase64(JSON.stringify(trip))
       }).then(function success(res) {
         tripService.saveTrip(res.status == 200);
         if (res.status != 200) onSubmitError();
@@ -443,11 +444,11 @@ angular.module('bikemoves.controllers', [])
         profileService.setProfile(profile);
       },
       submitProfile = function() {
+        var profile = angular.merge({
+          deviceUUID: window.device.uuid
+        }, profileService.getProfile());
         $http.post(ENDPOINT, {
-          data: LZString.compressToBase64(JSON.stringify({
-            deviceID: window.device.uuid,
-            profile: profileService.getProfile()
-          }))
+          data: LZString.compressToBase64(JSON.stringify(profile))
         }).catch(function errorCallback(response) {
           console.log(response)
         });
