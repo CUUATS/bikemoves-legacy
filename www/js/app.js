@@ -17,16 +17,8 @@ angular.module('bikemoves', [
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
-<<<<<<< HEAD
-    if (window.cordova) {
-      if (window.BackgroundGeolocation) {
-        BackgroundGeolocationService.configurePlugin(window.BackgroundGeolocation);
-      }
-      // Prompt user to turn on high accuracy gps mode if not enabled already
-=======
     if (window.cordova.plugins.locationAccuracy) {
       // Request high accuracy geolocation on Android.
->>>>>>> maptiles
       cordova.plugins.locationAccuracy.request(
         angular.noop,
         angular.noop,
