@@ -25,8 +25,8 @@
     {
       "locator": "https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
       "variables": {
-        "API_KEY_FOR_ANDROID": "AIzaSyAStHvFWgeNoWAByI3PvoJYpWvdKgqPzRo",
-        "API_KEY_FOR_IOS": "AIzaSyC13Vll142Z7iQGaUY-ezZ50cVrrkl_UTU"
+        "API_KEY_FOR_ANDROID": "AIzaSyCBzDSHggb_ft-AY01a0jhC10rmvAj5i68",
+        "API_KEY_FOR_IOS": "AIzaSyCHF7Q6EzllJjIaOXfjqry0XfxGO8X8Iq0"
       }
     },
     {
