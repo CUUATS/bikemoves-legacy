@@ -82,17 +82,24 @@ angular.module('bikemoves.services', [])
         return latLng;
       },
       displayFeatureInfo = function(feature, latLng) {
-        var snippetParts = [];
+        var snappedLatLng = snapToFeature(feature, latLng),
+          snippetParts = [];
         angular.forEach(feature.attributes, function(value, attr) {
-          if (excludedFields.indexOf(attr) == -1 && attr != feature.displayFieldName) {
+          if (excludedFields.indexOf(attr) == -1
+              && value.toLowerCase() != 'null') {
             snippetParts.push(attr + ': ' + value);
           }
         });
-        infoMarker.setPosition(snapToFeature(feature, latLng));
-        infoMarker.setTitle(feature.value);
+        infoMarker.setPosition(snappedLatLng);
+        infoMarker.setTitle(feature.layerName);
         infoMarker.setSnippet(snippetParts.join('\n'));
         infoMarker.setVisible(true);
         infoMarker.showInfoWindow();
+        map.getCameraPosition(function(camera) {
+          camera.target = snappedLatLng;
+          camera.duration = 200;
+          map.animateCamera(camera);
+        });
       },
       mapClick = function(latLng) {
         if (!identifyLayerIds || mapType != service.MAP_TYPE_CURRENT) return;
@@ -201,7 +208,7 @@ angular.module('bikemoves.services', [])
       } else {
         map.getCameraPosition(function(camera) {
           camera.target = location2LatLng(location);
-          camera.duation = duration;
+          camera.duration = duration;
           map.animateCamera(camera);
         });
       }
