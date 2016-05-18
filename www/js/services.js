@@ -154,10 +154,7 @@ angular.module('bikemoves.services', [])
         map.addMarker({
           position: defaultCenter,
           visible: false,
-          icon: {
-            url: 'www/img/transparent_marker.png',
-            size: {height: 1, width: 1}
-          }
+          icon: '#fbb03b'
         }, function(marker) {
           infoMarker = marker;
           map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
@@ -167,7 +164,7 @@ angular.module('bikemoves.services', [])
         map.addMarker({
           position: defaultCenter,
           visible: false,
-          icon: 'green'
+          icon: '#00008b'
         }, function(marker) {
           currentLocationMarker = marker;
           checkReady();
