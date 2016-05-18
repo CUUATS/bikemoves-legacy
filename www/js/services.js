@@ -92,7 +92,7 @@ angular.module('bikemoves.services', [])
         });
         infoMarker.setPosition(snappedLatLng);
         infoMarker.setTitle(feature.layerName);
-        infoMarker.setSnippet(snippetParts.join('\n'));
+        infoMarker.setSnippet(snippetParts.join('\r\n'));
         infoMarker.setVisible(true);
         infoMarker.showInfoWindow();
         map.getCameraPosition(function(camera) {
