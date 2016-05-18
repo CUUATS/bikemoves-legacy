@@ -1,35 +1,45 @@
-I biked...
-<br><br>
-<label class="item item-input item-select">
-    
-    <div class="input-label">
-      From:
+<ion-modal-view>
+  <ion-header-bar>
+    <h1 class="title">Tell Us About Your Trip</h1>
+  </ion-header-bar>
+  <ion-content>
+    <div class="list list-inset">
+      <div class="item item-divider">
+        I biked&hellip;
+      </div>
+      <label class="item item-input item-select">
+        <div class="input-label">
+          From:
+        </div>
+        <select ng-model="tripInfo.origin">
+          <option>Home</option>
+          <option>Work</option>
+          <option>K-12 School</option>
+          <option>University</option>
+          <option>Shopping</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label class="item item-input item-select">
+        <div class="input-label">
+          To:
+        </div>
+        <select ng-model="tripInfo.destination">
+          <option>Home</option>
+          <option>Work</option>
+          <option>K-12 School</option>
+          <option>University</option>
+          <option>Shopping</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <ion-checkbox ng-model="tripInfo.transit">I rode a bus during part of this trip.</ion-checkbox>
     </div>
-    <select ng-model="formData.from">
-      <option>Home</option>
-      <option>Work</option>
-      <option>K-12 School</option>
-      <option>University</option>
-      <option>Shopping</option>
-      <option>Other</option>
-    </select>
-
-    
-
-</label>
-
-<label class="item item-input item-select">
-    
-    <div class="input-label">
-      To:
+    <div class="padding-horizontal">
+      <button class="button button-block icon-left ion-share button-positive" ng-click="submitTrip()">Save and Submit</button>
+      <button class="button button-block icon-left ion-folder button-calm" ng-if="!settings.autoSubmit" ng-click="saveTrip()">Save</button>
+      <button class="button button-block icon-left ion-play button-stable" ng-click="resumeTrip()">Resume</button>
+      <button class="button button-block icon-left ion-trash-b button-assertive" ng-click="discardTrip()">Discard</button>
     </div>
-    <select  ng-model="formData.to">
-      <option>Home</option>
-      <option>Work</option>
-      <option>K-12 School</option>
-      <option>University</option>
-      <option>Shopping</option>
-      <option>Other</option>
-    </select>
-
-</label>
+  </ion-content>
+</ion-modal-view>

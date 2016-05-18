@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 angular.module('starter.services', [])
 
   // Load map markers
@@ -64,65 +65,99 @@ angular.module('starter.services', [])
               );
 
               infoWindow.open(map, this);
+=======
+angular.module('bikemoves.services', [])
+
+  .service('mapService', function($http) {
+    var service = this,
+      DEFAULT_LOCATION = {
+        latitude: 40.109403,
+        longitude: -88.227203
+      },
+      DEFAULT_ZOOM = 16.1,
+      SERVICE_ENDPOINT = 'http://utility.arcgis.com/usrsvcs/servers/c9e754f1fc35468a9392372c79452704/rest/services/CCRPC/BikeMovesBase/MapServer',
+      excludedFields = ['OBJECTID', 'Shape', 'SHAPE'],
+      layers = [],
+      identifyLayerIds = [],
+      identifyLayerNames = ['Bicycle Rack', 'Bicycle Repair and Retail', 'Bicycle Path'],
+      ready = false,
+      readyCount = 0,
+      readyQueue = [],
+      container,
+      map,
+      defaultCenter,
+      tileOverlay,
+      infoMarker,
+      currentLocationMarker,
+      tripPolyline,
+      mapType,
+      currentMapCamera,
+      currentLocation,
+      location2LatLng = function(location) {
+        return new plugin.google.maps.LatLng(location.latitude, location.longitude);
+      },
+      getLayerInfo = function() {
+        $http({
+          method: 'GET',
+          url: SERVICE_ENDPOINT,
+          params: {f: 'json'}
+        }).then(function(res) {
+          if (res.status == 200) {
+            layers = res.data.layers;
+            angular.forEach(res.data.layers, function(layer, idx) {
+              if (identifyLayerNames.indexOf(layer.name) != -1) {
+                identifyLayerIds.push(layer.id);
+              }
+>>>>>>> maptiles
             });
-
-            markers.push(marker);
           }
-
         });
-
-      /* Bike path markers */
-      $http.get('http://utility.arcgis.com/usrsvcs/servers/31e89733946d441187c0c4f692be8cf3/rest/services/CCRPC/BicyclePedestrianNetwork/MapServer/0/query?outSR=4326&where=SHAPE+IS+NOT+NULL&outFields=*&f=json')
-        .success(function(data) {
-          console.log(data);
-          for (var i = 0; i < data.features.length; i++) {
-            var coordlist = data.features[i].geometry.paths[0];
-            var properties = data.features[i].attributes;
-
-            var path = [];
-
-            for (var j = 0; j < coordlist.length; j++) {
-              path.push({
-                lat: coordlist[j][1],
-                lng: coordlist[j][0]
-              });
+      },
+      getIdentifyParams = function(latLng, callback) {
+        map.getVisibleRegion(function(bounds) {
+          var ne = bounds.northeast,
+            sw = bounds.southwest;
+          callback({
+            f: 'json',
+            geometry: [latLng.lng, latLng.lat].join(','),
+            geometryType: 'esriGeometryPoint',
+            sr: 4326,
+            layers: 'top:' + identifyLayerIds.join(','),
+            tolerance: 10,
+            mapExtent: [sw.lng, sw.lat, ne.lng, ne.lat].join(','),
+            imageDisplay: [container.offsetWidth, container.offsetHeight, 96].join(','),
+            returnGeometry: true
+          });
+        });
+      },
+      snapToFeature = function(feature, latLng) {
+        if (feature.geometryType == 'esriGeometryPoint') {
+          return new plugin.google.maps.LatLng(feature.geometry.y, feature.geometry.x);
+        } else if (feature.geometryType == 'esriGeometryPolyline') {
+          var point,
+            distance = Infinity;
+          angular.forEach(feature.geometry.paths, function(path, idx) {
+            var tapPoint = turf.point([latLng.lng, latLng.lat]),
+              newPoint = turf.pointOnLine(turf.linestring(path), tapPoint),
+              newDist = turf.distance(tapPoint, newPoint);
+            if (newDist < distance) {
+              point = newPoint;
+              distance = newDist;
             }
-
-            var bikepath = new google.maps.Polyline({
-              path: path,
-              geodesic: true,
-              strokeColor: '#585858',
-              strokeOpacity: .4,
-              strokeWeight: 4,
-              distance: properties.Dx_Miles,
-              name: properties.Name
-            });
-
-            bikepath.setMap(map)
-
-            bikepath.addListener('click', function(event) {
-
-              var content = '';
-
-              if (this.name) content += 'Name: ' + this.name + '<br>'
-
-              if (this.distance) content += 'Distance: ' + this.distance.toFixed(2) + ' miles<br>';
-
-              infoWindow.setContent(
-                "<b>Bike Path Information:</b><br>" +
-                content
-              );
-
-              infoWindow.setPosition(event.latLng);
-
-              infoWindow.open(map, this);
-              selectedPath = this;
-              selectedPath.setOptions({
-                strokeColor: '#FF0000'
-              })
-            });
+          });
+          return new plugin.google.maps.LatLng(
+            point.geometry.coordinates[1], point.geometry.coordinates[0]);
+        }
+        return latLng;
+      },
+      displayFeatureInfo = function(feature, latLng) {
+        var snippetParts = [];
+        angular.forEach(feature.attributes, function(value, attr) {
+          if (excludedFields.indexOf(attr) == -1 && attr != feature.displayFieldName) {
+            snippetParts.push(attr + ': ' + value);
           }
         });
+<<<<<<< HEAD
 
     }
   })
@@ -423,241 +458,378 @@ var BackgroundGeolocationService = (function() {
     }
     $config[setting.name] = value;
   }
-
-  // Build platform-specific list-of-settings
-  var platformSettings = undefined;
-  var getPlatformSettings = function() {
-    if (platformSettings === undefined) {
-      platformSettings = [].concat($settings[$platform || 'iOS']).concat($settings.common);
-      if (!$platform) {
-        platformSettings = platformSettings.concat($settings['Android']);
-      }
-    }
-    return platformSettings;
-  };
-
-  /**
-   * This is the BackgroundGeolocation callback.  I've set up the ability to add multiple listeners here so this
-   * callback simply calls upon all the added listeners here
-   */
-  var fireLocationListeners = function(location, taskId) {
-    console.log('[js] BackgroundGeolocation location received: ', JSON.stringify(location));
-    var me = this;
-    var callback;
-    for (var n = 0, len = $locationListeners.length; n < len; n++) {
-      callback = $locationListeners[n];
-      try {
-        callback.call(me, location);
-      } catch (e) {
-        console.log('error: ' + e.message);
-      }
-    }
-    $plugin.finish(taskId);
-  };
-
-  return {
-    /**
-     * Set the plugin state to track in background
-     * @param {Boolean} willEnable
-     */
-    setEnabled: function(willEnable, success, fail) {
-      window.localStorage.setItem('bgGeo:enabled', willEnable);
-      if ($plugin) {
-        if (willEnable) {
-          $plugin.start(success, fail);
-        } else {
-          $plugin.stop(success, fail);
-        }
-      }
-    },
-    /**
-     * Is the plugin enabled to run in background?
-     * @return {Boolean}
-     */
-    getEnabled: function() {
-      return window.localStorage.getItem('bgGeo:enabled') === 'true';
-    },
-    /**
-     * Toggle stationary/aggressive mode
-     * @param {Boolean} willStart
-     */
-    setPace: function(willStart, successFn) {
-      if ($plugin) {
-        $plugin.changePace(willStart, successFn, function(error) {
-          alert('Failed to change pace: ' + error);
+=======
+        infoMarker.setPosition(snapToFeature(feature, latLng));
+        infoMarker.setTitle(feature.value);
+        infoMarker.setSnippet(snippetParts.join('\n'));
+        infoMarker.setVisible(true);
+        infoMarker.showInfoWindow();
+      },
+      mapClick = function(latLng) {
+        if (!identifyLayerIds || mapType != service.MAP_TYPE_CURRENT) return;
+        getIdentifyParams(latLng, function(params) {
+          $http({
+            method: 'GET',
+            url: SERVICE_ENDPOINT + '/identify',
+            params: params
+          }).then(function(res) {
+            if (res.status == 200 && res.data.results.length) {
+              displayFeatureInfo(res.data.results[0], latLng);
+            } else {
+              infoMarker.hideInfoWindow();
+              infoMarker.setVisible(false);
+            }
+          });
         });
-      }
-    },
-    /**
-     * Manually sync plugin's persisted locations to server
-     */
-    sync: function(success, failure) {
-      if ($plugin) {
-        $plugin.sync(success, failure);
-      } else {
-        // Fake it for browser testing.
-        setTimeout(success, 1000);
-      }
-    },
-    finish: function(taskId) {
-      console.log('- BackgroundGeolocationService#finish, taskId: ', taskId);
-      if ($plugin) {
-        $plugin.finish(taskId);
-      }
-    },
-    /**
-     * Add an event-listener for location-received from $plugin
-     * @param {Function} callback
-     */
-    onLocation: function(callback) {
-      $locationListeners.push(callback);
-    },
-    /**
-     * Add a stationary-listener
-     * @param {Function} stationary event-listener
-     */
-    onMotionChange: function(callback, failure) {
-      var me = this;
-      if ($plugin) {
-        $plugin.onMotionChange(callback, failure);
-      }
-    },
-    onGeofence: function(callback) {
-      var me = this;
-      if ($plugin) {
-        $plugin.onGeofence(function(params, taskId) {
-          console.log('- onGeofence:' + JSON.stringify(params));
-          console.log('  taskId: ' + taskId);
-          try {
-            callback.call(me, params, taskId);
-          } catch (e) {
-            console.log('error: ' + e.message, e);
+      },
+      cameraChange = function(camera) {
+        if (mapType == service.MAP_TYPE_CURRENT) {
+          currentMapCamera = camera;
+        }
+      },
+      checkReady = function() {
+        readyCount += 1;
+        if (readyCount == 4) {
+          // All map elements have been added. Process any deferred actions.
+          ready = true;
+          angular.forEach(readyQueue, function(callback, idx) {
+            callback();
+          });
+        }
+      };
+>>>>>>> maptiles
+
+    service.MAP_TYPE_CURRENT = 'current';
+    service.MAP_TYPE_PREVIOUS = 'previous';
+
+    service.init = function() {
+      defaultCenter = location2LatLng(DEFAULT_LOCATION);
+      container = document.getElementById('current-map');
+      getLayerInfo();
+      map = plugin.google.maps.Map.getMap(container, {
+        'camera': {
+          'latLng': defaultCenter,
+          'zoom': DEFAULT_ZOOM
+        }
+      });
+      map.addEventListener(plugin.google.maps.event.MAP_READY, function() {
+        // Set up camera tracking for the current trip map.
+        map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);
+        // Tile overlay
+        map.addTileOverlay({
+          tileUrlFormat: "http://tiles.bikemoves.me/tiles/<zoom>/<y>/<x>.png"
+        }, function(overlay) {
+          tileOverlay = overlay;
+          checkReady();
+        });
+        // Info window marker
+        map.addMarker({
+          position: defaultCenter,
+          visible: false,
+          icon: {
+            url: 'www/img/transparent_marker.png',
+            size: {height: 1, width: 1}
           }
+        }, function(marker) {
+          infoMarker = marker;
+          map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
+          checkReady();
+        });
+        // Current position marker
+        map.addMarker({
+          position: defaultCenter,
+          visible: false,
+          icon: 'green'
+        }, function(marker) {
+          currentLocationMarker = marker;
+          checkReady();
+        });
+        // Trip path
+        map.addPolyline({
+          points: [defaultCenter, defaultCenter],
+          visible: false,
+          geodesic: true,
+          color: '#2677FF',
+          width: 5
+        }, function(polyline) {
+          tripPolyline = polyline;
+          checkReady();
+        });
+      });
+    };
+    service.onMapReady = function(callback) {
+      if (ready) {
+        callback();
+      } else {
+        readyQueue.push(callback);
+      }
+    };
+    service.setCurrentLocation = function(location) {
+      currentLocation = location;
+      currentLocationMarker.setPosition(location2LatLng(location));
+      currentLocationMarker.setVisible(true);
+    };
+    service.setCenter = function(location, duration) {
+      if (typeof duration === 'undefined') var duration = 0;
+      if (duration == 0) {
+        map.setCenter(location2LatLng(location));
+      } else {
+        map.getCameraPosition(function(camera) {
+          camera.target = location2LatLng(location);
+          camera.duation = duration;
+          map.animateCamera(camera);
         });
       }
-    },
+    };
+    service.setClickable = function(clickable) {
+      map.setClickable(clickable);
+    };
+    service.setTripLocations = function(locations) {
+      var latLngs = [];
+      angular.forEach(locations, function(location, idx) {
+        latLngs.push(location2LatLng(location));
+      });
+      tripPolyline.setPoints(latLngs);
+      tripPolyline.setVisible(true);
+    };
+    service.zoomToTripPolyline = function() {
+      map.moveCamera({
+        'target': tripPolyline.getPoints()
+      });
+    };
+    service.resetMap = function(newMapType) {
+      mapType = newMapType;
+      var containerId = (mapType == service.MAP_TYPE_CURRENT) ?
+        'current-map' : 'previous-map';
+      container = document.getElementById(containerId);
+      map.setDiv(container);
 
-    /**
-     * Return the current BackgroundGeolocation config-state as stored in localStorage
-     * @return {Object}
-     */
-    getConfig: function() {
-      return $config;
-    },
-    /**
-     * Return a list of all available plugin settings, filtered optionally by "group"
-     * @param {String} group
-     * @return {Array}
-     */
-    getSettings: function(group) {
-      var mySettings = getPlatformSettings();
-      if (group) {
-        var filterFn = function(setting) {
-          return setting.group === group;
+      // Show/hide map elements.
+      if (tileOverlay)
+        tileOverlay.setVisible(mapType == service.MAP_TYPE_CURRENT);
+      if (infoMarker) infoMarker.setVisible(false);
+      if (currentLocationMarker) currentLocationMarker.setVisible(false);
+      if (tripPolyline) tripPolyline.setVisible(false);
+
+      // Reset the camera if this is the current map.
+      if (mapType == service.MAP_TYPE_CURRENT &&
+        angular.isDefined(currentMapCamera)) {
+          if (angular.isDefined(currentLocation))
+            service.setCurrentLocation(currentLocation);
+          map.moveCamera(currentMapCamera);
+      }
+    };
+    service.getLegalText = function(callback) {
+      map.getLicenseInfo(callback);
+    };
+  })
+
+  .service('storageService', function() {
+    var service = this,
+      KEY_PREFIX = 'bikemoves:';
+
+    service.get = function(key, defaultValue) {
+      var value = window.localStorage.getItem(KEY_PREFIX + key);
+      return (value === null) ? defaultValue : JSON.parse(value);
+    };
+
+    service.set = function(key, value) {
+      window.localStorage[KEY_PREFIX + key] = JSON.stringify(value);
+    };
+  })
+
+  .service('settingsService', function(storageService) {
+    var service = this,
+      SETTINGS_KEY = 'settings',
+      DEFAULT_SETTINGS = {
+        accuracyLevel: 1,
+        autoSubmit: true
+      },
+      settings = storageService.get(SETTINGS_KEY, DEFAULT_SETTINGS);
+
+    service.getSettings = function() {
+      return angular.copy(settings);
+    };
+
+    service.updateSettings = function(newSettings) {
+      angular.merge(settings, newSettings);
+      storageService.set(SETTINGS_KEY, settings);
+    };
+
+    service.clearAll = function() {
+      settings = angular.copy(DEFAULT_SETTINGS);
+      storageService.set(SETTINGS_KEY, settings);
+    };
+  })
+
+  .service('profileService', function(storageService) {
+    var service = this,
+      PROFILE_KEY = 'profile',
+      DEFAULT_PROFILE = {
+        age: null,
+        cyclingExperience: null,
+        sex: null
+      },
+      profile = storageService.get(PROFILE_KEY, DEFAULT_PROFILE);
+
+    service.getProfile = function() {
+      return angular.copy(profile);
+    };
+
+    service.setProfile = function(newProfile) {
+      profile = newProfile;
+      storageService.set(PROFILE_KEY, newProfile);
+    };
+
+    service.clearAll = function() {
+      profile = angular.copy(DEFAULT_PROFILE);
+      storageService.set(PROFILE_KEY, profile);
+    };
+  })
+
+  .service('tripService', function(storageService) {
+    var service = this,
+      TRIPS_KEY = 'trips',
+      CURRENT_TRIP_KEY = 'currenttrip',
+      DISTANCE_KEY = 'totaldistance',
+      NEAR_THESHOLD = 500, // Maximum distance for location guesses, in meters
+      toGeoJSON = function(locations) {
+        if (angular.isArray(locations))
+          return turf.linestring(locations.map(function(location) {
+            return [location.longitude, location.latitude];
+          }));
+        return turf.point([locations.longitude, locations.latitude]);
+      },
+      getDistance = function(loc1, loc2) {
+        return turf.distance(
+          toGeoJSON(loc1), toGeoJSON(loc2), 'kilometers') * 1000;
+      },
+      getTripDistance = function(trip) {
+        if (trip.locations.length < 2) return 0;
+        return turf.lineDistance(
+          toGeoJSON(trip.locations), 'kilometers') * 1000;
+      },
+      newTrip = function() {
+        return {
+          desiredAccuracy: null,
+          destination: null,
+          distance: 0,
+          endTime: null,
+          locations: [],
+          origin: null,
+          startTime: null,
+          submitted: false,
+          transit: false
         };
-        return mySettings.filter(filterFn);
-      } else {
-        return mySettings;
-      }
-    },
-    /**
-     * Get a single config value by key
-     * @param {String} key A BackgroundGeolocation setting key to return a value for
-     * @return {Mixed}
-     */
-    get: function(key) {
-      return $config[key];
-    },
-    /**
-     * Set a single config value by key,value
-     * @param {String} key
-     * @param {Mixed} value
-     */
-    set: function(key, value) {
-      $ls.setItem('settings:' + key, value);
-      $config[key] = value;
+      },
+      trips = storageService.get(TRIPS_KEY, []),
+      distance = storageService.get(DISTANCE_KEY, 0),
+      currentTrip = storageService.get(CURRENT_TRIP_KEY, newTrip()),
+      getPreviousLocation = function() {
+        return currentTrip.locations[currentTrip.locations.length - 1];
+      };
 
-      if ($plugin) {
-        $plugin.setConfig(function(response) {
-          console.log('- setConfig: ', response);
-        }, function(error) {
-          console.warn('- setConfig error: ', error);
-        }, $config);
-      }
-    },
-    /**
-     * Configure the BackgroundGeolocation Cordova $plugin
-     * @param {BackgroundGeolocation} bgGeoPlugin
-     */
-    configurePlugin: function(bgGeoPlugin) {
-      var device = ionic.Platform.device();
-      $platform = device.platform;
+    service.getTrip = function () {
+      return currentTrip;
+    };
+    service.getCurrentDistance = function() {
+      return currentTrip.distance;
+    };
+    service.evaluateLocation = function(location) {
+      // Determine whether the current location should:
+      // -1: Be discarded
+      //  0: Replace the current location
+      //  1: Be added
+      if (currentTrip.locations.length == 0) return 1;
+      var prev = getPreviousLocation(),
+        dist = getDistance(getPreviousLocation(), location);
+      if (dist > prev.accuracy && dist > location.accuracy) return 1;
+      if (location.accuracy < prev.accuracy) return 0;
+      return -1;
+    };
+    service.replaceLocation = function(location) {
+      currentTrip.locations[currentTrip.locations.length - 1] = location;
+      currentTrip.distance = getTripDistance(currentTrip);
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
+    };
+    service.addLocation = function(location) {
+      currentTrip.locations.push(location);
+      currentTrip.distance = getTripDistance(currentTrip);
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
+    };
+    service.setStartTime = function(timestamp) {
+      if (!angular.isDefined(timestamp)) var timestamp = (new Date()).getTime();
+      currentTrip.startTime = timestamp;
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
+    };
+    service.setEndTime = function(timestamp) {
+      if (!angular.isDefined(timestamp)) var timestamp = (new Date()).getTime();
+      currentTrip.endTime = timestamp;
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
+    };
+    service.setTripMetadata = function(metadata) {
+      angular.merge(currentTrip, metadata);
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
+    };
+    service.saveTrip = function(submitted) {
+      currentTrip.submitted = submitted;
+      trips.unshift(currentTrip);
+      distance += currentTrip.distance;
+      storageService.set(TRIPS_KEY, trips);
+      storageService.set(DISTANCE_KEY, distance);
+    };
+    service.resetTrip = function() {
+      currentTrip = newTrip();
+      storageService.set(CURRENT_TRIP_KEY, currentTrip);
+    };
+    service.getTrips = function() {
+      return trips;
+    };
+    service.getTripByIndex = function(idx) {
+      return trips[idx];
+    };
+    service.deleteTrip = function(idx) {
+      distance -= service.getTripByIndex(idx).distance;
+      trips.splice(idx, 1);
+      storageService.set(TRIPS_KEY, trips);
+      storageService.set(DISTANCE_KEY, distance);
+    };
+    service.getTotalDistance = function() {
+      return distance;
+    };
+    service.guessLocationType = function(od) {
+      if (currentTrip.locations.length == 0) return null;
 
-      var me = this;
-      var config = this.getConfig();
+      var location = (od == 'origin') ?
+          currentTrip.locations[0] :
+          currentTrip.locations[currentTrip.locations.length - 1],
+        locationType = null,
+        minDistance = NEAR_THESHOLD;
 
-      config.preventSuspend = true;
-      config.heartbeatInterval = 30;
-
-      config.params = config.params || {};
-
-      // Append Cordova device-info to POST params so we can map a device-id to the location
-      config.params.device = device;
-
-      $plugin = bgGeoPlugin;
-
-      // Configure BackgroundGeolocation Plugin
-      $plugin.configure(fireLocationListeners, function(error) {
-        window.alert('Location error: ' + error);
-        console.warn('BackgroundGeolocation Error: ' + error);
-      }, config);
-
-      if (this.getEnabled()) {
-        $plugin.start();
-      }
-    },
-    /**
-     * Return a reference to Cordova BackgroundGeolocation plugin
-     * @return {BackgroundGeolocation}
-     */
-    getPlugin: function() {
-      return $plugin;
-    },
-    addGeofence: function(data, callback) {
-      if ($plugin) {
-        var me = this;
-        $plugin.addGeofence(data, function(res) {
-          me.playSound('ADD_GEOFENCE');
-          callback.call(me, res);
-        });
-      } else {
-        callback.call(me);
-      }
-    },
-    removeGeofence: function(identifier) {
-      if ($plugin) {
-        var me = this;
-        $plugin.removeGeofence(identifier, function(status) {
-          me.playSound('ADD_GEOFENCE');
-        }, function(error) {
-          console.log('- FAILED to remove geofence');
-        });
-      }
-    },
-    getCurrentPosition: function(callback, failure, options) {
-      if ($plugin) {
-        $plugin.getCurrentPosition(callback, failure, options);
-      }
-    },
-    playSound: function(action) {
-      if ($plugin) {
-        var soundId = $SOUNDS[action + '_' + $platform.toUpperCase()];
-        if (soundId) {
-          $plugin.playSound(soundId);
-        } else {
-          console.warn('Failed to locate sound-id "' + action + '"');
+      angular.forEach(trips, function(trip, idx) {
+        if (trip.locations.length == 0) return;
+        if (trip.origin) {
+          var originDist = getDistance(location, trip.locations[0]);
+          if (originDist < minDistance) {
+            locationType = trip.origin;
+            minDistance = originDist;
+          }
         }
-      }
-    }
-  };
-})();
+        if (trip.destination) {
+          var destinationDist = getDistance(
+            location, trip.locations[trip.locations.length - 1]);
+          if (destinationDist < minDistance) {
+            locationType = trip.destination;
+            minDistance = destinationDist;
+          }
+        }
+      });
+      return locationType;
+    };
+    service.clearAll = function() {
+      trips = [];
+      distance = 0;
+      storageService.set(TRIPS_KEY, trips);
+      storageService.set(DISTANCE_KEY, distance);
+    };
+  });

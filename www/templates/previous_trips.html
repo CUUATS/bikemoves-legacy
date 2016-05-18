@@ -1,17 +1,17 @@
-  <ion-view view-title="Previous Trips">
+  <ion-view view-title="Saved Trips">
     <ion-content>
-      <ion-list>
-        <ion-item ng-repeat="trip in trips" href="#/app/previous_trips/{{trip.id}}">
-          {{trip.title}}
-
-          <ion-option-button class="button-assertive"
-                             ng-click="onItemDelete(trip)">
-            Delete
-          </ion-option-button>
-
-          <ion-reorder-button class="ion-navicon" on-reorder="moveItem(item, $fromIndex, $toIndex)"></ion-reorder-button>
-
-        </ion-item>
+      <ion-list ng-if="trips.length > 0">
+        <a ng-repeat="trip in trips track by $index" class="item item-icon-right" href="#/app/previous_trips/{{$index}}">
+          {{formatDate(trip.startTime)}}
+          <i class="icon ion-chevron-right icon-accessory"></i>
+        </a>
       </ion-list>
+      <div ng-if="trips.length == 0" class="row row-center no-content no-previous-trips">
+        <div class="col">
+          <i class="icon ion-map icon-large"></i>
+          <p class="text-large">You have not recorded any trips.</p>
+          <p><a class="button button-positive button-block" href="#/app/map">Start a Trip</a></p>
+        </div>
+      </div>
     </ion-content>
   </ion-view>

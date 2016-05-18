@@ -1,9 +1,45 @@
-/* Empty. Add your own CSS if you like */
-map {
+#current-map {
   display: block;
-  width: 100%;
   height: 100%;
+  width: 100%;
+}
+#previous-map {
+  height: 50%;
+  width: 100%;
 }
 .scroll {
   height: 100%;
+}
+.bikemoves-play,
+.bikemoves-pause,
+.bikemoves-stop {
+  margin-left: 10px;
+  width: 75px;
+}
+.bikemoves-odometer {
+  padding-left: 15px;
+}
+.bikemoves-list-value {
+  font-weight: bold;
+}
+.icon-large {
+  font-size: 10em;
+}
+.text-large {
+  font-size: 2em;
+  line-height: 1.2em;
+  padding: 1em;
+}
+.no-content {
+  background-color: #dddddd;
+  height: 100%;
+  text-align: center;
+}
+.no-content .icon-large {
+  color: #bbbbbb;
+  text-shadow: 2px 2px rgba(255, 255, 255, 0.5);
+}
+.no-content .text-large {
+  color: #666666;
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.8);
 }

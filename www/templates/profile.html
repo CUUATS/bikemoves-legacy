@@ -1,17 +1,50 @@
 <ion-view view-title="Profile" ng-controller="profileCtrl">
+  <ion-nav-buttons side="primary">
+    <a class="button button-positive" ng-disabled="!dirty" ng-click="saveProfile()">Save</a>
+  </ion-nav-buttons>
   <ion-content>
     <div class="list">
-      <div class="item item-thumbnail-left item-button-right">
-        <img src="img/anonymous.png">
-        <button class="button icon ion-gear-a" ng-click="editInfo()"></button>
-        <p>Gender: {{ info.sex }}</p>
-        <p>Age: {{ info.age }}</p>
-        <p>Cycling Experience: {{ info.cyclingExperience }}</p>
+      <div class="item item-divider">
+        Demographics
+      </div>
+      <label class="item item-input item-select">
+        <div class="input-label">Gender</div>
+        <select ng-model="profile.sex" ng-change="profileChanged()">
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label class="item item-input item-select">
+        <div class="input-label">Age</div>
+        <select ng-model="profile.age" ng-change="profileChanged()">
+          <option>Under 15</option>
+          <option>15 to 19</option>
+          <option>20 to 24</option>
+          <option>25 to 34</option>
+          <option>35 to 44</option>
+          <option>45 to 54</option>
+          <option>55 to 64</option>
+          <option>65 to 74</option>
+          <option>75 and Older</option>
+        </select>
+      </label>
+      <label class="item item-input item-select">
+        <div  class="input-label item-text-wrap">Cycling Experience</div>
+        <select style="padding-left: 0px;" ng-model="profile.cyclingExperience" ng-change="profileChanged()">
+          <option>Beginner</option>
+          <option>Intermediate</option>
+          <option>Advanced</option>
+        </select>
+      </label>
+      <div class="item item-divider">
+        Statistics
       </div>
       <div class="item">
-        <h3>Statistics</h3>
-        <p>Total Distance: {{ info.totalDist.toFixed(1) }} miles</p>
-        <p>Total GHG Reduced: {{ (info.totalDist * .8115).toFixed(1) }} lbs</p>
+        Total Distance: <strong>{{ distance }} miles</strong>
+      </div>
+      <div class="item">
+        Total GHG Reduced: <strong>{{ ghg }} lb</strong>
       </div>
     </div>
   </ion-content>

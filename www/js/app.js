@@ -1,42 +1,44 @@
-// Ionic Starter App
+angular.module('bikemoves', [
+  'ionic',
+  'bikemoves.controllers',
+  'bikemoves.services',
+  'app.directives'
+])
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-// 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'app.directives'])
-
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, mapService) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       cordova.plugins.Keyboard.disableScroll(true);
-
     }
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+<<<<<<< HEAD
     if (window.cordova) {
       if (window.BackgroundGeolocation) {
         BackgroundGeolocationService.configurePlugin(window.BackgroundGeolocation);
       }
       // Prompt user to turn on high accuracy gps mode if not enabled already
+=======
+    if (window.cordova.plugins.locationAccuracy) {
+      // Request high accuracy geolocation on Android.
+>>>>>>> maptiles
       cordova.plugins.locationAccuracy.request(
-        function(success) {
-          console.log("Successfully requested accuracy: "+success.message);
-        }, function(error) {
-          console.error("Accuracy request failed: error code="+error.code+"; error message="+error.message);
-        }, 
-          cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY
+        angular.noop,
+        angular.noop,
+        cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY
       );
     }
     // Initialize devlog
     if(window.localStorage['devLog'] === undefined) {
       window.localStorage['devLog'] = JSON.stringify(new Array())
     }
+
+    mapService.init();
   });
 })
 
@@ -46,15 +48,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   .state('app', {
     url: '/app',
     abstract: true,
-    templateUrl: 'templates/menu.html',
+    templateUrl: 'templates/tabs.html',
     controller: 'AppCtrl'
   })
-
 
   .state('app.profile', {
     url: '/profile',
     views: {
-      'menuContent': {
+      'tab-profile': {
         templateUrl: 'templates/profile.html'
       }
     }
@@ -63,9 +64,9 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   .state('app.map', {
     url: '/map',
     views: {
-      'menuContent': {
+      'tab-map': {
         templateUrl: 'templates/map.html',
-        controller: 'mapCtrl'
+        controller: 'MapCtrl'
       }
     }
   })
@@ -73,28 +74,17 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   .state('app.settings', {
     url: '/settings',
     views: {
-      'menuContent': {
+      'tab-settings': {
         templateUrl: 'templates/settings.html',
         controller: "SettingsCtrl"
       }
     }
   })
 
-  .state('app.saved_locations', {
-    url: '/settings/saved_locations',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/saved_locations.html',
-        controller: 'SavedLocationsCtrl'
-      }
-    }
-  })
-
   .state('app.previous_trips', {
-    cache: false,
     url: '/previous_trips',
     views: {
-      'menuContent': {
+      'tab-previous-trips': {
         templateUrl: 'templates/previous_trips.html',
         controller: 'PreviousTripsCtrl'
       }
@@ -102,21 +92,39 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   })
 
   .state('app.single', {
-    url: '/previous_trips/:previousTripID',
+    url: '/previous_trips/:tripIndex',
     views: {
-      'menuContent': {
+      'tab-previous-trips': {
         templateUrl: 'templates/previous_trip.html',
         controller: 'PreviousTripCtrl'
       }
     }
   })
 
-  .state('app.devlog', {
-    url: '/devlog',
+  .state('app.privacy', {
+    url: '/privacy',
     views: {
-      'menuContent': {
-        templateUrl: 'templates/dev_log.html',
-        controller: 'DevLogCtrl'
+      'tab-settings': {
+        templateUrl: 'templates/privacy.html'
+      }
+    }
+  })
+
+  .state('app.legal', {
+    url: '/legal',
+    views: {
+      'tab-settings': {
+        templateUrl: 'templates/legal.html',
+        controller: 'LegalCtrl'
+      }
+    }
+  })
+
+  .state('app.credits', {
+    url: '/credits',
+    views: {
+      'tab-settings': {
+        templateUrl: 'templates/credits.html'
       }
     }
   });
