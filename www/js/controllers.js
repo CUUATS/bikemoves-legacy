@@ -10,14 +10,13 @@ angular.module('bikemoves.controllers', [])
   '$scope',
   '$ionicPlatform',
   '$ionicModal',
-  '$http',
   '$ionicPopup',
   'mapService',
+  'remoteService',
   'tripService',
   'settingsService',
-  function($scope, $ionicPlatform, $ionicModal, $http, $ionicPopup, mapService, tripService, settingsService) {
-    var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
-      STATUS_STOPPED = 'stopped',
+  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, mapService, remoteService, tripService, settingsService) {
+    var STATUS_STOPPED = 'stopped',
       STATUS_RECORDING = 'recording',
       STATUS_PAUSED = 'paused',
       BG_DEFAULT_SETTINGS = {
@@ -184,10 +183,7 @@ angular.module('bikemoves.controllers', [])
       var trip = angular.merge({
         deviceUUID: window.device.uuid
       }, tripService.getTrip());
-      console.log(JSON.stringify(trip));
-      return $http.post(TRIPS_ENDPOINT, {
-        data: LZString.compressToBase64(JSON.stringify(trip))
-      }).then(function success(res) {
+      return remoteService.postTrip(trip).then(function success(res) {
         tripService.saveTrip(res.status == 200);
         if (res.status != 200) onSubmitError();
       }, function failure(res) {
@@ -435,21 +431,19 @@ angular.module('bikemoves.controllers', [])
 .controller('profileCtrl', [
   '$scope',
   '$ionicPopup',
-  '$http',
   'profileService',
+  'remoteService',
   'tripService',
-  function($scope, $ionicPopup, $http, profileService, tripService) {
-    var ENDPOINT = 'http://api.bikemoves.me/v0.1/user',
+  function($scope, $ionicPopup, profileService, remoteService, tripService) {
+    var Age = remoteService.getEnum('User', 'Age'),
+      ExperienceLevel = remoteService.getEnum('User', 'ExperienceLevel'),
+      Gender = remoteService.getEnum('User', 'Gender'),
       saveProfile = function(profile) {
         profileService.setProfile(profile);
       },
       submitProfile = function() {
-        var profile = angular.merge({
-          deviceUUID: window.device.uuid
-        }, profileService.getProfile());
-        $http.post(ENDPOINT, {
-          data: LZString.compressToBase64(JSON.stringify(profile))
-        }).catch(function errorCallback(response) {
+        var profile = profileService.getProfile();
+        remoteService.postUser(profile).catch(function errorCallback(response) {
           console.log(response)
         });
       };
@@ -492,6 +486,87 @@ angular.module('bikemoves.controllers', [])
         });
       }
     });
+
+    $scope.options = {
+      age: [
+        {
+          id: Age.NOT_SPECIFIED,
+          label: ''
+        },
+        {
+          id: Age.AGE_UNDER_15,
+          label: 'Under 15'
+        },
+        {
+          id: Age.AGE_15_TO_19,
+          label: '15 to 19'
+        },
+        {
+          id: Age.AGE_20_TO_24,
+          label: '20 to 24'
+        },
+        {
+          id: Age.AGE_25_TO_34,
+          label: '25 to 34'
+        },
+        {
+          id: Age.AGE_35_TO_44,
+          label: '35 to 44'
+        },
+        {
+          id: Age.AGE_45_TO_54,
+          label: '45 to 54'
+        },
+        {
+          id: Age.AGE_55_TO_64,
+          label: '55 to 64'
+        },
+        {
+          id: Age.AGE_65_TO_74,
+          label: '65 to 74'
+        },
+        {
+          id: Age.AGE_75_AND_OLDER,
+          label: '75 and older'
+        }
+      ],
+      cyclingExperience: [
+        {
+          id: ExperienceLevel.NOT_SPECIFIED,
+          label: ''
+        },
+        {
+          id: ExperienceLevel.BEGINNER,
+          label: 'Beginner'
+        },
+        {
+          id: ExperienceLevel.INTERMEDIATE,
+          label: 'Intermediate'
+        },
+        {
+          id: ExperienceLevel.ADVANCED,
+          label: 'Advanced'
+        }
+      ],
+      gender: [
+        {
+          id: Gender.NOT_SPECIFIED,
+          label: ''
+        },
+        {
+          id: Gender.MALE,
+          label: 'Male'
+        },
+        {
+          id: Gender.FEMALE,
+          label: 'Female'
+        },
+        {
+          id: Gender.OTHER,
+          label: 'Other'
+        }
+      ]
+    };
 }])
 
 .controller('LegalCtrl', [
