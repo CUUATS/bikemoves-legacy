@@ -207,8 +207,8 @@ angular.module('bikemoves.controllers', [])
 
     $scope.startRecording = function() {
       console.log('Tapped record button');
+      if (getStatusFromScope() == STATUS_STOPPED) tripService.setStartTime();
       setStatus(STATUS_RECORDING);
-      tripService.setStartTime();
     };
 
     $scope.pauseRecording = function() {
