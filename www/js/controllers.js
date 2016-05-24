@@ -213,6 +213,7 @@ angular.module('bikemoves.controllers', [])
       submitTrip().finally(function () {
         tripService.resetTrip();
         updateMap();
+        updateOdometer();
       });
     };
 
@@ -221,6 +222,7 @@ angular.module('bikemoves.controllers', [])
       tripService.saveTrip(false);
       tripService.resetTrip();
       updateMap();
+      updateOdometer();
       setStatus(STATUS_STOPPED);
       cordova.plugins.Keyboard.close();
       tripSubmitModal.hide();
@@ -235,6 +237,7 @@ angular.module('bikemoves.controllers', [])
     $scope.discardTrip = function() {
       tripService.resetTrip();
       updateMap();
+      updateOdometer();
       setStatus(STATUS_STOPPED);
       cordova.plugins.Keyboard.close();
       tripSubmitModal.hide();
