@@ -217,12 +217,8 @@ angular.module('bikemoves.services', [])
       map.setClickable(clickable);
     };
     service.setTripLocations = function(locations) {
-      var latLngs = [];
-      angular.forEach(locations, function(location, idx) {
-        latLngs.push(location2LatLng(location));
-      });
-      tripPolyline.setPoints(latLngs);
-      tripPolyline.setVisible(true);
+      tripPolyline.setPoints(locations.map(location2LatLng));
+      tripPolyline.setVisible(locations.length > 1);
     };
     service.zoomToTripPolyline = function() {
       map.moveCamera({

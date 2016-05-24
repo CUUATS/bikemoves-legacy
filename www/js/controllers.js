@@ -103,17 +103,13 @@ angular.module('bikemoves.controllers', [])
       });
     },
     updateMap = function() {
-      if (currentLocation) {
-        mapService.onMapReady(function() {
+      mapService.onMapReady(function() {
+        if (currentLocation) {
           mapService.setCurrentLocation(currentLocation);
           mapService.setCenter(currentLocation);
-
-          var trip = tripService.getTrip();
-          if (trip.locations.length > 1) {
-            mapService.setTripLocations(trip.locations);
-          }
-        });
-      }
+        }
+        mapService.setTripLocations(tripService.getTrip().locations);
+      });
     },
     updateOdometer = function() {
       // Convert meters to miles.
