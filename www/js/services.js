@@ -360,6 +360,17 @@ angular.module('bikemoves.services', [])
       getPreviousLocation = function() {
         if (currentTrip.locations.length == 0) return null;
         return currentTrip.locations[currentTrip.locations.length - 1];
+      },
+      appendLocation = function(location) {
+        currentTrip.locations.push(location);
+      },
+      replaceLocation = function(location) {
+        currentTrip.locations[currentTrip.locations.length - 1] = location;
+      },
+      moreAccurate = function(loc1, loc2) {
+        if (loc1.accuracy == loc2.accuracy)
+          return (loc1.time > loc2.time) ? loc1 : loc2;
+        return (loc1.accuracy < loc2.accuracy) ? loc1 : loc2;
       };
 
     service.getTrip = function () {
@@ -369,10 +380,28 @@ angular.module('bikemoves.services', [])
       return currentTrip.distance;
     };
     service.addLocation = function(location) {
-      if (!location.moving) return getPreviousLocation();
-      currentTrip.locations.push(location);
+      var prev = getPreviousLocation();
+      if (!location.moving) return prev;
+
+      // If we have a previous location, check that the travel speed between
+      // the two locations is reasonable and that the locations are outside
+      // of each other's accuracy circles. If not, keep only the more
+      // accurate of the two locations.
+      if (prev) {
+        var meters = getDistance(prev, location),
+          seconds = (location.time - prev.time) / 1000;
+        if ((meters / seconds) > 23 || meters < location.accuracy ||
+            meters < prev.accuracy) {
+          replaceLocation(moreAccurate(prev, location));
+        } else {
+          appendLocation(location);
+        }
+      } else {
+        appendLocation(location);
+      }
+
       currentTrip.distance = getTripDistance(currentTrip);
-      return location;
+      return getPreviousLocation();
     };
     service.setStartTime = function(timestamp) {
       if (!angular.isDefined(timestamp)) var timestamp = (new Date()).getTime();
