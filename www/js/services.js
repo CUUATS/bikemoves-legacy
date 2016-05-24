@@ -322,7 +322,7 @@ angular.module('bikemoves.services', [])
   .service('tripService', function(storageService) {
     var service = this,
       TRIPS_KEY = 'trips',
-      CURRENT_TRIP_KEY = 'currenttrip',
+      START_TIME_KEY = 'starttime',
       DISTANCE_KEY = 'totaldistance',
       NEAR_THESHOLD = 500, // Maximum distance for location guesses, in meters
       toGeoJSON = function(locations) {
@@ -356,8 +356,9 @@ angular.module('bikemoves.services', [])
       },
       trips = storageService.get(TRIPS_KEY, []),
       distance = storageService.get(DISTANCE_KEY, 0),
-      currentTrip = storageService.get(CURRENT_TRIP_KEY, newTrip()),
+      currentTrip = newTrip(),
       getPreviousLocation = function() {
+        if (currentTrip.locations.length == 0) return null;
         return currentTrip.locations[currentTrip.locations.length - 1];
       };
 
@@ -367,45 +368,29 @@ angular.module('bikemoves.services', [])
     service.getCurrentDistance = function() {
       return currentTrip.distance;
     };
-    service.evaluateLocation = function(location, desiredAccuracy) {
-      // Determine whether the current location should:
-      // -1: Be discarded
-      //  0: Replace the current location
-      //  1: Be added
-      return 1;
-      // if (location.moving == false) return 0;
-      // if (currentTrip.locations.length == 0) return 1;
-      // var prev = getPreviousLocation(),
-      //   dist = getDistance(getPreviousLocation(), location);
-      // if (dist > prev.accuracy && dist > location.accuracy) return 1;
-      // if (location.accuracy < prev.accuracy) return 0;
-      // return -1;
-    };
-    service.replaceLocation = function(location) {
-      currentTrip.locations[currentTrip.locations.length - 1] = location;
-      currentTrip.distance = getTripDistance(currentTrip);
-      storageService.set(CURRENT_TRIP_KEY, currentTrip);
-    };
     service.addLocation = function(location) {
+      if (!location.moving) return getPreviousLocation();
       currentTrip.locations.push(location);
       currentTrip.distance = getTripDistance(currentTrip);
-      storageService.set(CURRENT_TRIP_KEY, currentTrip);
+      return location;
     };
     service.setStartTime = function(timestamp) {
       if (!angular.isDefined(timestamp)) var timestamp = (new Date()).getTime();
       currentTrip.startTime = timestamp;
-      storageService.set(CURRENT_TRIP_KEY, currentTrip);
+      storageService.set(START_TIME_KEY, timestamp);
     };
     service.setEndTime = function(timestamp) {
       if (!angular.isDefined(timestamp)) var timestamp = (new Date()).getTime();
       currentTrip.endTime = timestamp;
-      storageService.set(CURRENT_TRIP_KEY, currentTrip);
     };
     service.setTripMetadata = function(metadata) {
       angular.merge(currentTrip, metadata);
-      storageService.set(CURRENT_TRIP_KEY, currentTrip);
     };
     service.saveTrip = function(submitted) {
+      // Restore start time if the trip was recreated.
+      if (!currentTrip.starTime) currentTrip.starTime =
+        storageService.get(START_TIME_KEY);
+
       currentTrip.submitted = submitted;
       trips.unshift(currentTrip);
       distance += currentTrip.distance;
@@ -414,7 +399,6 @@ angular.module('bikemoves.services', [])
     };
     service.resetTrip = function() {
       currentTrip = newTrip();
-      storageService.set(CURRENT_TRIP_KEY, currentTrip);
     };
     service.getTrips = function() {
       return trips;

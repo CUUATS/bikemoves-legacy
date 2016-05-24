@@ -127,34 +127,15 @@ angular.module('bikemoves.controllers', [])
         time: e.timestamp.getTime()
       }, e.coords);
     },
-    onLocation = function(e, taskId) {
-      var location = makeLocation(e),
-        evaluation = tripService.evaluateLocation(location, geoSettings.desiredAccuracy);
-      console.log(evaluation + ': ' + JSON.stringify(location));
-      if (evaluation > -1) {
-        currentLocation = location;
-        if ($scope.status.isRecording) {
-          if (evaluation == 0) {
-            tripService.replaceLocation(location);
-          } else {
-            tripService.addLocation(location);
-          }
-          updateOdometer();
-        }
+    onLocation = function(e, taskId, skipUpdate) {
+      var location = makeLocation(e);
+      currentLocation = (getStatusFromScope() == STATUS_RECORDING) ?
+        tripService.addLocation(location) : location;
+      if (!skipUpdate) {
+        updateOdometer();
         updateMap();
       }
-      bgGeo.finish(taskId);
-    },
-    onLocationError = function(error) {
-      console.error('Location error: ', error);
-    },
-    onMotionChange = function(isMoving, location, taskId) {
-      if (isMoving) {
-        console.log('Device has just started MOVING', location);
-      } else {
-        console.log('Device has just STOPPED', location);
-      }
-      bgGeo.finish(taskId);
+      if (taskId) bgGeo.finish(taskId);
     },
     prepopulateTripForm = function() {
       $scope.tripInfo = {
@@ -184,14 +165,12 @@ angular.module('bikemoves.controllers', [])
       var trip = angular.merge({
         deviceUUID: window.device.uuid
       }, tripService.getTrip());
-      console.log(JSON.stringify(trip));
       return $http.post(TRIPS_ENDPOINT, {
         data: LZString.compressToBase64(JSON.stringify(trip))
       }).then(function success(res) {
         tripService.saveTrip(res.status == 200);
         if (res.status != 200) onSubmitError();
       }, function failure(res) {
-        console.log(res);
         tripService.saveTrip(false);
         onSubmitError();
       });
@@ -207,18 +186,22 @@ angular.module('bikemoves.controllers', [])
     };
 
     $scope.startRecording = function() {
-      console.log('Tapped record button');
-      if (getStatusFromScope() == STATUS_STOPPED) tripService.setStartTime();
-      setStatus(STATUS_RECORDING);
+      if (getStatusFromScope() == STATUS_STOPPED) {
+        // This is a new trip. Reset everything.
+        tripService.setStartTime();
+        bgGeo.clearDatabase(function() {
+          setStatus(STATUS_RECORDING);
+        });
+      } else {
+        setStatus(STATUS_RECORDING);
+      }
     };
 
     $scope.pauseRecording = function() {
-      console.log('Tapped pause button');
       setStatus(STATUS_PAUSED);
     };
 
     $scope.stopRecording = function() {
-      console.log('Tapped stop button');
       setStatus(STATUS_PAUSED);
       tripService.setEndTime();
       prepopulateTripForm();
@@ -266,6 +249,7 @@ angular.module('bikemoves.controllers', [])
         bgGeo.getCurrentPosition(function success(e, taskId) {
           // Reset background geolocation to its former state.
           setStatus(getStatusFromScope());
+          bgGeo.finish(taskId);
         }, function error(errorCode) {
           console.log('Error code: ' + errorCode)
         }, {maximumAge: 0});
@@ -290,16 +274,26 @@ angular.module('bikemoves.controllers', [])
       // Set up the geolocation plugin.
       geoSettings = getGeolocationSettings();
       bgGeo = window.BackgroundGeolocation;
-      bgGeo.onLocation(onLocation, onLocationError);
-      bgGeo.onMotionChange(onMotionChange);
+      bgGeo.onLocation(onLocation, angular.noop);
       bgGeo.configure(geoSettings);
 
       // Set the initial state.
       bgGeo.getState(function(state) {
-        console.log(JSON.stringify(state));
-        if (state.enabled === false) tripService.resetTrip();
-        updateOdometer();
-        setStatus(getStatusFromState(state), angular.noop, true);
+        if (state.enabled) {
+          // A trip is in progress. Load locations from the cache.
+          bgGeo.getLocations(function(events, taskId) {
+            angular.forEach(events, function(e, key) {
+              onLocation(e, null, true);
+            });
+            updateOdometer();
+            updateMap();
+            setStatus(getStatusFromState(state), angular.noop, true);
+            bgGeo.finish(taskId);
+          });
+        } else {
+          updateOdometer();
+          setStatus(getStatusFromState(state), angular.noop, true);
+        }
       });
 
       // Set up the view.
