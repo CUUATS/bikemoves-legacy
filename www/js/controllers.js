@@ -228,6 +228,7 @@ angular.module('bikemoves.controllers', [])
 
     $scope.submitTrip = function() {
       setStatus(STATUS_STOPPED);
+      cordova.plugins.Keyboard.close();
       tripSubmitModal.hide();
       setTripMetadata();
       submitTrip().finally(function () {
@@ -242,11 +243,13 @@ angular.module('bikemoves.controllers', [])
       tripService.resetTrip();
       updateMap();
       setStatus(STATUS_STOPPED);
+      cordova.plugins.Keyboard.close();
       tripSubmitModal.hide();
     };
 
     $scope.resumeTrip = function() {
       setStatus(STATUS_RECORDING);
+      cordova.plugins.Keyboard.close();
       tripSubmitModal.hide();
     };
 
@@ -254,6 +257,7 @@ angular.module('bikemoves.controllers', [])
       tripService.resetTrip();
       updateMap();
       setStatus(STATUS_STOPPED);
+      cordova.plugins.Keyboard.close();
       tripSubmitModal.hide();
     };
 
