@@ -34,6 +34,7 @@ angular.module('bikemoves.controllers', [])
           stopOnTerminate: true, // Stop geolocation tracking on app exit
           stopTimeout: 3 // Keep tracking for 3 minutes while stationary
         },
+      geoSettings,
       bgGeo,
       currentLocation,
       tripSubmitModal;
@@ -128,7 +129,7 @@ angular.module('bikemoves.controllers', [])
     },
     onLocation = function(e, taskId) {
       var location = makeLocation(e),
-        evaluation = tripService.evaluateLocation(location);
+        evaluation = tripService.evaluateLocation(location, geoSettings.desiredAccuracy);
       console.log(evaluation + ': ' + JSON.stringify(location));
       if (evaluation > -1) {
         currentLocation = location;
@@ -163,7 +164,6 @@ angular.module('bikemoves.controllers', [])
       };
     },
     setTripMetadata = function() {
-      var geoSettings = getGeolocationSettings();
       tripService.setTripMetadata({
         desiredAccuracy: geoSettings.desiredAccuracy,
         origin: $scope.tripInfo.origin,
@@ -197,7 +197,8 @@ angular.module('bikemoves.controllers', [])
       });
     },
     initView = function() {
-      bgGeo.setConfig(getGeolocationSettings());
+      geoSettings = getGeolocationSettings();
+      bgGeo.setConfig(geoSettings);
       mapService.onMapReady(function() {
         $scope.settings = settingsService.getSettings();
         mapService.resetMap(mapService.MAP_TYPE_CURRENT);
@@ -283,10 +284,11 @@ angular.module('bikemoves.controllers', [])
       });
 
       // Set up the geolocation plugin.
+      geoSettings = getGeolocationSettings();
       bgGeo = window.BackgroundGeolocation;
       bgGeo.onLocation(onLocation, onLocationError);
       bgGeo.onMotionChange(onMotionChange);
-      bgGeo.configure(getGeolocationSettings());
+      bgGeo.configure(geoSettings);
 
       // Set the initial state.
       bgGeo.getState(function(state) {

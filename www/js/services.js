@@ -367,17 +367,19 @@ angular.module('bikemoves.services', [])
     service.getCurrentDistance = function() {
       return currentTrip.distance;
     };
-    service.evaluateLocation = function(location) {
+    service.evaluateLocation = function(location, desiredAccuracy) {
       // Determine whether the current location should:
       // -1: Be discarded
       //  0: Replace the current location
       //  1: Be added
-      if (currentTrip.locations.length == 0) return 1;
-      var prev = getPreviousLocation(),
-        dist = getDistance(getPreviousLocation(), location);
-      if (dist > prev.accuracy && dist > location.accuracy) return 1;
-      if (location.accuracy < prev.accuracy) return 0;
-      return -1;
+      return 1;
+      // if (location.moving == false) return 0;
+      // if (currentTrip.locations.length == 0) return 1;
+      // var prev = getPreviousLocation(),
+      //   dist = getDistance(getPreviousLocation(), location);
+      // if (dist > prev.accuracy && dist > location.accuracy) return 1;
+      // if (location.accuracy < prev.accuracy) return 0;
+      // return -1;
     };
     service.replaceLocation = function(location) {
       currentTrip.locations[currentTrip.locations.length - 1] = location;
