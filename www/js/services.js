@@ -469,7 +469,6 @@ angular.module('bikemoves.services', ['lokijs'])
     };
 
     service.updateSettings = function(newSettings) {
-      console.log(newSettings);
       return storageService.set(SETTINGS_KEY, newSettings);
     };
 
@@ -485,21 +484,18 @@ angular.module('bikemoves.services', ['lokijs'])
         age: null,
         cyclingExperience: null,
         sex: null
-      },
-      profile = storageService.get(PROFILE_KEY, DEFAULT_PROFILE);
+      };
 
     service.getProfile = function() {
-      return angular.copy(profile);
+      return storageService.get(PROFILE_KEY, DEFAULT_PROFILE);
     };
 
-    service.setProfile = function(newProfile) {
-      profile = newProfile;
-      storageService.set(PROFILE_KEY, newProfile);
+    service.updateProfile = function(newProfile) {
+      return storageService.set(PROFILE_KEY, newProfile);
     };
 
     service.clearAll = function() {
-      profile = angular.copy(DEFAULT_PROFILE);
-      storageService.set(PROFILE_KEY, profile);
+      return storageService.delete(PROFILE_KEY);
     };
   })
 

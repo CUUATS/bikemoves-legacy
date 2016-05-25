@@ -351,15 +351,17 @@ angular.module('bikemoves.controllers', [])
   function($scope, $ionicPopup, $http, profileService, tripService) {
     var ENDPOINT = 'http://api.bikemoves.me/v0.1/user',
       saveProfile = function(profile) {
-        profileService.setProfile(profile);
+        return profileService.updateProfile(profile);
       },
       submitProfile = function() {
-        var profile = angular.merge({
-          deviceUUID: window.device.uuid
-        }, profileService.getProfile());
-        $http.post(ENDPOINT, {
-          data: LZString.compressToBase64(JSON.stringify(profile))
-        }).catch(function errorCallback(response) {
+        profileService.getProfile().then(function(profile) {
+          var data = angular.merge({
+            deviceUUID: window.device.uuid
+          }, profile);
+          return $http.post(ENDPOINT, {
+            data: LZString.compressToBase64(JSON.stringify(data))
+          });
+        }).catch(function (response) {
           console.log(response)
         });
       };
@@ -368,8 +370,7 @@ angular.module('bikemoves.controllers', [])
       // Prevent save action from firing twice when the save button is tapped.
       if (!$scope.dirty) return;
       $scope.dirty = false;
-      saveProfile($scope.profile);
-      submitProfile();
+      saveProfile($scope.profile).then(submitProfile);
     };
 
     $scope.profileChanged = function() {
@@ -378,7 +379,10 @@ angular.module('bikemoves.controllers', [])
 
     $scope.$on('$ionicView.enter', function(e) {
       $scope.dirty = false;
-      $scope.profile = profileService.getProfile();
+      profileService.getProfile().then(function(profile) {
+        $scope.profile = profile;
+      });
+
       var distance = tripService.getTotalDistance() * 0.000621371;
       $scope.distance =  distance.toFixed(1);
       $scope.ghg = (distance * .8115).toFixed(1);
@@ -395,10 +399,7 @@ angular.module('bikemoves.controllers', [])
            cancelText: 'Discard',
            okText: 'Save'
         }).then(function(res) {
-          if (res) {
-            saveProfile(profile);
-            submitProfile();
-          }
+          if (res) saveProfile(profile).then(submitProfile);
         });
       }
     });
