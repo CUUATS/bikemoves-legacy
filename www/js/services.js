@@ -1,4 +1,137 @@
-angular.module('bikemoves.services', [])
+angular.module('bikemoves.services', ['lokijs'])
+
+  .service('locationService', function($q, $ionicPlatform) {
+    var service = this,
+      BG_DEFAULT_SETTINGS = {
+        activityType: 'Fitness', // iOS activity type
+        autoSync: false, // Do not automatically post to the server
+        debug: false, // Disable debug notifications
+        desiredAccuracy: 10, // Overridden by settings.
+        distanceFilter: 20, // Generate update events every 20 meters
+        disableElasticity: true, // Do not auto-adjust distanceFilter
+        fastestLocationUpdateInterval: 1000, // Prevent updates more than once per second (Android)
+        locationUpdateInterval: 5000, // Request updates every 5 seconds (Android)
+        startOnBoot: false, // Do not start tracking on device boot
+        stationaryRadius: 20, // Activate the GPS after 20 meters (iOS)
+        stopOnTerminate: true, // Stop geolocation tracking on app exit
+        stopTimeout: 3 // Keep tracking for 3 minutes while stationary
+      },
+      bgGeo,
+      geoSettings = angular.copy(BG_DEFAULT_SETTINGS),
+      initPlugin = function() {
+        return $q(function(resolve, reject) {
+          if (bgGeo) {
+            resolve();
+          } else {
+            $ionicPlatform.ready(function() {
+              bgGeo = window.BackgroundGeolocation;
+              bgGeo.onLocation(angular.noop);
+              bgGeo.configure(geoSettings);
+              resolve();
+            });
+          }
+        });
+      },
+      doGeoTask = function(fn, options) {
+        var task;
+        return initPlugin().then(function() {
+          return $q(function(resolve, reject) {
+            bgGeo[fn](function(e, taskId) {
+              task = taskId;
+              resolve(e);
+            }, function(e, taskId) {
+              task = taskId;
+              reject(e);
+            }, options);
+          }).finally(function() {
+            console.log('finishing task', task);
+            bgGeo.finish(task);
+          });
+        });
+      },
+      getState = function() {
+        return initPlugin().then(function() {
+          return $q(function(resolve, reject) {
+            bgGeo.getState(resolve);
+          });
+        });
+      },
+      setGeolocationEnabled = function(on) {
+        return getState().then(function(state) {
+          if (state.enabled === on) {
+            resolve();
+          } else if (on) {
+            bgGeo.start(resolve);
+          } else {
+            bgGeo.stop(resolve);
+          }
+        });
+      },
+      setMoving = function(moving) {
+        return getState().then(function(state) {
+          return $q(function(resolve, reject) {
+            if (state.isMoving === moving) {
+              resolve();
+            } else {
+              bgGeo.changePace(moving, resolve);
+            }
+          });
+        });
+      },
+      makeLocation = function(e) {
+        return angular.merge({
+          moving: e.is_moving,
+          time: e.timestamp.getTime()
+        }, e.coords);
+      };
+
+    service.STATUS_STOPPED = 'stopped';
+    service.STATUS_RECORDING = 'recording';
+    service.STATUS_PAUSED = 'paused';
+    service.getSettings = function() {
+      return geoSettings;
+    };
+    service.updateSettings = function(newSettings) {
+      return initPlugin().then(function() {
+        angular.merge(geoSettings, newSettings);
+        bgGeo.setConfig(geoSettings);
+      });
+    };
+    service.getLocations = function() {
+      return doGeoTask('getLocations').then(makeLocation);
+    };
+    service.onLocation = function(locationHandler) {
+      return initPlugin().then(function() {
+        bgGeo.onLocation(function(e, taskId) {
+          locationHandler(makeLocation(e));
+          bgGeo.finish(taskId);
+        });
+      });
+    };
+    service.getCurrentPosition = function(options) {
+      return doGeoTask('getCurrentPosition', options).then(makeLocation);
+    };
+    service.clearDatabase = function() {
+      return initPlugin().then(function() {
+        return $q(function(resolve, reject) {
+          bgGeo.clearDatabase(resolve, reject);
+        });
+      })
+    };
+    service.setStatus = function(status) {
+      var enabled = status != service.STATUS_STOPPED;
+      return setGeolocationEnabled(enabled).then(function() {
+        if (enabled) return setMoving(status == service.STATUS_RECORDING);
+      });
+    };
+    service.getStatus = function() {
+      return getState().then(function(state) {
+        return (state.enabled) ? (
+          (state.isMoving) ? service.STATUS_RECORDING : service.STATUS_PAUSED) :
+            service.STATUS_STOPPED;
+      });
+    };
+  })
 
   .service('mapService', function($http) {
     var service = this,
@@ -252,17 +385,74 @@ angular.module('bikemoves.services', [])
     };
   })
 
-  .service('storageService', function() {
+  .service('storageService', function($q, Loki) {
     var service = this,
-      KEY_PREFIX = 'bikemoves:';
+      APP_COLLECTION = 'app',
+      db = new Loki('bikemoves', {
+        autosave: false,
+        adapter: new LokiCordovaFSAdapter({'prefix': 'loki'})
+      }),
+      dbLoaded = false,
+      loadDb = function() {
+        return $q(function (resolve, reject) {
+          if (dbLoaded) {
+            resolve()
+          } else {
+            db.loadDatabase({}, function () {
+              dbLoaded = true;
+              resolve();
+            });
+          };
+        });
+      },
+      getCollection = function(collectionName, uniqueIndices) {
+        return loadDb().then(function() {
+          var collection = db.getCollection(collectionName);
+          if (!collection) {
+            collection = db.addCollection(collectionName);
+            if (uniqueIndices) {
+              angular.forEach(uniqueIndices, function(indexName) {
+                collection.ensureUniqueIndex(indexName);
+              });
+            }
+          }
+          return collection;
+        });
+      },
+      save = function() {
+        return loadDb().then(function() {
+          return $q(function (resolve, reject) {
+            db.saveDatabase(resolve);
+          });
+        });
+      };
 
-    service.get = function(key, defaultValue) {
-      var value = window.localStorage.getItem(KEY_PREFIX + key);
-      return (value === null) ? defaultValue : JSON.parse(value);
+    service.get = function(docName, defaultValue) {
+      return getCollection(APP_COLLECTION, ['_name']).then(function(collection) {
+        var doc = collection.by('_name', docName);
+        return (doc) ? doc : angular.copy(defaultValue);
+      });
     };
 
-    service.set = function(key, value) {
-      window.localStorage[KEY_PREFIX + key] = JSON.stringify(value);
+    service.set = function(docName, doc) {
+      return getCollection(APP_COLLECTION).then(function(collection) {
+        var oldDoc = collection.by('_name', docName);
+        if (!oldDoc) {
+          collection.insert(angular.merge({'_name': docName}, doc));
+        } else {
+          collection.update(doc);
+        }
+        return save();
+      });
+    };
+
+    service.delete = function(docName) {
+      return getCollection(APP_COLLECTION).then(function(collection) {
+        collection.removeWhere({
+          '_name': docName
+        });
+        return save();
+      });
     };
   })
 
@@ -272,21 +462,19 @@ angular.module('bikemoves.services', [])
       DEFAULT_SETTINGS = {
         accuracyLevel: 1,
         autoSubmit: true
-      },
-      settings = storageService.get(SETTINGS_KEY, DEFAULT_SETTINGS);
+      };
 
     service.getSettings = function() {
-      return angular.copy(settings);
+      return storageService.get(SETTINGS_KEY, DEFAULT_SETTINGS);
     };
 
     service.updateSettings = function(newSettings) {
-      angular.merge(settings, newSettings);
-      storageService.set(SETTINGS_KEY, settings);
+      console.log(newSettings);
+      return storageService.set(SETTINGS_KEY, newSettings);
     };
 
     service.clearAll = function() {
-      settings = angular.copy(DEFAULT_SETTINGS);
-      storageService.set(SETTINGS_KEY, settings);
+      return storageService.delete(SETTINGS_KEY);
     };
   })
 
