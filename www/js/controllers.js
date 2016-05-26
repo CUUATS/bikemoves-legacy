@@ -18,6 +18,7 @@ angular.module('bikemoves.controllers', [])
   'settingsService',
   function($scope, $ionicPlatform, $ionicModal, $http, $ionicPopup, locationService, mapService, tripService, settingsService) {
     var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
+      START_TIME_KEY = 'bikemoves:starttime',
       currentLocation,
       tripSubmitModal;
 
@@ -106,7 +107,11 @@ angular.module('bikemoves.controllers', [])
     $scope.startRecording = function() {
       if ($scope.status.isStopped) {
         // This is a new trip. Reset everything.
-        tripService.setStartTime();
+        tripService.getTrip().then(function(trip) {
+          var now = tripService.now();
+          trip.startTime = now;
+          window.localStorage.setItem(START_TIME_KEY, String.valueOf(now));
+        });
         locationService.clearDatabase().then(function() {
           setStatus(locationService.STATUS_RECORDING);
         });
@@ -192,7 +197,12 @@ angular.module('bikemoves.controllers', [])
 
     locationService.getStatus().then(function(status) {
       if (status != locationService.STATUS_STOPPED) {
-        // A trip is in progress. Load locations from the cache.
+        // A trip is in progress.
+        // Restore start time if the trip was recreated.
+        tripService.getTrip().then(function(trip) {
+          trip.startTime = parseInt(window.localStorage.getItem(START_TIME_KEY));
+        });
+        // Load locations from the cache.
         return locationService.getLocations().then(function(locations) {
           angular.forEach(locations, function(location, key) {
             onLocation(location, true);

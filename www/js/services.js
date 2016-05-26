@@ -388,35 +388,43 @@ angular.module('bikemoves.services', ['lokijs'])
   .service('storageService', function($q, Loki) {
     var service = this,
       APP_COLLECTION = 'app',
+      TRIPS_COLLECTION = 'trips',
       db = new Loki('bikemoves', {
         autosave: false,
         adapter: new LokiCordovaFSAdapter({'prefix': 'loki'})
       }),
+      collections = {},
       dbLoaded = false,
       loadDb = function() {
         return $q(function (resolve, reject) {
           if (dbLoaded) {
             resolve()
           } else {
-            db.loadDatabase({}, function () {
+            db.loadDatabase({
+              trips: {
+                proto: Trip
+              }
+            }, function () {
+              buildCollections();
               dbLoaded = true;
               resolve();
             });
           };
         });
       },
-      getCollection = function(collectionName, uniqueIndices) {
+      buildCollections = function() {
+        // App collection
+        collections[APP_COLLECTION] = db.getCollection(APP_COLLECTION) ||
+          db.addCollection(APP_COLLECTION);
+        collections[APP_COLLECTION].ensureUniqueIndex('_name');
+
+        // Trips collection
+        collections[TRIPS_COLLECTION] = db.getCollection(TRIPS_COLLECTION) ||
+          db.addCollection(TRIPS_COLLECTION);
+      },
+      getCollection = function(collectionName) {
         return loadDb().then(function() {
-          var collection = db.getCollection(collectionName);
-          if (!collection) {
-            collection = db.addCollection(collectionName);
-            if (uniqueIndices) {
-              angular.forEach(uniqueIndices, function(indexName) {
-                collection.ensureUniqueIndex(indexName);
-              });
-            }
-          }
-          return collection;
+          return collections[collectionName];
         });
       },
       save = function() {
@@ -428,7 +436,7 @@ angular.module('bikemoves.services', ['lokijs'])
       };
 
     service.get = function(docName, defaultValue) {
-      return getCollection(APP_COLLECTION, ['_name']).then(function(collection) {
+      return getCollection(APP_COLLECTION).then(function(collection) {
         var doc = collection.by('_name', docName);
         return (doc) ? doc : angular.copy(defaultValue);
       });
@@ -452,6 +460,38 @@ angular.module('bikemoves.services', ['lokijs'])
           '_name': docName
         });
         return save();
+      });
+    };
+
+    service.addTrip = function(trip) {
+      return getCollection(TRIPS_COLLECTION).then(function(collection) {
+        collection.insert(trip);
+        return save();
+      });
+    };
+
+    service.deleteTrip = function(tripID) {
+      return getCollection(TRIPS_COLLECTION).then(function(collection) {
+        collection.remove(tripID);
+        return save();
+      });
+    };
+
+    service.getTrips = function() {
+      return getCollection(TRIPS_COLLECTION).then(function(collection) {
+        return collection.data();
+      });
+    };
+
+    service.getTotalDistance = function() {
+      return getCollection(TRIPS_COLLECTION).then(function(collection) {
+        return collection.mapReduce(function(trip) {
+          return trip.distance;
+        }, function(distances) {
+          return distances.reduce(function(a, b) {
+            return a + b;
+          });
+        });
       });
     };
   })
@@ -501,113 +541,21 @@ angular.module('bikemoves.services', ['lokijs'])
 
   .service('tripService', function(storageService) {
     var service = this,
-      TRIPS_KEY = 'trips',
-      START_TIME_KEY = 'starttime',
-      DISTANCE_KEY = 'totaldistance',
       NEAR_THESHOLD = 500, // Maximum distance for location guesses, in meters
-      toGeoJSON = function(locations) {
-        if (angular.isArray(locations))
-          return turf.linestring(locations.map(function(location) {
-            return [location.longitude, location.latitude];
-          }));
-        return turf.point([locations.longitude, locations.latitude]);
-      },
-      getDistance = function(loc1, loc2) {
-        return turf.distance(
-          toGeoJSON(loc1), toGeoJSON(loc2), 'kilometers') * 1000;
-      },
-      getTripDistance = function(trip) {
-        if (trip.locations.length < 2) return 0;
-        return turf.lineDistance(
-          toGeoJSON(trip.locations), 'kilometers') * 1000;
-      },
-      newTrip = function() {
-        return {
-          desiredAccuracy: null,
-          destination: null,
-          distance: 0,
-          endTime: null,
-          locations: [],
-          origin: null,
-          startTime: null,
-          submitted: false,
-          transit: false
-        };
-      },
-      trips = storageService.get(TRIPS_KEY, []),
-      distance = storageService.get(DISTANCE_KEY, 0),
-      currentTrip = newTrip(),
-      getPreviousLocation = function() {
-        if (currentTrip.locations.length == 0) return null;
-        return currentTrip.locations[currentTrip.locations.length - 1];
-      },
-      appendLocation = function(location) {
-        currentTrip.locations.push(location);
-      },
-      replaceLocation = function(location) {
-        currentTrip.locations[currentTrip.locations.length - 1] = location;
-      },
-      moreAccurate = function(loc1, loc2) {
-        if (loc1.accuracy == loc2.accuracy)
-          return (loc1.time > loc2.time) ? loc1 : loc2;
-        return (loc1.accuracy < loc2.accuracy) ? loc1 : loc2;
-      };
+      currentTrip = new Trip();
 
     service.getTrip = function () {
       return currentTrip;
     };
-    service.getCurrentDistance = function() {
-      return currentTrip.distance;
-    };
-    service.addLocation = function(location) {
-      var prev = getPreviousLocation();
-      if (!location.moving) return prev;
-
-      // If we have a previous location, check that the travel speed between
-      // the two locations is reasonable and that the locations are outside
-      // of each other's accuracy circles. If not, keep only the more
-      // accurate of the two locations.
-      if (prev) {
-        var meters = getDistance(prev, location),
-          seconds = (location.time - prev.time) / 1000;
-        if ((meters / seconds) > 23 || meters < location.accuracy ||
-            meters < prev.accuracy) {
-          replaceLocation(moreAccurate(prev, location));
-        } else {
-          appendLocation(location);
-        }
-      } else {
-        appendLocation(location);
-      }
-
-      currentTrip.distance = getTripDistance(currentTrip);
-      return getPreviousLocation();
-    };
-    service.setStartTime = function(timestamp) {
-      if (!angular.isDefined(timestamp)) var timestamp = (new Date()).getTime();
-      currentTrip.startTime = timestamp;
-      storageService.set(START_TIME_KEY, timestamp);
-    };
-    service.setEndTime = function(timestamp) {
-      if (!angular.isDefined(timestamp)) var timestamp = (new Date()).getTime();
-      currentTrip.endTime = timestamp;
-    };
-    service.setTripMetadata = function(metadata) {
-      angular.merge(currentTrip, metadata);
+    service.now = function() {
+      return (new Date()).getTime();
     };
     service.saveTrip = function(submitted) {
-      // Restore start time if the trip was recreated.
-      if (!currentTrip.starTime) currentTrip.starTime =
-        storageService.get(START_TIME_KEY);
-
       currentTrip.submitted = submitted;
-      trips.unshift(currentTrip);
-      distance += currentTrip.distance;
-      storageService.set(TRIPS_KEY, trips);
-      storageService.set(DISTANCE_KEY, distance);
+      return storageService.addTrip(currentTrip);
     };
     service.resetTrip = function() {
-      currentTrip = newTrip();
+      currentTrip = new Trip();
     };
     service.getTrips = function() {
       return trips;
