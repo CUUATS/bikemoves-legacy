@@ -1,6 +1,6 @@
 angular.module('bikemoves.services', ['lokijs'])
 
-  .service('locationService', function($q, $ionicPlatform) {
+  .service('locationService', function($q) {
     var service = this,
       BG_DEFAULT_SETTINGS = {
         activityType: 'OtherNavigation', // iOS activity type
@@ -127,7 +127,7 @@ angular.module('bikemoves.services', ['lokijs'])
     };
   })
 
-  .service('mapService', function($http) {
+  .service('mapService', function($http, $q, $ionicPlatform) {
     var service = this,
       DEFAULT_LOCATION = {
         latitude: 40.109403,
@@ -140,7 +140,6 @@ angular.module('bikemoves.services', ['lokijs'])
       identifyLayerIds = [],
       identifyLayerNames = ['Bicycle Rack', 'Bicycle Repair and Retail', 'Bicycle Path'],
       ready = false,
-      readyCount = 0,
       readyQueue = [],
       container,
       map,
@@ -154,6 +153,58 @@ angular.module('bikemoves.services', ['lokijs'])
       currentLocation,
       location2LatLng = function(location) {
         return new plugin.google.maps.LatLng(location.latitude, location.longitude);
+      },
+      createMap = function() {
+        if (!map) {
+          defaultCenter = location2LatLng(DEFAULT_LOCATION);
+          container = document.getElementById('current-map');
+          getLayerInfo();
+          map = plugin.google.maps.Map.getMap(container, {
+            'camera': {
+              'latLng': defaultCenter,
+              'zoom': DEFAULT_ZOOM
+            }
+          });
+        }
+        return $q(function(resolve, reject) {
+          map.addEventListener(plugin.google.maps.event.MAP_READY, resolve);
+        });
+      },
+      addTileOverlay = function(map) {
+        return $q(function(resolve, reject) {
+          map.addTileOverlay({
+            tileUrlFormat: "http://tiles.bikemoves.me/tiles/<zoom>/<y>/<x>.png"
+          }, resolve);
+        });
+      },
+      addInfoMarker = function(map) {
+        return $q(function(resolve, reject) {
+          map.addMarker({
+            position: defaultCenter,
+            visible: false,
+            icon: '#fbb03b'
+          }, resolve);
+        });
+      },
+      addCurrentLocationMarker = function(map) {
+        return $q(function(resolve, reject) {
+          map.addMarker({
+            position: defaultCenter,
+            visible: false,
+            icon: '#00008b'
+          }, resolve);
+        });
+      },
+      addTripPolyline = function(map) {
+        return $q(function(resolve, reject) {
+          map.addPolyline({
+            points: [defaultCenter, defaultCenter],
+            visible: false,
+            geodesic: true,
+            color: '#2677FF',
+            width: 5
+          }, resolve);
+        });
       },
       getLayerInfo = function() {
         $http({
@@ -172,19 +223,25 @@ angular.module('bikemoves.services', ['lokijs'])
         });
       },
       getIdentifyParams = function(latLng, callback) {
-        map.getVisibleRegion(function(bounds) {
-          var ne = bounds.northeast,
-            sw = bounds.southwest;
-          callback({
-            f: 'json',
-            geometry: [latLng.lng, latLng.lat].join(','),
-            geometryType: 'esriGeometryPoint',
-            sr: 4326,
-            layers: 'top:' + identifyLayerIds.join(','),
-            tolerance: 10,
-            mapExtent: [sw.lng, sw.lat, ne.lng, ne.lat].join(','),
-            imageDisplay: [container.offsetWidth, container.offsetHeight, 96].join(','),
-            returnGeometry: true
+        return $q(function(resolve, reject) {
+          map.getVisibleRegion(function(bounds) {
+            var ne = bounds.northeast,
+              sw = bounds.southwest;
+            resolve({
+              f: 'json',
+              geometry: [latLng.lng, latLng.lat].join(','),
+              geometryType: 'esriGeometryPoint',
+              sr: 4326,
+              layers: 'top:' + identifyLayerIds.join(','),
+              tolerance: 10,
+              mapExtent: [sw.lng, sw.lat, ne.lng, ne.lat].join(','),
+              imageDisplay: [
+                container.offsetWidth,
+                container.offsetHeight,
+                96
+              ].join(','),
+              returnGeometry: true
+            });
           });
         });
       },
@@ -230,19 +287,19 @@ angular.module('bikemoves.services', ['lokijs'])
       },
       mapClick = function(latLng) {
         if (!identifyLayerIds || mapType != service.MAP_TYPE_CURRENT) return;
-        getIdentifyParams(latLng, function(params) {
-          $http({
+        getIdentifyParams(latLng).then(function(params) {
+          return $http({
             method: 'GET',
             url: SERVICE_ENDPOINT + '/identify',
             params: params
-          }).then(function(res) {
-            if (res.status == 200 && res.data.results.length) {
-              displayFeatureInfo(res.data.results[0], latLng);
-            } else {
-              infoMarker.hideInfoWindow();
-              infoMarker.setVisible(false);
-            }
           });
+        }).then(function(res) {
+          if (res.status == 200 && res.data.results.length) {
+            displayFeatureInfo(res.data.results[0], latLng);
+          } else {
+            infoMarker.hideInfoWindow();
+            infoMarker.setVisible(false);
+          }
         });
       },
       cameraChange = function(camera) {
@@ -250,133 +307,114 @@ angular.module('bikemoves.services', ['lokijs'])
           currentMapCamera = camera;
         }
       },
-      checkReady = function() {
-        readyCount += 1;
-        if (readyCount == 4) {
-          // All map elements have been added. Process any deferred actions.
-          ready = true;
-          angular.forEach(readyQueue, function(callback, idx) {
-            callback();
-          });
-        }
+      initMap = function() {
+        return $q(function(resolve, reject) {
+          if (ready) {
+            resolve();
+          } else {
+            readyQueue.push(resolve);
+          }
+        });
       };
 
     service.MAP_TYPE_CURRENT = 'current';
     service.MAP_TYPE_PREVIOUS = 'previous';
 
-    service.init = function() {
-      defaultCenter = location2LatLng(DEFAULT_LOCATION);
-      container = document.getElementById('current-map');
-      getLayerInfo();
-      map = plugin.google.maps.Map.getMap(container, {
-        'camera': {
-          'latLng': defaultCenter,
-          'zoom': DEFAULT_ZOOM
-        }
-      });
-      map.addEventListener(plugin.google.maps.event.MAP_READY, function() {
-        // Set up camera tracking for the current trip map.
-        map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);
-        // Tile overlay
-        map.addTileOverlay({
-          tileUrlFormat: "http://tiles.bikemoves.me/tiles/<zoom>/<y>/<x>.png"
-        }, function(overlay) {
-          tileOverlay = overlay;
-          checkReady();
-        });
-        // Info window marker
-        map.addMarker({
-          position: defaultCenter,
-          visible: false,
-          icon: '#fbb03b'
-        }, function(marker) {
-          infoMarker = marker;
-          map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
-          checkReady();
-        });
-        // Current position marker
-        map.addMarker({
-          position: defaultCenter,
-          visible: false,
-          icon: '#00008b'
-        }, function(marker) {
-          currentLocationMarker = marker;
-          checkReady();
-        });
-        // Trip path
-        map.addPolyline({
-          points: [defaultCenter, defaultCenter],
-          visible: false,
-          geodesic: true,
-          color: '#2677FF',
-          width: 5
-        }, function(polyline) {
-          tripPolyline = polyline;
-          checkReady();
-        });
-      });
-    };
-    service.onMapReady = function(callback) {
-      if (ready) {
-        callback();
-      } else {
-        readyQueue.push(callback);
-      }
-    };
     service.setCurrentLocation = function(location) {
-      currentLocation = location;
-      currentLocationMarker.setPosition(location2LatLng(location));
-      currentLocationMarker.setVisible(true);
+      return initMap().then(function() {
+        currentLocation = location;
+        currentLocationMarker.setPosition(location2LatLng(location));
+        currentLocationMarker.setVisible(true);
+      });
     };
     service.setCenter = function(location, duration) {
-      if (typeof duration === 'undefined') var duration = 0;
-      if (duration == 0) {
-        map.setCenter(location2LatLng(location));
-      } else {
-        map.getCameraPosition(function(camera) {
-          camera.target = location2LatLng(location);
-          camera.duration = duration;
-          map.animateCamera(camera);
-        });
-      }
+      return initMap().then(function() {
+        if (typeof duration === 'undefined') var duration = 0;
+        if (duration == 0) {
+          map.setCenter(location2LatLng(location));
+        } else {
+          return $q(function(resolve, reject) {
+            map.getCameraPosition(function(camera) {
+              camera.target = location2LatLng(location);
+              camera.duration = duration;
+              map.animateCamera(camera, resolve);
+            });
+          });
+        }
+      });
     };
     service.setClickable = function(clickable) {
-      map.setClickable(clickable);
+      return initMap().then(function() {
+        map.setClickable(clickable);
+      });
     };
     service.setTripLocations = function(locations) {
-      tripPolyline.setPoints(locations.map(location2LatLng));
-      tripPolyline.setVisible(locations.length > 1);
+      return initMap().then(function() {
+        tripPolyline.setPoints(locations.map(location2LatLng));
+        tripPolyline.setVisible(locations.length > 1);
+      });
     };
     service.zoomToTripPolyline = function() {
-      map.moveCamera({
-        'target': tripPolyline.getPoints()
+      return initMap().then(function() {
+        return $q(function(resolve, reject) {
+          map.moveCamera({
+            'target': tripPolyline.getPoints()
+          }, resolve);
+        });
       });
     };
     service.resetMap = function(newMapType) {
-      mapType = newMapType;
-      var containerId = (mapType == service.MAP_TYPE_CURRENT) ?
-        'current-map' : 'previous-map';
-      container = document.getElementById(containerId);
-      map.setDiv(container);
+      return initMap().then(function() {
+        mapType = newMapType;
+        var containerId = (mapType == service.MAP_TYPE_CURRENT) ?
+          'current-map' : 'previous-map';
+        container = document.getElementById(containerId);
+        map.setDiv(container);
 
-      // Show/hide map elements.
-      if (tileOverlay)
-        tileOverlay.setVisible(mapType == service.MAP_TYPE_CURRENT);
-      if (infoMarker) infoMarker.setVisible(false);
-      if (currentLocationMarker) currentLocationMarker.setVisible(false);
-      if (tripPolyline) tripPolyline.setVisible(false);
+        // Show/hide map elements.
+        if (tileOverlay)
+          tileOverlay.setVisible(mapType == service.MAP_TYPE_CURRENT);
+        if (infoMarker) infoMarker.setVisible(false);
+        if (currentLocationMarker) currentLocationMarker.setVisible(false);
+        if (tripPolyline) tripPolyline.setVisible(false);
 
-      // Reset the camera if this is the current map.
-      if (mapType == service.MAP_TYPE_CURRENT &&
-        angular.isDefined(currentMapCamera)) {
+        // Reset the camera if this is the current map.
+        if (mapType == service.MAP_TYPE_CURRENT &&
+            angular.isDefined(currentMapCamera)) {
           if (angular.isDefined(currentLocation))
             service.setCurrentLocation(currentLocation);
-          map.moveCamera(currentMapCamera);
-      }
+          return $q(function(resolve, reject) {
+            map.moveCamera(currentMapCamera, resolve);
+          });
+        }
+      });
     };
-    service.getLegalText = function(callback) {
-      map.getLicenseInfo(callback);
+    service.getLegalText = function() {
+      return $q(function(resolve, reject) {
+        map.getLicenseInfo(resolve);
+      });
     };
+
+    // Initialize the map.
+    $ionicPlatform.ready().then(createMap).then(function() {
+      return $q.all([
+        addTileOverlay(map),
+        addInfoMarker(map),
+        addCurrentLocationMarker(map),
+        addTripPolyline(map)
+      ]);
+    }).then(function(mapFeatures) {
+      tileOverlay = mapFeatures[0];
+      infoMarker = mapFeatures[1];
+      currentLocationMarker = mapFeatures[2];
+      tripPolyline = mapFeatures[3];
+      map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);
+      map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
+      ready = true;
+      angular.forEach(readyQueue, function(callback) {
+        callback();
+      });
+    });
   })
 
   .service('storageService', function($q, Loki) {

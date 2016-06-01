@@ -37,13 +37,11 @@ angular.module('bikemoves.controllers', [])
       return locationService.setStatus(status);
     },
     updateMap = function() {
-      mapService.onMapReady(function() {
-        if (currentLocation) {
-          mapService.setCurrentLocation(currentLocation);
-          mapService.setCenter(currentLocation);
-        }
-        mapService.setTripLocations($scope.trip.locations);
-      });
+      if (currentLocation) {
+        mapService.setCurrentLocation(currentLocation);
+        mapService.setCenter(currentLocation);
+      }
+      mapService.setTripLocations($scope.trip.locations);
     },
     updateOdometer = function() {
       // Convert meters to miles.
@@ -95,10 +93,8 @@ angular.module('bikemoves.controllers', [])
       }
     },
     initView = function() {
-      mapService.onMapReady(function() {
-        mapService.resetMap(mapService.MAP_TYPE_CURRENT);
-        if (!angular.isDefined(currentLocation)) $scope.getCurrentPosition();
-      });
+      mapService.resetMap(mapService.MAP_TYPE_CURRENT);
+      if (!angular.isDefined(currentLocation)) $scope.getCurrentPosition();
     },
     now = function() {
       return (new Date()).getTime();
@@ -290,13 +286,11 @@ angular.module('bikemoves.controllers', [])
 
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
-      mapService.onMapReady(function() {
-        mapService.resetMap(mapService.MAP_TYPE_PREVIOUS);
-        if ($scope.locations.length > 0) {
-          mapService.setTripLocations($scope.locations);
-          mapService.zoomToTripPolyline();
-        }
-      });
+      mapService.resetMap(mapService.MAP_TYPE_PREVIOUS);
+      if ($scope.locations.length > 0) {
+        mapService.setTripLocations($scope.locations);
+        mapService.zoomToTripPolyline();
+      }
     });
 }])
 
@@ -410,11 +404,7 @@ angular.module('bikemoves.controllers', [])
   '$scope',
   'mapService',
   function($scope, mapService) {
-    mapService.onMapReady(function() {
-      mapService.getLegalText(function(text) {
-        $scope.$apply(function() {
-          $scope.googleText = text;
-        });
-      });
+    mapService.getLegalText().then(function(text) {
+      $scope.googleText = text;
     });
 }]);

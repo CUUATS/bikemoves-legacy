@@ -5,7 +5,7 @@ angular.module('bikemoves', [
   'app.directives'
 ])
 
-.run(function($ionicPlatform, mapService) {
+.run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -29,8 +29,6 @@ angular.module('bikemoves', [
     if(window.localStorage['devLog'] === undefined) {
       window.localStorage['devLog'] = JSON.stringify(new Array())
     }
-
-    mapService.init();
   });
 })
 
