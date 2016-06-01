@@ -455,7 +455,7 @@ angular.module('bikemoves.services', ['lokijs'])
         collection.removeWhere({
           '_name': docName
         });
-        return serivce.save();
+        return service.save();
       });
     };
   })
@@ -534,6 +534,7 @@ angular.module('bikemoves.services', ['lokijs'])
     };
     service.getTotalDistance = function() {
       return getTripsCollection().then(function(collection) {
+        if (collection.data.length == 0) return 0;
         return collection.mapReduce(function(trip) {
           return trip.getDistance();
         }, function(distances) {
