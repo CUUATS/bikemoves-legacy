@@ -38,7 +38,7 @@ Trip.prototype._moreAccurate = function(loc1, loc2) {
 
 Trip.prototype._getLocation = function(idx) {
   if (idx < 0) idx = this.locations.length + idx;
-  return this.locations.length || null;
+  return this.locations[idx] || null;
 };
 
 Trip.prototype._locationInfo = function(type, idx) {
