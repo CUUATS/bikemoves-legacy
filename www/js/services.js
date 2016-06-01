@@ -1,6 +1,6 @@
 angular.module('bikemoves.services', ['lokijs'])
 
-  .service('locationService', function($q) {
+  .service('locationService', function($q, $ionicPlatform) {
     var service = this,
       BG_DEFAULT_SETTINGS = {
         activityType: 'OtherNavigation', // iOS activity type
@@ -17,15 +17,21 @@ angular.module('bikemoves.services', ['lokijs'])
         stopTimeout: 3 // Keep tracking for 3 minutes while stationary
       },
       bgGeo,
+      ready = false,
+      readyQueue = [],
       geoSettings = angular.copy(BG_DEFAULT_SETTINGS),
       initPlugin = function() {
         return $q(function(resolve, reject) {
-          if (bgGeo) {
-            bgGeo.getState(resolve, reject);
+          if (ready) {
+            resolve();
           } else {
-            bgGeo = window.BackgroundGeolocation;
-            bgGeo.configure(geoSettings, resolve, reject);
+            readyQueue.push(resolve);
           }
+        });
+      },
+      getState = function() {
+        return $q(function(resolve, reject) {
+          bgGeo.getState(resolve, reject);
         });
       },
       doGeoTask = function(fn, options) {
@@ -45,7 +51,7 @@ angular.module('bikemoves.services', ['lokijs'])
         });
       },
       setGeolocationEnabled = function(on) {
-        return initPlugin().then(function(state) {
+        return initPlugin().then(getState).then(function(state) {
           return $q(function(resolve, reject) {
             if (state.enabled === on) {
               resolve();
@@ -58,7 +64,7 @@ angular.module('bikemoves.services', ['lokijs'])
         });
       },
       setMoving = function(moving) {
-        return initPlugin().then(function(state) {
+        return initPlugin().then(getState).then(function(state) {
           return $q(function(resolve, reject) {
             if (angular.isDefined(state.isMoving) === moving) {
               resolve();
@@ -88,7 +94,7 @@ angular.module('bikemoves.services', ['lokijs'])
       });
     };
     service.getLocations = function() {
-      return initPlugin().then(function(state) {
+      return initPlugin().then(function() {
         return doGeoTask('getLocations').then(function(events) {
           return events.map(makeLocation);
         });
@@ -119,12 +125,22 @@ angular.module('bikemoves.services', ['lokijs'])
       });
     };
     service.getStatus = function() {
-      return initPlugin().then(function(state) {
+      return initPlugin().then(getState).then(function(state) {
         return (state.enabled) ? (
           (state.isMoving) ? service.STATUS_RECORDING : service.STATUS_PAUSED) :
             service.STATUS_STOPPED;
       });
     };
+
+    $ionicPlatform.ready(function() {
+      bgGeo = window.BackgroundGeolocation;
+      bgGeo.configure(geoSettings, function() {
+        ready = true;
+        angular.forEach(readyQueue, function(callback) {
+          callback();
+        });
+      });
+    });
   })
 
   .service('mapService', function($http, $q, $ionicPlatform) {
@@ -564,7 +580,6 @@ angular.module('bikemoves.services', ['lokijs'])
       });
     };
     service.deleteTrip = function(tripID) {
-      console.log('Deleting trip ' + tripID);
       return getTripsCollection().then(function(collection) {
         collection.remove(collection.data[tripID]);
         return storageService.save();
