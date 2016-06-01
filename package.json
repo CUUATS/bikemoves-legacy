@@ -30,7 +30,7 @@
       }
     },
     {
-      "locator": "https://github.com/transistorsoft/cordova-background-geolocation.git#1.6.1",
+      "locator": "https://github.com/transistorsoft/cordova-background-geolocation.git#1.6.3",
       "id": "com.transistorsoft.cordova.background-geolocation"
     },
     "cordova-plugin-inappbrowser",

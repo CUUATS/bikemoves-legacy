@@ -3,7 +3,7 @@ angular.module('bikemoves.services', ['lokijs'])
   .service('locationService', function($q, $ionicPlatform) {
     var service = this,
       BG_DEFAULT_SETTINGS = {
-        activityType: 'Fitness', // iOS activity type
+        activityType: 'OtherNavigation', // iOS activity type
         autoSync: false, // Do not automatically post to the server
         debug: false, // Disable debug notifications
         desiredAccuracy: 10, // Overridden by settings.
@@ -21,14 +21,10 @@ angular.module('bikemoves.services', ['lokijs'])
       initPlugin = function() {
         return $q(function(resolve, reject) {
           if (bgGeo) {
-            resolve();
+            bgGeo.getState(resolve, reject);
           } else {
-            $ionicPlatform.ready(function() {
-              bgGeo = window.BackgroundGeolocation;
-              bgGeo.onLocation(angular.noop);
-              bgGeo.configure(geoSettings);
-              resolve();
-            });
+            bgGeo = window.BackgroundGeolocation;
+            bgGeo.configure(geoSettings, resolve, reject);
           }
         });
       },
@@ -44,36 +40,30 @@ angular.module('bikemoves.services', ['lokijs'])
               reject(e);
             }, options);
           }).finally(function() {
-            console.log('finishing task', task);
             bgGeo.finish(task);
           });
         });
       },
-      getState = function() {
-        return initPlugin().then(function() {
+      setGeolocationEnabled = function(on) {
+        return initPlugin().then(function(state) {
           return $q(function(resolve, reject) {
-            bgGeo.getState(resolve);
+            if (state.enabled === on) {
+              resolve();
+            } else if (on) {
+              bgGeo.start(resolve);
+            } else {
+              bgGeo.stop(resolve);
+            }
           });
         });
       },
-      setGeolocationEnabled = function(on) {
-        return getState().then(function(state) {
-          if (state.enabled === on) {
-            resolve();
-          } else if (on) {
-            bgGeo.start(resolve);
-          } else {
-            bgGeo.stop(resolve);
-          }
-        });
-      },
       setMoving = function(moving) {
-        return getState().then(function(state) {
+        return initPlugin().then(function(state) {
           return $q(function(resolve, reject) {
-            if (state.isMoving === moving) {
+            if (angular.isDefined(state.isMoving) === moving) {
               resolve();
             } else {
-              bgGeo.changePace(moving, resolve);
+              bgGeo.changePace(moving, resolve, reject);
             }
           });
         });
@@ -98,7 +88,11 @@ angular.module('bikemoves.services', ['lokijs'])
       });
     };
     service.getLocations = function() {
-      return doGeoTask('getLocations').then(makeLocation);
+      return initPlugin().then(function(state) {
+        return doGeoTask('getLocations').then(function(events) {
+          return events.map(makeLocation);
+        });
+      });
     };
     service.onLocation = function(locationHandler) {
       return initPlugin().then(function() {
@@ -125,7 +119,7 @@ angular.module('bikemoves.services', ['lokijs'])
       });
     };
     service.getStatus = function() {
-      return getState().then(function(state) {
+      return initPlugin().then(function(state) {
         return (state.enabled) ? (
           (state.isMoving) ? service.STATUS_RECORDING : service.STATUS_PAUSED) :
             service.STATUS_STOPPED;
@@ -421,77 +415,47 @@ angular.module('bikemoves.services', ['lokijs'])
         // Trips collection
         collections[TRIPS_COLLECTION] = db.getCollection(TRIPS_COLLECTION) ||
           db.addCollection(TRIPS_COLLECTION);
-      },
-      getCollection = function(collectionName) {
-        return loadDb().then(function() {
-          return collections[collectionName];
-        });
-      },
-      save = function() {
-        return loadDb().then(function() {
-          return $q(function (resolve, reject) {
-            db.saveDatabase(resolve);
-          });
-        });
       };
 
+    service.getCollection = function(collectionName) {
+      return loadDb().then(function() {
+        return collections[collectionName];
+      });
+    };
+
+    service.save = function() {
+      return loadDb().then(function() {
+        return $q(function (resolve, reject) {
+          db.saveDatabase(resolve);
+        });
+      });
+    };
+
     service.get = function(docName, defaultValue) {
-      return getCollection(APP_COLLECTION).then(function(collection) {
+      return service.getCollection(APP_COLLECTION).then(function(collection) {
         var doc = collection.by('_name', docName);
         return (doc) ? doc : angular.copy(defaultValue);
       });
     };
 
     service.set = function(docName, doc) {
-      return getCollection(APP_COLLECTION).then(function(collection) {
+      return service.getCollection(APP_COLLECTION).then(function(collection) {
         var oldDoc = collection.by('_name', docName);
         if (!oldDoc) {
           collection.insert(angular.merge({'_name': docName}, doc));
         } else {
           collection.update(doc);
         }
-        return save();
+        return service.save();
       });
     };
 
     service.delete = function(docName) {
-      return getCollection(APP_COLLECTION).then(function(collection) {
+      return service.getCollection(APP_COLLECTION).then(function(collection) {
         collection.removeWhere({
           '_name': docName
         });
-        return save();
-      });
-    };
-
-    service.addTrip = function(trip) {
-      return getCollection(TRIPS_COLLECTION).then(function(collection) {
-        collection.insert(trip);
-        return save();
-      });
-    };
-
-    service.deleteTrip = function(tripID) {
-      return getCollection(TRIPS_COLLECTION).then(function(collection) {
-        collection.remove(tripID);
-        return save();
-      });
-    };
-
-    service.getTrips = function() {
-      return getCollection(TRIPS_COLLECTION).then(function(collection) {
-        return collection.data();
-      });
-    };
-
-    service.getTotalDistance = function() {
-      return getCollection(TRIPS_COLLECTION).then(function(collection) {
-        return collection.mapReduce(function(trip) {
-          return trip.distance;
-        }, function(distances) {
-          return distances.reduce(function(a, b) {
-            return a + b;
-          });
-        });
+        return serivce.save();
       });
     };
   })
@@ -541,70 +505,47 @@ angular.module('bikemoves.services', ['lokijs'])
 
   .service('tripService', function(storageService) {
     var service = this,
-      NEAR_THESHOLD = 500, // Maximum distance for location guesses, in meters
-      currentTrip = new Trip();
+      getTripsCollection = function() {
+        return storageService.getCollection('trips');
+      };
 
-    service.getTrip = function () {
-      return currentTrip;
-    };
-    service.now = function() {
-      return (new Date()).getTime();
-    };
-    service.saveTrip = function(submitted) {
-      currentTrip.submitted = submitted;
-      return storageService.addTrip(currentTrip);
-    };
-    service.resetTrip = function() {
-      currentTrip = new Trip();
+    service.saveTrip = function(trip) {
+      return getTripsCollection().then(function(collection) {
+        collection.insert(trip);
+        return storageService.save();
+      });
     };
     service.getTrips = function() {
-      return trips;
+      return getTripsCollection().then(function(collection) {
+        return collection.data();
+      });
     };
-    service.getTripByIndex = function(idx) {
-      return trips[idx];
+    service.getTrip = function(tripID) {
+      return getTripsCollection().then(function(collection) {
+        return collection.get(tripID);
+      });
     };
-    service.deleteTrip = function(idx) {
-      distance -= service.getTripByIndex(idx).distance;
-      trips.splice(idx, 1);
-      storageService.set(TRIPS_KEY, trips);
-      storageService.set(DISTANCE_KEY, distance);
+    service.deleteTrip = function(tripID) {
+      return getTripsCollection().then(function(collection) {
+        collection.remove(tripID);
+        return storageService.save();
+      });
     };
     service.getTotalDistance = function() {
-      return distance;
-    };
-    service.guessLocationType = function(od) {
-      if (currentTrip.locations.length == 0) return null;
-
-      var location = (od == 'origin') ?
-          currentTrip.locations[0] :
-          currentTrip.locations[currentTrip.locations.length - 1],
-        locationType = null,
-        minDistance = NEAR_THESHOLD;
-
-      angular.forEach(trips, function(trip, idx) {
-        if (trip.locations.length == 0) return;
-        if (trip.origin) {
-          var originDist = getDistance(location, trip.locations[0]);
-          if (originDist < minDistance) {
-            locationType = trip.origin;
-            minDistance = originDist;
-          }
-        }
-        if (trip.destination) {
-          var destinationDist = getDistance(
-            location, trip.locations[trip.locations.length - 1]);
-          if (destinationDist < minDistance) {
-            locationType = trip.destination;
-            minDistance = destinationDist;
-          }
-        }
+      return getTripsCollection().then(function(collection) {
+        return collection.mapReduce(function(trip) {
+          return trip.getDistance();
+        }, function(distances) {
+          return distances.reduce(function(a, b) {
+            return a + b;
+          });
+        });
       });
-      return locationType;
     };
     service.clearAll = function() {
-      trips = [];
-      distance = 0;
-      storageService.set(TRIPS_KEY, trips);
-      storageService.set(DISTANCE_KEY, distance);
+      return getTripsCollection().then(function(collection) {
+        collection.removeDataOnly();
+        return storageService.save();
+      });
     };
   });
