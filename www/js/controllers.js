@@ -220,8 +220,8 @@ angular.module('bikemoves.controllers', [])
 
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
-      tripService.getTripList().then(function(list) {
-        $scope.trips = list;
+      tripService.getTrips().then(function(trips) {
+        $scope.trips = trips;
       });
     });
 }])
@@ -251,11 +251,12 @@ angular.module('bikemoves.controllers', [])
           zeroPad(Math.round((millisec % MINUTE) / SECOND), 2);
       };
 
-    tripService.getTrip($stateParams.tripIndex).then(function(trip) {
+    tripService.getTrip($stateParams.tripID).then(function(trip) {
       var duration = new Date(trip.endTime) - new Date(trip.startTime), // In milliseconds
-        distance = trip.distance * 0.000621371, // In miles
+        distance = trip.getDistance() * 0.000621371, // In miles
         speed = distance / (duration / HOUR); // In MPH
 
+      $scope.locations = trip.locations;
       $scope.origin = trip.origin;
       $scope.destination = trip.destination;
       $scope.date = moment(trip.startTime).format('MMM D, YYYY');
@@ -280,7 +281,7 @@ angular.module('bikemoves.controllers', [])
       }).then(function(res) {
         mapService.setClickable(true);
         if (res) {
-          tripService.deleteTrip($stateParams.tripIndex).then(function() {
+          tripService.deleteTrip($stateParams.tripID).then(function() {
             $state.go('app.previous_trips');
           });
         }
@@ -291,8 +292,8 @@ angular.module('bikemoves.controllers', [])
     $scope.$on('$ionicView.enter', function(e) {
       mapService.onMapReady(function() {
         mapService.resetMap(mapService.MAP_TYPE_PREVIOUS);
-        if (trip.locations.length > 0) {
-          mapService.setTripLocations(trip.locations);
+        if ($scope.locations.length > 0) {
+          mapService.setTripLocations($scope.locations);
           mapService.zoomToTripPolyline();
         }
       });

@@ -84,7 +84,7 @@ angular.module('bikemoves', [
   })
 
   .state('app.single', {
-    url: '/previous_trips/:tripIndex',
+    url: '/previous_trips/:tripID',
     views: {
       'tab-previous-trips': {
         templateUrl: 'templates/previous_trip.html',

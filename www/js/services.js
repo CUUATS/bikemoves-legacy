@@ -517,7 +517,7 @@ angular.module('bikemoves.services', ['lokijs'])
     };
     service.getTrips = function() {
       return getTripsCollection().then(function(collection) {
-        return collection.chain().simplesort('startTime').data();
+        return collection.chain().simplesort('startTime', true).data();
       });
     };
     service.getTrip = function(tripID) {
@@ -526,8 +526,9 @@ angular.module('bikemoves.services', ['lokijs'])
       });
     };
     service.deleteTrip = function(tripID) {
+      console.log('Deleting trip ' + tripID);
       return getTripsCollection().then(function(collection) {
-        collection.remove(tripID);
+        collection.remove(collection.data[tripID]);
         return storageService.save();
       });
     };

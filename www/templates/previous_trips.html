@@ -1,7 +1,7 @@
   <ion-view view-title="Saved Trips">
     <ion-content>
       <ion-list ng-if="trips.length > 0">
-        <a ng-repeat="trip in trips track by $index" class="item item-icon-right" href="#/app/previous_trips/{{$index}}">
+        <a ng-repeat="trip in trips track by trip.$loki" class="item item-icon-right" href="#/app/previous_trips/{{trip.$loki}}">
           {{formatDate(trip.startTime)}}
           <i class="icon ion-chevron-right icon-accessory"></i>
         </a>
