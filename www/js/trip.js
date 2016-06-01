@@ -44,7 +44,7 @@ Trip.prototype._getLocation = function(idx) {
 Trip.prototype._locationInfo = function(type, idx) {
   return {
     type: type,
-    location: this.getLocation(idx)
+    location: this._getLocation(idx)
   };
 };
 
@@ -87,10 +87,10 @@ Trip.prototype.guessODTypes = function(trips) {
     odTypes.push.apply(odTypes, trip.getODTypes());
   });
 
-  var origin = this.getLocation(0),
-    destination = this.getLocation(-1),
-    minOrigin = NEAR_THESHOLD,
-    minDestination = NEAR_THESHOLD;
+  var origin = this._getLocation(0),
+    destination = this._getLocation(-1),
+    minOrigin = this.NEAR_THESHOLD,
+    minDestination = this.NEAR_THESHOLD;
 
   angular.forEach(odTypes, function(odType) {
     var distOrigin = this._getDistance(odType.location, origin),

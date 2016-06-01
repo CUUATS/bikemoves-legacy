@@ -517,7 +517,7 @@ angular.module('bikemoves.services', ['lokijs'])
     };
     service.getTrips = function() {
       return getTripsCollection().then(function(collection) {
-        return collection.data();
+        return collection.chain().simplesort('startTime').data();
       });
     };
     service.getTrip = function(tripID) {
