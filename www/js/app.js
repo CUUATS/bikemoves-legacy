@@ -5,12 +5,12 @@ angular.module('bikemoves', [
   'app.directives'
 ])
 
-.run(function($ionicPlatform, mapService) {
+.run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(false);
       cordova.plugins.Keyboard.disableScroll(true);
     }
     if (window.StatusBar) {
@@ -29,8 +29,6 @@ angular.module('bikemoves', [
     if(window.localStorage['devLog'] === undefined) {
       window.localStorage['devLog'] = JSON.stringify(new Array())
     }
-
-    mapService.init();
   });
 })
 
@@ -84,7 +82,7 @@ angular.module('bikemoves', [
   })
 
   .state('app.single', {
-    url: '/previous_trips/:tripIndex',
+    url: '/previous_trips/:tripID',
     views: {
       'tab-previous-trips': {
         templateUrl: 'templates/previous_trip.html',

@@ -11,295 +11,197 @@ angular.module('bikemoves.controllers', [])
   '$ionicPlatform',
   '$ionicModal',
   '$ionicPopup',
+  'locationService',
   'mapService',
   'remoteService',
   'tripService',
   'settingsService',
-  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, mapService, remoteService, tripService, settingsService) {
-    var STATUS_STOPPED = 'stopped',
-      STATUS_RECORDING = 'recording',
-      STATUS_PAUSED = 'paused',
-      BG_DEFAULT_SETTINGS = {
-          activityType: 'Fitness', // iOS activity type
-          autoSync: false, // Do not automatically post to the server
-          debug: false, // Disable debug notifications
-          desiredAccuracy: 10, // Overridden by settings.
-          distanceFilter: 20, // Generate update events every 20 meters
-          disableElasticity: true, // Do not auto-adjust distanceFilter
-          fastestLocationUpdateInterval: 1000, // Prevent updates more than once per second (Android)
-          locationUpdateInterval: 5000, // Request updates every 5 seconds (Android)
-          startOnBoot: false, // Do not start tracking on device boot
-          stationaryRadius: 20, // Activate the GPS after 20 meters (iOS)
-          stopOnTerminate: true, // Stop geolocation tracking on app exit
-          stopTimeout: 3 // Keep tracking for 3 minutes while stationary
-        },
-      bgGeo,
+  function($scope, $ionicPlatform, $ionicModal, $http, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService) {
+    var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
+      START_TIME_KEY = 'bikemoves:starttime',
       currentLocation,
       tripSubmitModal;
 
-    var getStatusFromScope = function() {
-      if ($scope.status.isRecording) return STATUS_RECORDING;
-      if ($scope.status.isPaused) return STATUS_PAUSED;
-      return STATUS_STOPPED;
-    },
-    getStatusFromState = function(state) {
-      // Get the current status from the geolocation plugin state.
-      return (state.enabled) ? (
-        (state.isMoving) ? STATUS_RECORDING : STATUS_PAUSED) : STATUS_STOPPED;
-    },
-    setStatus = function(status, callback, initial) {
-      console.log('Seting status: ' + status);
-      if (!angular.isDefined(callback)) var callback = angular.noop;
+    var setStatus = function(status, initial) {
+      console.log('Setting status: ' + status);
       $scope.status = {
-        isStopped: status == STATUS_STOPPED,
-        isPaused: status == STATUS_PAUSED,
-        isRecording: status == STATUS_RECORDING
+        isStopped: status == locationService.STATUS_STOPPED,
+        isPaused: status == locationService.STATUS_PAUSED,
+        isRecording: status == locationService.STATUS_RECORDING
       };
       // Disable other tabs while recording.
       // TODO: Find a way around this $parent nonsense.
-      $scope.$parent.$parent.$parent.isRecording = (status == STATUS_RECORDING);
-      if (initial) return;
+      $scope.$parent.$parent.$parent.isRecording = $scope.status.isRecording;
 
-      if (status == STATUS_RECORDING) {
-        setGeolocationEnabled(true, function() {
-          setMoving(true, callback);
-        });
-      } else if (status == STATUS_PAUSED) {
-        setGeolocationEnabled(true, function() {
-          setMoving(false, callback);
-        });
-      } else {
-        setGeolocationEnabled(false, callback);
-      }
-    },
-    setGeolocationEnabled = function(on, callback) {
-      if (!angular.isDefined(callback)) var callback = angular.noop;
-      bgGeo.getState(function(state) {
-        if (state.enabled === on) {
-          callback();
-        } else if (on) {
-          bgGeo.start(callback);
-        } else {
-          bgGeo.stop(callback);
-        }
-      });
-    },
-    setMoving = function(moving, callback) {
-      if (!angular.isDefined(callback)) var callback = angular.noop;
-      bgGeo.getState(function(state) {
-        if (state.isMoving === moving) {
-          callback();
-        } else {
-          bgGeo.changePace(moving, callback);
-        }
-      });
-    },
-    getGeolocationSettings = function() {
-      var settings = settingsService.getSettings();
-      return angular.merge({}, BG_DEFAULT_SETTINGS, {
-        desiredAccuracy: [100, 10, 0][settings.accuracyLevel]
-      });
+      if (initial) return;
+      return locationService.setStatus(status);
     },
     updateMap = function() {
       if (currentLocation) {
-        mapService.onMapReady(function() {
-          mapService.setCurrentLocation(currentLocation);
-          mapService.setCenter(currentLocation);
-
-          var trip = tripService.getTrip();
-          if (trip.locations.length > 1) {
-            mapService.setTripLocations(trip.locations);
-          }
-        });
+        mapService.setCurrentLocation(currentLocation);
+        mapService.setCenter(currentLocation);
       }
+      mapService.setTripLocations($scope.trip.locations);
     },
     updateOdometer = function() {
       // Convert meters to miles.
-      $scope.$apply(function () {
-        $scope.odometer = (tripService.getCurrentDistance() * 0.000621371).toFixed(1);
-      });
+      $scope.odometer = ($scope.trip.getDistance() * 0.000621371).toFixed(1);
     },
-    makeLocation = function(e) {
-      return angular.merge({
-        moving: e.is_moving,
-        time: e.timestamp.getTime()
-      }, e.coords);
-    },
-    onLocation = function(e, taskId) {
-      var location = makeLocation(e),
-        evaluation = tripService.evaluateLocation(location);
-      console.log(evaluation + ': ' + JSON.stringify(location));
-      if (evaluation > -1) {
-        currentLocation = location;
-        if ($scope.status.isRecording) {
-          if (evaluation == 0) {
-            tripService.replaceLocation(location);
-          } else {
-            tripService.addLocation(location);
-          }
-          updateOdometer();
-        }
+    onLocation = function(location, skipUpdate) {
+      currentLocation = ($scope.status.isRecording) ?
+        $scope.trip.addLocation(location) : location;
+      if (!skipUpdate) {
+        updateOdometer();
         updateMap();
       }
-      bgGeo.finish(taskId);
-    },
-    onLocationError = function(error) {
-      console.error('Location error: ', error);
-    },
-    onMotionChange = function(isMoving, location, taskId) {
-      if (isMoving) {
-        console.log('Device has just started MOVING', location);
-      } else {
-        console.log('Device has just STOPPED', location);
-      }
-      bgGeo.finish(taskId);
-    },
-    prepopulateTripForm = function() {
-      $scope.tripInfo = {
-        origin: tripService.guessLocationType('origin'),
-        destination: tripService.guessLocationType('destination'),
-        transit: false
-      };
-    },
-    setTripMetadata = function() {
-      var geoSettings = getGeolocationSettings();
-      tripService.setTripMetadata({
-        desiredAccuracy: geoSettings.desiredAccuracy,
-        origin: $scope.tripInfo.origin,
-        destination: $scope.tripInfo.destination,
-        transit: $scope.tripInfo.transit
-      });
     },
     onSubmitError = function() {
       mapService.setClickable(false);
       $ionicPopup.alert({
         title: 'Trip Submission Failed',
-        template: 'Sorry, an error occurred while submitting your trip. Please try again later.'
+        template: 'Sorry, an error occurred while submitting your trip. ' +
+          'Please try again later.'
       }).then(function() {
         mapService.setClickable(true);
       });
     },
-    submitTrip = function() {
-      var trip = angular.merge({
-        deviceUUID: window.device.uuid
-      }, tripService.getTrip());
-      return remoteService.postTrip(trip).then(function success(res) {
-        tripService.saveTrip(res.status == 200);
-        if (res.status != 200) onSubmitError();
-      }, function failure(res) {
-        console.log(res);
-        tripService.saveTrip(false);
-        onSubmitError();
+    initTrip = function() {
+      $scope.trip.startTime = now();
+      window.localStorage.setItem(
+        START_TIME_KEY, String.valueOf($scope.trip.startTime));
+      settingsService.getSettings().then(function(settings) {
+        $scope.trip.desiredAccuracy = settings.desiredAccuracy;
       });
     },
-    initView = function() {
-      bgGeo.setConfig(getGeolocationSettings());
-      mapService.onMapReady(function() {
-        $scope.settings = settingsService.getSettings();
-        mapService.resetMap(mapService.MAP_TYPE_CURRENT);
-        if (!angular.isDefined(currentLocation)) $scope.getCurrentPosition();
+    submitTrip = function() {
+      var submitted = false;
+      return remoteService.postTrip($scope.trip).then(function(res) {
+        submitted = (res.status == 200);
+        if (res.status != 200) onSubmitError();
+      }).catch(onSubmitError).finally(function() {
+        $scope.trip.submitted = submitted;
+        return tripService.saveTrip($scope.trip);
       });
+    },
+    resetTrip = function(skipUpdate) {
+      $scope.trip = new Trip();
+      if (!skipUpdate) {
+        updateMap();
+        updateOdometer();
+      }
+    },
+    initView = function() {
+      mapService.resetMap(mapService.MAP_TYPE_CURRENT);
+      if (!angular.isDefined(currentLocation)) $scope.getCurrentPosition();
+      settingsService.getSettings().then(function(settings) {
+        $scope.autoSubmit = settings.autoSubmit;
+      });
+    },
+    now = function() {
+      return (new Date()).getTime();
     };
 
     $scope.startRecording = function() {
-      console.log('Tapped record button');
-      setStatus(STATUS_RECORDING);
-      tripService.setStartTime();
+      if ($scope.status.isStopped) {
+        // This is a new trip.
+        initTrip();
+        locationService.clearDatabase().then(function() {
+          setStatus(locationService.STATUS_RECORDING);
+        });
+      } else {
+        setStatus(locationService.STATUS_RECORDING);
+      }
     };
 
     $scope.pauseRecording = function() {
-      console.log('Tapped pause button');
-      setStatus(STATUS_PAUSED);
+      setStatus(locationService.STATUS_PAUSED);
     };
 
     $scope.stopRecording = function() {
-      console.log('Tapped stop button');
-      setStatus(STATUS_PAUSED);
-      tripService.setEndTime();
-      prepopulateTripForm();
-      mapService.setClickable(false);
-      tripSubmitModal.show();
-    };
-
-    $scope.submitTrip = function() {
-      setStatus(STATUS_STOPPED);
-      tripSubmitModal.hide();
-      setTripMetadata();
-      submitTrip().finally(function () {
-        tripService.resetTrip();
-        updateMap();
+      setStatus(locationService.STATUS_PAUSED);
+      $scope.trip.endTime = now();
+      tripService.getTrips().then(function(trips) {
+        $scope.trip.guessODTypes(trips);
+        mapService.setClickable(false);
+        tripSubmitModal.show();
       });
     };
 
+    $scope.submitTrip = function() {
+      setStatus(locationService.STATUS_STOPPED);
+      tripSubmitModal.hide();
+      submitTrip().finally(resetTrip);
+    };
+
     $scope.saveTrip = function() {
-      setTripMetadata();
-      tripService.saveTrip(false);
-      tripService.resetTrip();
-      updateMap();
-      setStatus(STATUS_STOPPED);
+      tripService.saveTrip().finally(resetTrip);
+      setStatus(locationService.STATUS_STOPPED);
       tripSubmitModal.hide();
     };
 
     $scope.resumeTrip = function() {
-      setStatus(STATUS_RECORDING);
+      setStatus(locationService.STATUS_RECORDING);
       tripSubmitModal.hide();
     };
 
     $scope.discardTrip = function() {
-      tripService.resetTrip();
-      updateMap();
-      setStatus(STATUS_STOPPED);
+      resetTrip();
+      setStatus(locationService.STATUS_STOPPED);
       tripSubmitModal.hide();
     };
 
     $scope.getCurrentPosition = function() {
-      setGeolocationEnabled(true, function() {
-        bgGeo.getCurrentPosition(function success(e, taskId) {
-          // Reset background geolocation to its former state.
-          setStatus(getStatusFromScope());
-        }, function error(errorCode) {
-          console.log('Error code: ' + errorCode)
-        }, {maximumAge: 0});
+      locationService.getCurrentPosition({
+        maximumAge: 0
       });
     };
 
-    $ionicPlatform.ready(function() {
-      // Create the modal window for trip submission.
-      $ionicModal.fromTemplateUrl('templates/trip_form.html', {
-        scope: $scope,
-        animation: 'slide-in-up'
-      }).then(function(modal) {
-        tripSubmitModal = modal;
-      });
-      $scope.$on('modal.hidden', function(e) {
-        mapService.setClickable(true);
-      });
-      $scope.$on('$destroy', function() {
-        tripSubmitModal.remove();
-      });
+    // Create a new trip, and set the initial status.
+    resetTrip(true);
+    setStatus(locationService.STATUS_STOPPED, true);
 
-      // Set up the geolocation plugin.
-      bgGeo = window.BackgroundGeolocation;
-      bgGeo.onLocation(onLocation, onLocationError);
-      bgGeo.onMotionChange(onMotionChange);
-      bgGeo.configure(getGeolocationSettings());
-
-      // Set the initial state.
-      bgGeo.getState(function(state) {
-        console.log(JSON.stringify(state));
-        if (state.enabled === false) tripService.resetTrip();
-        updateOdometer();
-        setStatus(getStatusFromState(state), angular.noop, true);
-      });
-
-      // Set up the view.
-      $scope.$on('$ionicView.enter', function(e) {
-        initView();
-      });
-
-      // iOS does not fire the "enter" event on first load.
-      if (ionic.Platform.isIOS()) initView();
+    // Create the modal window for trip submission.
+    $ionicModal.fromTemplateUrl('templates/trip_form.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      tripSubmitModal = modal;
     });
+    $scope.$on('modal.hidden', function(e) {
+      cordova.plugins.Keyboard.close();
+      mapService.setClickable(true);
+    });
+    $scope.$on('$destroy', function() {
+      tripSubmitModal.remove();
+    });
+
+    // Set up the view.
+    $scope.$on('$ionicView.enter', function(e) {
+      initView();
+    });
+
+    locationService.getStatus().then(function(status) {
+      if (status != locationService.STATUS_STOPPED) {
+        // A trip is in progress.
+        // Restore start time if the trip was recreated.
+        $scope.trip.startTime =
+          parseInt(window.localStorage.getItem(START_TIME_KEY));
+        // Load locations from the cache.
+        return locationService.getLocations().then(function(locations) {
+          angular.forEach(locations, function(location, key) {
+            onLocation(location, true);
+          });
+          updateMap();
+          return status;
+        });
+      }
+      return status;
+    }).then(function(status) {
+      updateOdometer();
+      setStatus(status, true);
+    });
+
+    locationService.onLocation(onLocation);
 }])
 
 .controller('PreviousTripsCtrl', [
@@ -315,7 +217,9 @@ angular.module('bikemoves.controllers', [])
 
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
-      $scope.trips = tripService.getTrips();
+      tripService.getTrips().then(function(trips) {
+        $scope.trips = trips;
+      });
     });
 }])
 
@@ -342,27 +246,27 @@ angular.module('bikemoves.controllers', [])
         return zeroPad(Math.floor(millisec / HOUR), 2) + ':' +
           zeroPad(Math.floor((millisec % HOUR) / MINUTE), 2) + ':' +
           zeroPad(Math.round((millisec % MINUTE) / SECOND), 2);
-      },
-      deleteTrip = function() {
-        tripService.deleteTrip($stateParams.tripIndex);
-      },
-      trip = tripService.getTripByIndex($stateParams.tripIndex),
-      duration = new Date(trip.endTime) - new Date(trip.startTime), // In milliseconds
-      distance = trip.distance * 0.000621371, // In miles
-      speed = distance / (duration / HOUR); // In MPH
+      };
 
-    $scope.origin = trip.origin;
-    $scope.destination = trip.destination;
-    $scope.date = moment(trip.startTime).format('MMM D, YYYY');
-    $scope.time = moment(trip.startTime).format('h:mm A');
-    $scope.distance = distance.toFixed(1);
-    $scope.duration = formatDuration(duration);
-    $scope.avgSpeed = speed.toFixed(1);
-    // Total Calories = avgSpeed * (K1 + K2 * avgSpeed ^ 2) * (duration in min)
-    $scope.calories = (
-      (speed * (K1 + K2 * Math.pow(speed, 2))) / 67.78 * (duration / MINUTE)
-    ).toFixed(0);
-    $scope.ghg = (distance * .8115).toFixed(1);
+    tripService.getTrip($stateParams.tripID).then(function(trip) {
+      var duration = new Date(trip.endTime) - new Date(trip.startTime), // In milliseconds
+        distance = trip.getDistance() * 0.000621371, // In miles
+        speed = distance / (duration / HOUR); // In MPH
+
+      $scope.locations = trip.locations;
+      $scope.origin = trip.origin;
+      $scope.destination = trip.destination;
+      $scope.date = moment(trip.startTime).format('MMM D, YYYY');
+      $scope.time = moment(trip.startTime).format('h:mm A');
+      $scope.distance = distance.toFixed(1);
+      $scope.duration = formatDuration(duration);
+      $scope.avgSpeed = speed.toFixed(1);
+      // Total Calories = avgSpeed * (K1 + K2 * avgSpeed ^ 2) * (duration in min)
+      $scope.calories = (
+        (speed * (K1 + K2 * Math.pow(speed, 2))) / 67.78 * (duration / MINUTE)
+      ).toFixed(0);
+      $scope.ghg = (distance * .8115).toFixed(1);
+    });
 
     $scope.deleteTrip = function() {
       mapService.setClickable(false);
@@ -374,36 +278,40 @@ angular.module('bikemoves.controllers', [])
       }).then(function(res) {
         mapService.setClickable(true);
         if (res) {
-          deleteTrip();
-          $state.go('app.previous_trips');
+          tripService.deleteTrip($stateParams.tripID).then(function() {
+            $state.go('app.previous_trips');
+          });
         }
       });
     };
 
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
-      mapService.onMapReady(function() {
-        mapService.resetMap(mapService.MAP_TYPE_PREVIOUS);
-        if (trip.locations.length > 0) {
-          mapService.setTripLocations(trip.locations);
-          mapService.zoomToTripPolyline();
-        }
-      });
+      mapService.resetMap(mapService.MAP_TYPE_PREVIOUS);
+      if ($scope.locations.length > 0) {
+        mapService.setTripLocations($scope.locations);
+        mapService.zoomToTripPolyline();
+      }
     });
 }])
 
 .controller('SettingsCtrl', [
   '$scope',
+  '$q',
   '$ionicPopup',
+  'profileService',
   'settingsService',
   'tripService',
-  function($scope, $ionicPopup, settingsService, tripService) {
+  function($scope, $q, $ionicPopup, profileService, settingsService, tripService) {
+
     var reloadSettings = function() {
-      $scope.settings = settingsService.getSettings();
+      return settingsService.getSettings().then(function(settings) {
+        $scope.settings = settings;
+      });
     };
 
     $scope.updateSettings = function() {
-      settingsService.updateSettings($scope.settings);
+      return settingsService.updateSettings($scope.settings);
     };
 
     $scope.reset = function() {
@@ -414,15 +322,17 @@ angular.module('bikemoves.controllers', [])
 
       confirmPopup.then(function(res) {
         if (res) {
-          settingsService.clearAll();
-          reloadSettings();
-          tripService.clearAll();
-          $ionicPopup.alert({
-            title: 'Data Reset',
-            content: 'All data have been reset.'
+          var settingsReset = settingsService.clearAll().then(reloadSettings),
+            profileReset = profileService.clearAll(),
+            tripsReset = tripService.clearAll();
+          $q.all([settingsReset, profileReset, tripsReset]).then(function() {
+            $ionicPopup.alert({
+              title: 'Data Reset',
+              content: 'All data have been reset.'
+            });
           });
         }
-      })
+      });
     };
 
     reloadSettings();
@@ -439,12 +349,13 @@ angular.module('bikemoves.controllers', [])
       ExperienceLevel = remoteService.getEnum('User', 'ExperienceLevel'),
       Gender = remoteService.getEnum('User', 'Gender'),
       saveProfile = function(profile) {
-        profileService.setProfile(profile);
+        return profileService.updateProfile(profile);
       },
       submitProfile = function() {
-        var profile = profileService.getProfile();
-        remoteService.postUser(profile).catch(function errorCallback(response) {
-          console.log(response)
+        profileService.getProfile().then(function(profile) {
+          remoteService.postUser(profile).catch(function(response) {
+            console.log(response)
+          });
         });
       };
 
@@ -452,8 +363,7 @@ angular.module('bikemoves.controllers', [])
       // Prevent save action from firing twice when the save button is tapped.
       if (!$scope.dirty) return;
       $scope.dirty = false;
-      saveProfile($scope.profile);
-      submitProfile();
+      saveProfile($scope.profile).then(submitProfile);
     };
 
     $scope.profileChanged = function() {
@@ -462,10 +372,14 @@ angular.module('bikemoves.controllers', [])
 
     $scope.$on('$ionicView.enter', function(e) {
       $scope.dirty = false;
-      $scope.profile = profileService.getProfile();
-      var distance = tripService.getTotalDistance() * 0.000621371;
-      $scope.distance =  distance.toFixed(1);
-      $scope.ghg = (distance * .8115).toFixed(1);
+      profileService.getProfile().then(function(profile) {
+        $scope.profile = profile;
+      });
+      tripService.getTotalDistance().then(function(distance) {
+        var miles = distance * 0.000621371;
+        $scope.distance =  miles.toFixed(1);
+        $scope.ghg = (miles * .8115).toFixed(1);
+      });
     });
 
     $scope.$on('$ionicView.beforeLeave', function(e) {
@@ -479,10 +393,7 @@ angular.module('bikemoves.controllers', [])
            cancelText: 'Discard',
            okText: 'Save'
         }).then(function(res) {
-          if (res) {
-            saveProfile(profile);
-            submitProfile();
-          }
+          if (res) saveProfile(profile).then(submitProfile);
         });
       }
     });
@@ -573,11 +484,7 @@ angular.module('bikemoves.controllers', [])
   '$scope',
   'mapService',
   function($scope, mapService) {
-    mapService.onMapReady(function() {
-      mapService.getLegalText(function(text) {
-        $scope.$apply(function() {
-          $scope.googleText = text;
-        });
-      });
+    mapService.getLegalText().then(function(text) {
+      $scope.googleText = text;
     });
 }]);
