@@ -498,7 +498,8 @@ angular.module('bikemoves.services', ['lokijs'])
         if (!oldDoc) {
           collection.insert(angular.merge({'_name': docName}, doc));
         } else {
-          collection.update(doc);
+          angular.merge(oldDoc, doc);
+          collection.update(oldDoc);
         }
         return service.save();
       });
