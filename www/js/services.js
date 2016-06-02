@@ -515,12 +515,19 @@ angular.module('bikemoves.services', ['lokijs'])
     };
   })
 
-  .service('settingsService', function($q, storageService, locationService) {
+  .service('settingsService', function(storageService, locationService) {
     var service = this,
       SETTINGS_KEY = 'settings',
       DEFAULT_SETTINGS = {
         accuracyLevel: 1,
         autoSubmit: true
+      },
+      updateAccuracy = function() {
+        return service.getSettings().then(function(settings) {
+          locationService.updateSettings({
+            desiredAccuracy: [100, 10, 0][settings.accuracyLevel]
+          });
+        });
       };
 
     service.getSettings = function() {
@@ -528,16 +535,15 @@ angular.module('bikemoves.services', ['lokijs'])
     };
 
     service.updateSettings = function(newSettings) {
-      var updateAccuracy = locationService.updateSettings({
-          desiredAccuracy: [100, 10, 0][newSettings.accuracyLevel]
-        }),
-        storeSettings = storageService.set(SETTINGS_KEY, newSettings);
-      return $q.all([updateAccuracy, storeSettings]);
+      return storageService.set(SETTINGS_KEY, newSettings).then(updateAccuracy);
     };
 
     service.clearAll = function() {
       return storageService.delete(SETTINGS_KEY);
     };
+
+    // Set initial accuracy.
+    updateAccuracy();
   })
 
   .service('profileService', function(storageService) {
