@@ -19,7 +19,6 @@ angular.module('bikemoves.controllers', [])
   function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService) {
     var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
       START_TIME_KEY = 'bikemoves:starttime',
-      LocationType = remoteService.getEnum('Trip', 'LocationType'),
       currentLocation,
       tripSubmitModal;
 
@@ -205,36 +204,7 @@ angular.module('bikemoves.controllers', [])
     locationService.onLocation(onLocation);
 
     $scope.options = {
-      locationType: [
-        {
-          id: LocationType.NOT_SPECIFIED,
-          label: ''
-        },
-        {
-          id: LocationType.HOME,
-          label: 'Home'
-        },
-        {
-          id: LocationType.WORK,
-          label: 'Work'
-        },
-        {
-          id: LocationType.K12_SCHOOL,
-          label: 'K-12 School'
-        },
-        {
-          id: LocationType.UNIVERSITY,
-          label: 'University'
-        },
-        {
-          id: LocationType.SHOPPING,
-          label: 'Shopping'
-        },
-        {
-          id: LocationType.OTHER,
-          label: 'Other'
-        }
-      ]
+      locationType: remoteService.getOptions('Trip', 'LocationType')
     };
 }])
 
@@ -263,8 +233,9 @@ angular.module('bikemoves.controllers', [])
   '$stateParams',
   '$ionicPopup',
   'mapService',
+  'remoteService',
   'tripService',
-  function($scope, $state, $stateParams, $ionicPopup, mapService, tripService) {
+  function($scope, $state, $stateParams, $ionicPopup, mapService, remoteService, tripService) {
     var SECOND = 1000,
       MINUTE = SECOND * 60,
       HOUR = MINUTE * 60,
@@ -288,8 +259,10 @@ angular.module('bikemoves.controllers', [])
         speed = distance / (duration / HOUR); // In MPH
 
       $scope.locations = trip.locations;
-      $scope.origin = trip.origin;
-      $scope.destination = trip.destination;
+      $scope.origin = remoteService.getLabel(
+          'Trip', 'LocationType', trip.origin);
+      $scope.destination = remoteService.getLabel(
+          'Trip', 'LocationType', trip.destination);
       $scope.date = moment(trip.startTime).format('MMM D, YYYY');
       $scope.time = moment(trip.startTime).format('h:mm A');
       $scope.distance = distance.toFixed(1);
@@ -379,10 +352,7 @@ angular.module('bikemoves.controllers', [])
   'remoteService',
   'tripService',
   function($scope, $ionicPopup, profileService, remoteService, tripService) {
-    var Age = remoteService.getEnum('User', 'Age'),
-      ExperienceLevel = remoteService.getEnum('User', 'ExperienceLevel'),
-      Gender = remoteService.getEnum('User', 'Gender'),
-      saveProfile = function(profile) {
+    var saveProfile = function(profile) {
         return profileService.updateProfile(profile);
       },
       submitProfile = function() {
@@ -433,84 +403,9 @@ angular.module('bikemoves.controllers', [])
     });
 
     $scope.options = {
-      age: [
-        {
-          id: Age.NOT_SPECIFIED,
-          label: ''
-        },
-        {
-          id: Age.AGE_UNDER_15,
-          label: 'Under 15'
-        },
-        {
-          id: Age.AGE_15_TO_19,
-          label: '15 to 19'
-        },
-        {
-          id: Age.AGE_20_TO_24,
-          label: '20 to 24'
-        },
-        {
-          id: Age.AGE_25_TO_34,
-          label: '25 to 34'
-        },
-        {
-          id: Age.AGE_35_TO_44,
-          label: '35 to 44'
-        },
-        {
-          id: Age.AGE_45_TO_54,
-          label: '45 to 54'
-        },
-        {
-          id: Age.AGE_55_TO_64,
-          label: '55 to 64'
-        },
-        {
-          id: Age.AGE_65_TO_74,
-          label: '65 to 74'
-        },
-        {
-          id: Age.AGE_75_AND_OLDER,
-          label: '75 and older'
-        }
-      ],
-      cyclingExperience: [
-        {
-          id: ExperienceLevel.NOT_SPECIFIED,
-          label: ''
-        },
-        {
-          id: ExperienceLevel.BEGINNER,
-          label: 'Beginner'
-        },
-        {
-          id: ExperienceLevel.INTERMEDIATE,
-          label: 'Intermediate'
-        },
-        {
-          id: ExperienceLevel.ADVANCED,
-          label: 'Advanced'
-        }
-      ],
-      gender: [
-        {
-          id: Gender.NOT_SPECIFIED,
-          label: ''
-        },
-        {
-          id: Gender.MALE,
-          label: 'Male'
-        },
-        {
-          id: Gender.FEMALE,
-          label: 'Female'
-        },
-        {
-          id: Gender.OTHER,
-          label: 'Other'
-        }
-      ]
+      age: remoteService.getOptions('User', 'Age'),
+      cyclingExperience: remoteService.getOptions('User', 'ExperienceLevel'),
+      gender: remoteService.getOptions('User', 'Gender')
     };
 }])
 
