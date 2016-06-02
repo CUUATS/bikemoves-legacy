@@ -298,13 +298,13 @@ angular.module('bikemoves.controllers', [])
   '$scope',
   '$q',
   '$ionicPopup',
+  'profileService',
   'settingsService',
   'tripService',
-  function($scope, $q, $ionicPopup, settingsService, tripService) {
+  function($scope, $q, $ionicPopup, profileService, settingsService, tripService) {
 
     var reloadSettings = function() {
       return settingsService.getSettings().then(function(settings) {
-        console.log('Got settings', settings);
         $scope.settings = settings;
       });
     };
@@ -322,8 +322,9 @@ angular.module('bikemoves.controllers', [])
       confirmPopup.then(function(res) {
         if (res) {
           var settingsReset = settingsService.clearAll().then(reloadSettings),
+            profileReset = profileService.clearAll(),
             tripsReset = tripService.clearAll();
-          $q.all([settingsReset, tripsReset]).then(function() {
+          $q.all([settingsReset, profileReset, tripsReset]).then(function() {
             $ionicPopup.alert({
               title: 'Data Reset',
               content: 'All data have been reset.'
