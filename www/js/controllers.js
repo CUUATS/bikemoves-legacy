@@ -16,9 +16,10 @@ angular.module('bikemoves.controllers', [])
   'remoteService',
   'tripService',
   'settingsService',
-  function($scope, $ionicPlatform, $ionicModal, $http, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService) {
+  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService) {
     var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
       START_TIME_KEY = 'bikemoves:starttime',
+      LocationType = remoteService.getEnum('Trip', 'LocationType'),
       currentLocation,
       tripSubmitModal;
 
@@ -69,8 +70,8 @@ angular.module('bikemoves.controllers', [])
       $scope.trip.startTime = now();
       window.localStorage.setItem(
         START_TIME_KEY, String.valueOf($scope.trip.startTime));
-      settingsService.getSettings().then(function(settings) {
-        $scope.trip.desiredAccuracy = settings.desiredAccuracy;
+      settingsService.getDesiredAccuracy().then(function(accuracy) {
+        $scope.trip.desiredAccuracy = accuracy;
       });
     },
     submitTrip = function() {
@@ -202,6 +203,39 @@ angular.module('bikemoves.controllers', [])
     });
 
     locationService.onLocation(onLocation);
+
+    $scope.options = {
+      locationType: [
+        {
+          id: LocationType.NOT_SPECIFIED,
+          label: ''
+        },
+        {
+          id: LocationType.HOME,
+          label: 'Home'
+        },
+        {
+          id: LocationType.WORK,
+          label: 'Work'
+        },
+        {
+          id: LocationType.K12_SCHOOL,
+          label: 'K-12 School'
+        },
+        {
+          id: LocationType.UNIVERSITY,
+          label: 'University'
+        },
+        {
+          id: LocationType.SHOPPING,
+          label: 'Shopping'
+        },
+        {
+          id: LocationType.OTHER,
+          label: 'Other'
+        }
+      ]
+    };
 }])
 
 .controller('PreviousTripsCtrl', [

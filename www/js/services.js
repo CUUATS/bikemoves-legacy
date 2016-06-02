@@ -435,30 +435,36 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
 
   .service('remoteService', function($http) {
     var service = this,
-      ENDPOINT = 'http://api.bikemoves.me/v0.1/',
+      ENDPOINT = 'http://api.bikemoves.me/v0.2/',
       POST_CONFIG = {
         headers: {'Content-Type': 'application/octet-stream'},
         transformRequest: []
       },
-      messages = dcodeIO.ProtoBuf.loadJsonFile('js/messages.json').build();
+      messages = dcodeIO.ProtoBuf.loadJsonFile('js/messages.json').build(),
+      postMessage = function(url, msg) {
+        return $http.post(
+          ENDPOINT + url, msg.encode().toArrayBuffer(), POST_CONFIG);
+      };
 
     service.getEnum = function(messageName, enumName) {
       return messages.bikemoves[messageName][enumName];
     };
 
     service.postUser = function(profile) {
-      var user = new messages.bikemoves.User(angular.merge({
+      var userMessage = new messages.bikemoves.User({
         deviceUuid: window.device.uuid,
         platformName: ionic.Platform.platform(),
-        platformVersion: ionic.Platform.version()
-      }, profile));
-      return $http.post(ENDPOINT + 'user',
-        user.toArrayBuffer(), POST_CONFIG);
+        platformVersion: ionic.Platform.version(),
+        age: profile.age,
+        cyclingExperience: profile.cyclingExperience,
+        gender: profile.gender
+      });
+      return postMessage('user', userMessage);
     };
 
     service.postTrip = function(trip) {
-      return $http.post(ENDPOINT + 'trip',
-        messages.bikemoves.Trip.encode(trip), POST_CONFIG);
+      var tripMessage = new messages.bikemoves.Trip(trip.serialize());
+      return postMessage('trip', tripMessage);
     };
   })
 
@@ -552,15 +558,19 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
         autoSubmit: true
       },
       updateAccuracy = function() {
-        return service.getSettings().then(function(settings) {
-          locationService.updateSettings({
-            desiredAccuracy: [100, 10, 0][settings.accuracyLevel]
-          });
+        return service.getDesiredAccuracy().then(function(accuracy) {
+          return locationService.updateSettings({desiredAccuracy: accuracy});
         });
       };
 
     service.getSettings = function() {
       return storageService.get(SETTINGS_KEY, DEFAULT_SETTINGS);
+    };
+
+    service.getDesiredAccuracy = function() {
+      return service.getSettings().then(function(settings) {
+        return [100, 10, 0][settings.accuracyLevel];
+      });
     };
 
     service.updateSettings = function(newSettings) {
@@ -579,9 +589,9 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
     var service = this,
       PROFILE_KEY = 'profile',
       DEFAULT_PROFILE = {
-        age: null,
-        cyclingExperience: null,
-        sex: null
+        age: 0,
+        cyclingExperience: 0,
+        sex: 0
       };
 
     service.getProfile = function() {
