@@ -514,7 +514,7 @@ angular.module('bikemoves.services', ['lokijs'])
     };
   })
 
-  .service('settingsService', function(storageService) {
+  .service('settingsService', function($q, storageService, locationService) {
     var service = this,
       SETTINGS_KEY = 'settings',
       DEFAULT_SETTINGS = {
@@ -527,7 +527,11 @@ angular.module('bikemoves.services', ['lokijs'])
     };
 
     service.updateSettings = function(newSettings) {
-      return storageService.set(SETTINGS_KEY, newSettings);
+      var updateAccuracy = locationService.updateSettings({
+          desiredAccuracy: [100, 10, 0][newSettings.accuracyLevel]
+        }),
+        storeSettings = storageService.set(SETTINGS_KEY, newSettings);
+      return $q.all([updateAccuracy, storeSettings]);
     };
 
     service.clearAll = function() {
