@@ -95,6 +95,9 @@ angular.module('bikemoves.controllers', [])
     initView = function() {
       mapService.resetMap(mapService.MAP_TYPE_CURRENT);
       if (!angular.isDefined(currentLocation)) $scope.getCurrentPosition();
+      settingsService.getSettings().then(function(settings) {
+        $scope.autoSubmit = settings.autoSubmit;
+      });
     },
     now = function() {
       return (new Date()).getTime();
