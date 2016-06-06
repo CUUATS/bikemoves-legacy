@@ -524,31 +524,21 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
     };
   })
 
-  .service('storageService', function($q, Loki) {
+  .service('storageService', function($q, $ionicPlatform, Loki) {
     var service = this,
       APP_COLLECTION = 'app',
       TRIPS_COLLECTION = 'trips',
-      db = new Loki('bikemoves', {
-        autosave: false,
-        adapter: new LokiCordovaFSAdapter({'prefix': 'loki'})
-      }),
       collections = {},
-      dbLoaded = false,
+      ready = false,
+      readyQueue = [],
+      db,
       loadDb = function() {
-        return $q(function (resolve, reject) {
-          if (dbLoaded) {
-            resolve()
+        return $q(function(resolve, reject) {
+          if (ready) {
+            resolve();
           } else {
-            db.loadDatabase({
-              trips: {
-                proto: Trip
-              }
-            }, function () {
-              buildCollections();
-              dbLoaded = true;
-              resolve();
-            });
-          };
+            readyQueue.push(resolve);
+          }
         });
       },
       buildCollections = function() {
@@ -604,6 +594,24 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
         return service.save();
       });
     };
+
+    $ionicPlatform.ready().then(function() {
+      db = new Loki('bikemoves', {
+        autosave: false,
+        adapter: new LokiCordovaFSAdapter({'prefix': 'loki'})
+      });
+      db.loadDatabase({
+        trips: {
+          proto: Trip
+        }
+      }, function () {
+        buildCollections();
+        ready = true;
+        angular.forEach(readyQueue, function(callback) {
+          callback();
+        });
+      });
+    });
   })
 
   .service('settingsService', function(storageService, locationService) {
