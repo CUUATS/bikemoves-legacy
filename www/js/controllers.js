@@ -130,7 +130,12 @@ angular.module('bikemoves.controllers', [])
     $scope.submitTrip = function() {
       setStatus(locationService.STATUS_STOPPED);
       tripSubmitModal.hide();
-      submitTrip().finally(resetTrip);
+      // Don't submit trips that have no locations.
+      if ($scope.trip.locations.length > 0) {
+        submitTrip().finally(resetTrip);
+      } else {
+        tripService.saveTrip().finally(resetTrip);
+      }
     };
 
     $scope.saveTrip = function() {
