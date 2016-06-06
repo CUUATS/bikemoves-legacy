@@ -1,10 +1,10 @@
 function Trip(locations, startTime, endTime, origin, destination,
     transit, submitted, desiredAccuracy) {
   this.desiredAccuracy = desiredAccuracy || null;
-  this.destination = destination || null;
+  this.destination = destination || 0;
   this.endTime = endTime || null;
   this.locations = locations || [];
-  this.origin = origin || null;
+  this.origin = origin || 0;
   this.startTime = startTime || null;
   this.submitted = submitted || false;
   this.transit = transit || false;
@@ -51,8 +51,8 @@ Trip.prototype._locationInfo = function(type, idx) {
 Trip.prototype.getODTypes = function() {
   if (this.locations.length < 2) return [];
   var od = [];
-  if (this.origin) od.push(this._locationInfo(this.origin, 0));
-  if (this.destination) od.push(this._locationInfo(this.destination, -1));
+  if (this.origin > 0) od.push(this._locationInfo(this.origin, 0));
+  if (this.destination > 0) od.push(this._locationInfo(this.destination, -1));
   return od;
 };
 
@@ -119,7 +119,14 @@ Trip.prototype.toLineString = function() {
 };
 
 Trip.prototype.serialize = function() {
-  return angular.merge({
-    deviceUUID: window.device.uuid
-  }, this);
+  return {
+    deviceUuid: window.device.uuid,
+    locations: this.locations,
+    startTime: this.startTime,
+    endTime: this.endTime,
+    desiredAccuracy: this.desiredAccuracy,
+    transit: this.transit,
+    origin: this.origin,
+    destination: this.destination
+  };
 };

@@ -10,13 +10,13 @@ angular.module('bikemoves.controllers', [])
   '$scope',
   '$ionicPlatform',
   '$ionicModal',
-  '$http',
   '$ionicPopup',
   'locationService',
   'mapService',
+  'remoteService',
   'tripService',
   'settingsService',
-  function($scope, $ionicPlatform, $ionicModal, $http, $ionicPopup, locationService, mapService, tripService, settingsService) {
+  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService) {
     var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
       START_TIME_KEY = 'bikemoves:starttime',
       currentLocation,
@@ -69,15 +69,13 @@ angular.module('bikemoves.controllers', [])
       $scope.trip.startTime = now();
       window.localStorage.setItem(
         START_TIME_KEY, String.valueOf($scope.trip.startTime));
-      settingsService.getSettings().then(function(settings) {
-        $scope.trip.desiredAccuracy = settings.desiredAccuracy;
+      settingsService.getDesiredAccuracy().then(function(accuracy) {
+        $scope.trip.desiredAccuracy = accuracy;
       });
     },
     submitTrip = function() {
       var submitted = false;
-      return $http.post(TRIPS_ENDPOINT, {
-        data: LZString.compressToBase64(JSON.stringify($scope.trip.serialize()))
-      }).then(function(res) {
+      return remoteService.postTrip($scope.trip).then(function(res) {
         submitted = (res.status == 200);
         if (res.status != 200) onSubmitError();
       }).catch(onSubmitError).finally(function() {
@@ -204,6 +202,10 @@ angular.module('bikemoves.controllers', [])
     });
 
     locationService.onLocation(onLocation);
+
+    $scope.options = {
+      locationType: remoteService.getOptions('Trip', 'LocationType')
+    };
 }])
 
 .controller('PreviousTripsCtrl', [
@@ -231,8 +233,9 @@ angular.module('bikemoves.controllers', [])
   '$stateParams',
   '$ionicPopup',
   'mapService',
+  'remoteService',
   'tripService',
-  function($scope, $state, $stateParams, $ionicPopup, mapService, tripService) {
+  function($scope, $state, $stateParams, $ionicPopup, mapService, remoteService, tripService) {
     var SECOND = 1000,
       MINUTE = SECOND * 60,
       HOUR = MINUTE * 60,
@@ -256,8 +259,10 @@ angular.module('bikemoves.controllers', [])
         speed = distance / (duration / HOUR); // In MPH
 
       $scope.locations = trip.locations;
-      $scope.origin = trip.origin;
-      $scope.destination = trip.destination;
+      $scope.origin = remoteService.getLabel(
+          'Trip', 'LocationType', trip.origin);
+      $scope.destination = remoteService.getLabel(
+          'Trip', 'LocationType', trip.destination);
       $scope.date = moment(trip.startTime).format('MMM D, YYYY');
       $scope.time = moment(trip.startTime).format('h:mm A');
       $scope.distance = distance.toFixed(1);
@@ -343,24 +348,18 @@ angular.module('bikemoves.controllers', [])
 .controller('profileCtrl', [
   '$scope',
   '$ionicPopup',
-  '$http',
   'profileService',
+  'remoteService',
   'tripService',
-  function($scope, $ionicPopup, $http, profileService, tripService) {
-    var ENDPOINT = 'http://api.bikemoves.me/v0.1/user',
-      saveProfile = function(profile) {
+  function($scope, $ionicPopup, profileService, remoteService, tripService) {
+    var saveProfile = function(profile) {
         return profileService.updateProfile(profile);
       },
       submitProfile = function() {
         profileService.getProfile().then(function(profile) {
-          var data = angular.merge({
-            deviceUUID: window.device.uuid
-          }, profile);
-          return $http.post(ENDPOINT, {
-            data: LZString.compressToBase64(JSON.stringify(data))
+          remoteService.postUser(profile).catch(function(response) {
+            console.log(response)
           });
-        }).catch(function (response) {
-          console.log(response)
         });
       };
 
@@ -402,6 +401,12 @@ angular.module('bikemoves.controllers', [])
         });
       }
     });
+
+    $scope.options = {
+      age: remoteService.getOptions('User', 'Age'),
+      cyclingExperience: remoteService.getOptions('User', 'ExperienceLevel'),
+      gender: remoteService.getOptions('User', 'Gender')
+    };
 }])
 
 .controller('LegalCtrl', [

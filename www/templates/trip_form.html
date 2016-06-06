@@ -11,35 +11,31 @@
         <div class="input-label">
           From:
         </div>
-        <select ng-model="tripInfo.origin">
-          <option>Home</option>
-          <option>Work</option>
-          <option>K-12 School</option>
-          <option>University</option>
-          <option>Shopping</option>
-          <option>Other</option>
+        <select ng-model="trip.origin"
+          ng-options="item.id as item.label for item in options.locationType">
         </select>
       </label>
       <label class="item item-input item-select">
         <div class="input-label">
           To:
         </div>
-        <select ng-model="tripInfo.destination">
-          <option>Home</option>
-          <option>Work</option>
-          <option>K-12 School</option>
-          <option>University</option>
-          <option>Shopping</option>
-          <option>Other</option>
+        <select ng-model="trip.destination"
+          ng-options="item.id as item.label for item in options.locationType">
         </select>
       </label>
-      <ion-checkbox ng-model="tripInfo.transit">I rode a bus during part of this trip.</ion-checkbox>
+      <ion-checkbox ng-model="trip.transit">
+        I rode a bus during part of this trip.
+      </ion-checkbox>
     </div>
     <div class="padding-horizontal">
-      <button class="button button-block icon-left ion-share button-positive" ng-click="submitTrip()">Save and Submit</button>
-      <button class="button button-block icon-left ion-folder button-calm" ng-if="!autoSubmit" ng-click="saveTrip()">Save</button>
-      <button class="button button-block icon-left ion-play button-stable" ng-click="resumeTrip()">Resume</button>
-      <button class="button button-block icon-left ion-trash-b button-assertive" ng-click="discardTrip()">Discard</button>
+      <button class="button button-block icon-left ion-share button-positive"
+        ng-click="submitTrip()">Save and Submit</button>
+      <button class="button button-block icon-left ion-folder button-calm"
+        ng-if="!autoSubmit" ng-click="saveTrip()">Save</button>
+      <button class="button button-block icon-left ion-play button-stable"
+        ng-click="resumeTrip()">Resume</button>
+      <button class="button button-block icon-left ion-trash-b button-assertive"
+        ng-click="discardTrip()">Discard</button>
     </div>
   </ion-content>
 </ion-modal-view>
