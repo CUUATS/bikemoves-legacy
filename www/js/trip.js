@@ -58,13 +58,15 @@ Trip.prototype.getODTypes = function() {
 
 Trip.prototype.addLocation = function(location) {
   var prev = this._getLocation(-1);
-  if (!location.moving) return prev;
+  // if (!location.moving) return prev;  <-- iOS never was reporting motion
 
   // If we have a previous location, check that the travel speed between
   // the two locations is reasonable and that the locations are outside
   // of each other's accuracy circles. If not, keep only the more
   // accurate of the two locations.
+  console.log("Prev is:", prev)
   if (prev) {
+    console.log("Null Case")
     var meters = this._getDistance(prev, location),
       seconds = (location.time - prev.time) / 1000;
     if ((meters / seconds) > 23 || meters < location.accuracy ||
@@ -74,6 +76,7 @@ Trip.prototype.addLocation = function(location) {
       this._appendLocation(location);
     }
   } else {
+    console.log("Should add this location")
     this._appendLocation(location);
   }
   return this._getLocation(-1);

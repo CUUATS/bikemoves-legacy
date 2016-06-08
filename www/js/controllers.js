@@ -49,6 +49,7 @@ angular.module('bikemoves.controllers', [])
       $scope.odometer = ($scope.trip.getDistance() * 0.000621371).toFixed(1);
     },
     onLocation = function(location, skipUpdate) {
+      console.log("The Location Thingy", location, " ? ", $scope.status.isRecording)
       currentLocation = ($scope.status.isRecording) ?
         $scope.trip.addLocation(location) : location;
       if (!skipUpdate) {
@@ -131,10 +132,12 @@ angular.module('bikemoves.controllers', [])
     $scope.submitTrip = function() {
       setStatus(locationService.STATUS_STOPPED);
       tripSubmitModal.hide();
+
       // Don't submit trips that have no locations.
       if ($scope.trip.locations.length > 0) {
         submitTrip().finally(resetTrip);
       } else {
+        console.log("Submitted trip with no data points")
         tripService.saveTrip().finally(resetTrip);
       }
     };

@@ -12,7 +12,7 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
         fastestLocationUpdateInterval: 1000, // Prevent updates more than once per second (Android)
         locationUpdateInterval: 5000, // Request updates every 5 seconds (Android)
         startOnBoot: false, // Do not start tracking on device boot
-        stationaryRadius: 20, // Activate the GPS after 20 meters (iOS)
+        stationaryRadius: 0, // Activate the GPS after 20 meters (iOS)
         stopOnTerminate: true, // Stop geolocation tracking on app exit
         stopTimeout: 3 // Keep tracking for 3 minutes while stationary
       },
@@ -335,8 +335,6 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
       };
       mapLongClick = function(latLng){
         incidentService.openModal(latLng);
-
-        console.log("LatLng is:" ,latLng)
       };
 
     service.MAP_TYPE_CURRENT = 'current';
@@ -526,6 +524,9 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
     };
 
     service.postTrip = function(trip) {
+      for (i of trip.locations){
+        delete i.altitudeAccuracy // Property only exists on iOS, no purpose for it
+      }
       var tripMessage = new messages.bikemoves.Trip(trip.serialize());
       return postMessage('trip', tripMessage);
     };
@@ -731,7 +732,7 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
     GEOCODER_ENDPOINT = "https://maps.googleapis.com/maps/api/geocode/json"
 
     service.openModal = function(latLng){
-      location = latLng
+      incidentlocation = latLng
       $rootScope.$broadcast("OpenIncidentReportModal")
       // Apparently only way to open modal from service
     }
