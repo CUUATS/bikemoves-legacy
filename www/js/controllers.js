@@ -49,7 +49,6 @@ angular.module('bikemoves.controllers', [])
       $scope.odometer = ($scope.trip.getDistance() * 0.000621371).toFixed(1);
     },
     onLocation = function(location, skipUpdate) {
-      console.log("The Location Thingy", location, " ? ", $scope.status.isRecording)
       currentLocation = ($scope.status.isRecording) ?
         $scope.trip.addLocation(location) : location;
       if (!skipUpdate) {
