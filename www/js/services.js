@@ -143,7 +143,7 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
     });
   })
 
-  .service('mapService', function($http, $q, $ionicPlatform) {
+  .service('mapService', function($http, $q, $ionicPlatform, incidentService) {
     var service = this,
       DEFAULT_LOCATION = {
         latitude: 40.109403,
@@ -166,6 +166,7 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
       tripPolyline,
       mapType,
       currentMapCamera,
+      disableDoubleClickZoom = true,
       currentLocation,
       location2LatLng = function(location) {
         return new plugin.google.maps.LatLng(location.latitude, location.longitude);
@@ -332,6 +333,11 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
           }
         });
       };
+      mapLongClick = function(latLng){
+        incidentService.openModal(latLng);
+
+        console.log("LatLng is:" ,latLng)
+      };
 
     service.MAP_TYPE_CURRENT = 'current';
     service.MAP_TYPE_PREVIOUS = 'previous';
@@ -426,6 +432,7 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
       tripPolyline = mapFeatures[3];
       map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);
       map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
+      map.on(plugin.google.maps.event.MAP_LONG_CLICK, mapLongClick);
       ready = true;
       angular.forEach(readyQueue, function(callback) {
         callback();
@@ -717,4 +724,31 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
         return storageService.save();
       });
     };
+  })
+
+  .service('incidentService', function($q, $rootScope, $http) {
+    var service = this;
+    GEOCODER_ENDPOINT = "https://maps.googleapis.com/maps/api/geocode/json"
+
+    service.openModal = function(latLng){
+      location = latLng
+      $rootScope.$broadcast("OpenIncidentReportModal")
+      // Apparently only way to open modal from service
+    }
+    service.getAddress = function(){
+      $http({
+        method: 'GET',
+        url: GEOCODER_ENDPOINT,
+        params: {f: 'json'}
+      }).then(function(res) {
+        if (res.status == 200) {
+          return res[0].formatted_address;
+        return "Inavlid Location";
+        }
+      });
+      }
+
+    service.saveIncident = function(){
+      console.log("Incident Saved")
+    }
   });

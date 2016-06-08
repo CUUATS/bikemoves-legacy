@@ -16,7 +16,8 @@ angular.module('bikemoves.controllers', [])
   'remoteService',
   'tripService',
   'settingsService',
-  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService) {
+  'incidentService',
+  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService) {
     var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
       START_TIME_KEY = 'bikemoves:starttime',
       currentLocation,
@@ -178,7 +179,32 @@ angular.module('bikemoves.controllers', [])
     });
     $scope.$on('$destroy', function() {
       tripSubmitModal.remove();
+      incidentReportModal.remove();
     });
+
+    //Create the modal window for incident reporting
+    $ionicModal.fromTemplateUrl("templates/incident_form.html", {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      incidentReportModal = modal;
+    });
+
+    $scope.$on("OpenIncidentReportModal", function(){
+      mapService.setClickable("false")
+      $scope.incidentAddress = incidentService.getAddress();
+      incidentReportModal.show();
+    });
+    $scope.submitIncident = function(){
+      incidentService.saveIncident();
+      incidentReportModal.hide();
+      console.log("Submit")
+    };
+    $scope.discardIncident = function(){
+      incidentReportModal.hide();
+      console.log("discard")
+    };
+
 
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
