@@ -69,7 +69,7 @@ Trip.prototype.addLocation = function(location) {
       seconds = (location.time - prev.time) / 1000;
     if ((meters / seconds) > 23 || meters < location.accuracy ||
         meters < prev.accuracy) {
-      this._replaceLocation(moreAccurate(prev, location));
+      this._replaceLocation(this._moreAccurate(prev, location));
     } else {
       this._appendLocation(location);
     }
