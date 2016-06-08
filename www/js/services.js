@@ -739,7 +739,6 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
       $http({
         method: 'GET',
         url: GEOCODER_ENDPOINT,
-        params: {f: 'json'}
       }).then(function(res) {
         if (res.status == 200) {
           return res[0].formatted_address;

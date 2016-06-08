@@ -192,7 +192,7 @@ angular.module('bikemoves.controllers', [])
 
     $scope.$on("OpenIncidentReportModal", function(){
       mapService.setClickable("false")
-      $scope.incidentAddress = incidentService.getAddress();
+      // $scope.incidentAddress = incidentService.getAddress();
       incidentReportModal.show();
     });
     $scope.submitIncident = function(){
