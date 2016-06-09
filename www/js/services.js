@@ -535,6 +535,15 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
       var tripMessage = new messages.bikemoves.Trip(trip.serialize());
       return postMessage('trip', tripMessage);
     };
+    service.postIncident = function(incidnet){
+      var incidentMessage = new messages.bikemoves.Incident({
+        deviceUuid: window.device.uuid,
+        category: incident.category,
+        time: incident.time,
+        location: incident.location
+      });
+      return postMessge('incident',incidentMessage)
+    }
   })
 
   .service('storageService', function($q, $ionicPlatform, Loki) {
@@ -732,8 +741,9 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
     };
   })
 
-  .service('incidentService', function($q, $rootScope, $http) {
+  .service('incidentService', function($q, $rootScope, $http, $remoteService) {
     var service = this;
+    var incidentlocation;
     service.openModal = function(latLng){
       incidentlocation = latLng
       $rootScope.$broadcast("OpenIncidentReportModal")
@@ -751,7 +761,8 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
       })
     })
     };
-    service.saveIncident = function(){
-      console.log("Incident Saved")
+    service.saveIncident = function(incident){
+      incident.location = incidentlocation;
+      postIncident(incident)
     }
   });
