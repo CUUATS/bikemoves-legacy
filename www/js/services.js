@@ -729,25 +729,23 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
 
   .service('incidentService', function($q, $rootScope, $http) {
     var service = this;
-    GEOCODER_ENDPOINT = "https://maps.googleapis.com/maps/api/geocode/json"
-
     service.openModal = function(latLng){
       incidentlocation = latLng
       $rootScope.$broadcast("OpenIncidentReportModal")
       // Apparently only way to open modal from service
     }
     service.getAddress = function(){
-      $http({
-        method: 'GET',
-        url: GEOCODER_ENDPOINT,
-      }).then(function(res) {
-        if (res.status == 200) {
-          return res[0].formatted_address;
-        return "Inavlid Location";
+      return $q(function(resolve, reject){
+        console.log(incidentlocation);
+      plugin.google.maps.Geocoder.geocode({'position' : incidentlocation}, function(results, status) {
+        console.log("Status:", status, "Results",results)
+        if (results.length) {
+          resolve(results[0].extra.lines[0]);
         }
-      });
-      }
-
+        reject("");
+      })
+    })
+    };
     service.saveIncident = function(){
       console.log("Incident Saved")
     }
