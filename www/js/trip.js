@@ -58,7 +58,7 @@ Trip.prototype.getODTypes = function() {
 
 Trip.prototype.addLocation = function(location) {
   var prev = this._getLocation(-1);
-  // if (!location.moving) return prev;  <-- iOS never was reporting motion
+  if (!(location.moving || location.speed <= 0)) return prev;  //<-- iOS never was reporting motion
 
   // If we have a previous location, check that the travel speed between
   // the two locations is reasonable and that the locations are outside
