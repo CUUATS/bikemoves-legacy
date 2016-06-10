@@ -12,7 +12,7 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
         fastestLocationUpdateInterval: 1000, // Prevent updates more than once per second (Android)
         locationUpdateInterval: 5000, // Request updates every 5 seconds (Android)
         startOnBoot: false, // Do not start tracking on device boot
-        stationaryRadius: 0, // Activate the GPS after 20 meters (iOS)
+        stationaryRadius: 20, // Activate the GPS after 20 meters (iOS)
         stopOnTerminate: true, // Stop geolocation tracking on app exit
         stopTimeout: 3 // Keep tracking for 3 minutes while stationary
       },
@@ -87,6 +87,7 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
     service.getSettings = function() {
       return geoSettings;
     };
+
     service.updateSettings = function(newSettings) {
       return initPlugin().then(function() {
         angular.merge(geoSettings, newSettings);
@@ -102,6 +103,10 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
     };
     service.onLocation = function(locationHandler) {
       return initPlugin().then(function() {
+        bgGeo.onMotionChange(function(isMoving, loc, taskId){
+          console.log("Motion State Changed to:", isMoving);
+
+        });
         bgGeo.onLocation(function(e, taskId) {
           locationHandler(makeLocation(e));
           bgGeo.finish(taskId);
