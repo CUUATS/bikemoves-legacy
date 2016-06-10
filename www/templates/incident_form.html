@@ -6,31 +6,31 @@
   <ion-content>
     <ion-list>
       <div class = "item item-divider">Incident Type</div>
-      <ion-radio ng-model="incident" value ="pathDamage" name="primary"> Path Damage </ion-radio>
-      <ion-radio ng-model="incident" value ="obstruction" name="primary"> Obstruction </ion-radio>
-      <ion-radio ng-model="incident" value ="accident" name="primary"> Accident </ion-radio>
-      <ion-radio ng-model="incident" value ="other" name="primary"> Other </ion-radio>
+      <ion-radio ng-model="incident.Ui" value ="pathDamage" name="primary"> Path Damage </ion-radio>
+      <ion-radio ng-model="incident.Ui" value ="obstruction" name="primary"> Obstruction </ion-radio>
+      <ion-radio ng-model="incident.Ui" value ="accident" name="primary"> Accident </ion-radio>
+      <ion-radio ng-model="incident.Ui" value ="other" name="primary"> Other </ion-radio>
 
-    <div ng-show="incident=='accident'" >
+    <div ng-show="incident.Ui=='accident'" >
       <div class = "item item-divider">Accident Type</div>
-      <ion-radio ng-model="incidentSpecific" value ="bikeOnBike" name="secondary"> Bike on Bike </ion-radio>
-      <ion-radio ng-model="incidentSpecific" value ="bikeOnObject" name="secondary"> Bike on Object </ion-radio>
-      <ion-radio ng-model="incidentSpecific" value ="bikeOnVehicle" name="secondary"> Bike on Vehicle </ion-radio>
+      <ion-radio ng-model="incident.specific" value ="bikeOnBike" name="secondary"> Bike on Bike </ion-radio>
+      <ion-radio ng-model="incident.specific" value ="bikeOnObject" name="secondary"> Bike on Object </ion-radio>
+      <ion-radio ng-model="incident.specific" value ="bikeOnVehicle" name="secondary"> Bike on Vehicle </ion-radio>
     </div>
 
-    <div ng-show="incident=='obstruction'">
+    <div ng-show="incident.Ui=='obstruction'">
       <div class = "item item-divider">Obstruction Type</div>
-      <ion-radio ng-model="incidentSpecific" value ="vegetation" name="secondary"> Vegetation </ion-radio>
-      <ion-radio ng-model="incidentSpecific" value ="debris" name="secondary"> Debris </ion-radio>
+      <ion-radio ng-model="incident.specific" value ="vegetation" name="secondary"> Vegetation </ion-radio>
+      <ion-radio ng-model="incident.specific" value ="debris" name="secondary"> Debris </ion-radio>
     </div>
 
-    <div ng-show="incident=='pathDamage'">
+    <div ng-show="incident.Ui=='pathDamage'">
       <div class = "item item-divider">Obstruction Type</div>
-      <ion-radio ng-model="incidentSpecific" value ="pothole" name="secondary"> Pothole </ion-radio>
+      <ion-radio ng-model="incident.specific" value ="pothole" name="secondary"> Pothole </ion-radio>
     </div>
     <div class = "item item-divider"> Additional Info </div>
-    <label class = "item item-input">
-      <textarea placeholder="Comments"></textarea>
+    <label class = "item item-input" >
+      <textarea placeholder="{{incident.comment}}" ng-model="incident.comment"></textarea>
     </label>
   </ion-list>
 

@@ -205,11 +205,17 @@ angular.module('bikemoves.controllers', [])
       });
       incidentReportModal.show();
     });
+    $scope.incident = {
+      category: "None",
+      comment: "None",
+      Ui: "None"
+    };
+
     $scope.submitIncident = function(){
       var incident = {
         time: (new Date()).getTime(),
-        category: $scope.incidentSpecific,
-        comment: $scope.comment
+        category: $scope.incident.Ui != "other" ? $scope.incident.specific : "other",
+        comment: $scope.incident.comment
       }
       incidentService.saveIncident(incident);
       incidentReportModal.hide();

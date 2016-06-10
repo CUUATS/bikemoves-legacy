@@ -445,7 +445,8 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
 
   .service('remoteService', function($http) {
     var service = this,
-      ENDPOINT = 'http://api.bikemoves.me/v0.2/',
+      // ENDPOINT = 'http://api.bikemoves.me/v0.2/',
+      ENDPOINT = 'http://209.174.185.114:8083/v0.2/' // Debug Edndpoint
       POST_CONFIG = {
         headers: {'Content-Type': 'application/octet-stream'},
         transformRequest: []
@@ -535,14 +536,15 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
       var tripMessage = new messages.bikemoves.Trip(trip.serialize());
       return postMessage('trip', tripMessage);
     };
-    service.postIncident = function(incidnet){
+    service.postIncident = function(incident){
       var incidentMessage = new messages.bikemoves.Incident({
-        deviceUuid: window.device.uuid,
+        device_uuid: window.device.uuid,
         category: incident.category,
+        comment: incident.comment,
         time: incident.time,
-        location: incident.location
+        position: {latitude: incident.position.lat, longitude: incident.position.lng}
       });
-      return postMessge('incident',incidentMessage)
+      return postMessage('incident',incidentMessage)
     }
   })
 
@@ -741,7 +743,7 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
     };
   })
 
-  .service('incidentService', function($q, $rootScope, $http, $remoteService) {
+  .service('incidentService', function($q, $rootScope, $http, remoteService) {
     var service = this;
     var incidentlocation;
     service.openModal = function(latLng){
@@ -762,7 +764,7 @@ angular.module('bikemoves.services', ['ionic', 'lokijs'])
     })
     };
     service.saveIncident = function(incident){
-      incident.location = incidentlocation;
-      postIncident(incident)
+      incident.position = incidentlocation;
+      remoteService.postIncident(incident)
     }
   });
