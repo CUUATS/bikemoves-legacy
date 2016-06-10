@@ -1,6 +1,5 @@
 <ion-modal-view>
   <ion-header-bar>
-<<<<<<< HEAD
     <h1 class="title">Report Incident Near: {{incidentAddress}}</h1>
   </ion-header-bar>
 
@@ -45,29 +44,6 @@
       ng-click="discardIncident()">Discard</button>
     </div>
 
-=======
-    <h1 class="title">Report Incident {{incidentAddress}}</h1>
-  </ion-header-bar>
 
-  <ion-content class="transparent">
-    <ion-list>
-      <ion-radio ng-model="incident" ng-value ="Pothole"> Pothole </ion-radio>
-      <ion-radio ng-model="incident" ng-value ="Pothole"> Thing </ion-radio>
-      <ion-radio ng-model="incident" ng-value ="Bike Accident"> Accident </ion-radio>
-
-    </ion-list>
-<ion-list ng-show="incident=='Bike Accident'">
-  <ion-radio ng-model="accidentType" ng-value ="BikeOnBike"> Accident </ion-radio>
-  <ion-radio ng-model="accidentType" ng-value ="BikeOnObject"> Object </ion-radio>
-</ion-list>
-    <div class="padding-horizontal">
-      <button class="button button-block icon-left ion-share button-positive"
-        ng-click="submitIncident()">Save and Submit</button>
-      <button class="button button-block icon-left ion-folder button-calm"
-        ng-if="!autoSubmit" ng-click="saveIncident()">Save</button>
-      <button class="button button-block icon-left ion-trash-b button-assertive"
-        ng-click="discardIncident()">Discard</button>
-    </div>
->>>>>>> a05c1f1ffcacac2fde4900774b1b84351c2541ff
   </ion-content>
 </ion-modal-view>
