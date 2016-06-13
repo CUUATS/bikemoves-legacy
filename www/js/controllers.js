@@ -260,8 +260,8 @@ angular.module('bikemoves.controllers', [])
     isWarned = false;
     var crashWarning = function(){
       var crashPopup = $ionicPopup.alert({
-        title: 'Please Call 911 if this is an emergency',
-        template: 'This app will NOT report to emergency services'
+        title: 'If this is an emergency, close this app and dial 911',
+        template: 'Submitting an incident report does <b> not </b>  notify police or emergency responders'
       });
       crashPopup.then(function(res){
         isWarned = true;
