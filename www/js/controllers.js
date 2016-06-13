@@ -205,12 +205,15 @@ angular.module('bikemoves.controllers', [])
       });
       incidentReportModal.show();
     });
-    $scope.incident = {
-      category: "None",
-      comment: "None",
-      Ui: "None"
+    var initIncidentForm = function(){
+      isWarned = false;
+      $scope.incident = {
+        category: "None",
+        comment: '',
+        Ui: "None"
     };
-
+  }
+    initIncidentForm();
     $scope.submitIncident = function(){
       var incident = {
         time: (new Date()).getTime(),
@@ -220,8 +223,10 @@ angular.module('bikemoves.controllers', [])
       incidentService.saveIncident(incident);
       incidentReportModal.hide();
       console.log("Submit")
+      initIncidentForm();
     };
     $scope.discardIncident = function(){
+      initIncidentForm();
       incidentReportModal.hide();
       console.log("discard")
     };
@@ -252,7 +257,20 @@ angular.module('bikemoves.controllers', [])
       updateOdometer();
       setStatus(status, true);
     });
-
+    isWarned = false;
+    var crashWarning = function(){
+      var crashPopup = $ionicPopup.alert({
+        title: 'Please Call 911 if this is an emergency',
+        template: 'This app will NOT report to emergency services'
+      });
+      crashPopup.then(function(res){
+        isWarned = true;
+      })
+    }
+    $scope.$watch('incident.Ui', function(oldVal, newVal){
+      if(oldVal == 'crash' && !(isWarned))
+        crashWarning();
+    });
     locationService.onLocation(onLocation);
 
     $scope.options = {
