@@ -1,9 +1,9 @@
 angular.module('bikemoves', [
   'ionic',
-  'bikemoves.controllers',
-  'bikemoves.services',
-  'app.directives'
+  'app.directives',
+  'lokijs'
 ])
+
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {

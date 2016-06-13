@@ -1,4 +1,4 @@
-angular.modules('bikemoves').controller('LegalCtrl', [
+angular.module('bikemoves').controller('LegalCtrl', [
   '$scope',
   'mapService',
   function($scope, mapService) {

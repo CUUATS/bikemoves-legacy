@@ -197,12 +197,15 @@ angular.module('bikemoves').controller('MapCtrl', [
       });
       incidentReportModal.show();
     });
-    $scope.incident = {
-      category: "None",
-      comment: "None",
-      Ui: "None"
+    var initIncidentForm = function(){
+      isWarned = false;
+      $scope.incident = {
+        category: "None",
+        comment: '',
+        Ui: "None"
     };
-
+  }
+    initIncidentForm();
     $scope.submitIncident = function(){
       var incident = {
         time: (new Date()).getTime(),
@@ -212,8 +215,10 @@ angular.module('bikemoves').controller('MapCtrl', [
       incidentService.saveIncident(incident);
       incidentReportModal.hide();
       console.log("Submit")
+      initIncidentForm();
     };
     $scope.discardIncident = function(){
+      initIncidentForm();
       incidentReportModal.hide();
       console.log("discard")
     };
@@ -244,10 +249,42 @@ angular.module('bikemoves').controller('MapCtrl', [
       updateOdometer();
       setStatus(status, true);
     });
-
+    isWarned = false;
+    var crashWarning = function(){
+      var crashPopup = $ionicPopup.alert({
+        title: 'If this is an emergency, close this app and dial 911',
+        template: 'Submitting an incident report does <b> not </b>  notify police or emergency responders'
+      });
+      crashPopup.then(function(res){
+        isWarned = true;
+      })
+    }
+    $scope.$watch('incident.Ui', function(oldVal, newVal){
+      if(oldVal == 'crash' && !(isWarned))
+        crashWarning();
+    });
     locationService.onLocation(onLocation);
 
     $scope.options = {
       locationType: remoteService.getOptions('Trip', 'LocationType')
     };
+}])
+
+.controller('PreviousTripsCtrl', [
+  '$scope',
+  'tripService',
+  function($scope, tripService) {
+    var service = this;
+    $scope.formatDate = function(timestamp) {
+      return moment(timestamp).calendar(moment(), {
+        sameElse: 'dddd, MMMM D, YYYY [at] h:mm A'
+      });
+    };
+
+    // Set up the view.
+    $scope.$on('$ionicView.enter', function(e) {
+      tripService.getTrips().then(function(trips) {
+        $scope.trips = trips;
+      });
+    });
 }])
