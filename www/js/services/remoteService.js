@@ -94,7 +94,7 @@ angular.module('bikemoves')
     };
     service.postIncident = function(incident){
       var incidentMessage = new messages.bikemoves.Incident({
-        device_uuid: window.device.uuid,
+        deviceUuid: window.device.uuid,
         category: incident.category,
         comment: incident.comment,
         time: incident.time,
