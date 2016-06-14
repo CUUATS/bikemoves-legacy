@@ -9,7 +9,7 @@
   </author>
   <content src="index.html"/>
   <access origin="*"/>
-  <vs:features></vs:features>
+  <vs:features/>
   <preference name="SplashScreen" value="screen"/>
   <preference name="windows-target-version" value="8.1"/>
   <preference name="windows-phone-target-version" value="8.1"/>
@@ -19,7 +19,7 @@
   <preference name="InAppBrowserStorageEnabled" value="True"/>
   <preference name="SuppressesIncrementalRendering" value="True"/>
   <preference name="SplashScreenDelay" value="3000"/>
-  <preference name="SplashMaintainAspectRatio" value="true" />
+  <preference name="SplashMaintainAspectRatio" value="true"/>
   <platform name="android">
     <icon src="resources/android/icon/drawable-ldpi-icon.png" density="ldpi"/>
     <icon src="resources/android/icon/drawable-mdpi-icon.png" density="mdpi"/>

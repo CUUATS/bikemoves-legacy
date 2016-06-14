@@ -4,6 +4,9 @@
     <div class="button button-energized" ng-if="status.isPaused">Paused</div>
     <div class="button button-assertive" ng-if="status.isRecording">Recording</div>
   </ion-nav-buttons>
+  <ion-nav-buttons side ="secondary">
+    <div class = "button button-assertive icon-right ion-alert-circled" ng-click = "openIncident">Incident Report</div>
+  </ion-nav-buttons>
   <ion-content data-tap-disabled="true" scroll="false">
     <div id="current-map"></div>
   </ion-content>

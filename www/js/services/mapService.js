@@ -1,6 +1,7 @@
 angular.module('bikemoves')
 .service('mapService', function($http, $q, $ionicPlatform, incidentService) {
   var service = this,
+    isReporting = false;
     DEFAULT_LOCATION = {
       latitude: 40.109403,
       longitude: -88.227203
