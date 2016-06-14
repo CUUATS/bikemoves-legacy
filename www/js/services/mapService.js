@@ -1,7 +1,7 @@
 angular.module('bikemoves')
-.service('mapService', function($http, $q, $ionicPlatform, incidentService) {
+.service('mapService', function($http, $q, $ionicPlatform, incidentService, $rootScope) {
   var service = this,
-    isReporting = false;
+    isReporting = false,
     DEFAULT_LOCATION = {
       latitude: 40.109403,
       longitude: -88.227203
@@ -25,6 +25,7 @@ angular.module('bikemoves')
     currentMapCamera,
     disableDoubleClickZoom = true,
     currentLocation,
+    currentIncidentMarker
     location2LatLng = function(location) {
       return new plugin.google.maps.LatLng(location.latitude, location.longitude);
     },
@@ -159,22 +160,37 @@ angular.module('bikemoves')
         map.animateCamera(camera);
       });
     },
-    mapClick = function(latLng) {
-      if (!identifyLayerIds || mapType != service.MAP_TYPE_CURRENT) return;
-      getIdentifyParams(latLng).then(function(params) {
-        return $http({
-          method: 'GET',
-          url: SERVICE_ENDPOINT + '/identify',
-          params: params
-        });
-      }).then(function(res) {
-        if (res.status == 200 && res.data.results.length) {
-          displayFeatureInfo(res.data.results[0], latLng);
-        } else {
-          infoMarker.hideInfoWindow();
-          infoMarker.setVisible(false);
-        }
+    mapClick = function(latLng, map) {
+      if(isReporting){
+        map.addMarker({
+          position: latLng,
+          visible: true,
+          icon: '#00008b'
+      }, function(marker){
+        currentIncidentMarker = marker;
       });
+      console.log(map);
+      incidentService.getAddress(latLng).then(function(res,rej){
+        $rootScope.$broadcast("OpenIncidentReportPopover")
+      })
+    }
+      else {
+        if (!identifyLayerIds || mapType != service.MAP_TYPE_CURRENT) return;
+        getIdentifyParams(latLng).then(function(params) {
+          return $http({
+            method: 'GET',
+            url: SERVICE_ENDPOINT + '/identify',
+            params: params
+          });
+        }).then(function(res) {
+          if (res.status == 200 && res.data.results.length) {
+            displayFeatureInfo(res.data.results[0], latLng);
+          } else {
+            infoMarker.hideInfoWindow();
+            infoMarker.setVisible(false);
+          }
+        });
+      }
     },
     cameraChange = function(camera) {
       if (mapType == service.MAP_TYPE_CURRENT) {
@@ -294,4 +310,13 @@ angular.module('bikemoves')
       callback();
     });
   });
+  service.setMapState = function(name) {
+    if(name == 'report')
+      isReporting = true;
+    if(name == 'normal')
+      isReporting = false;
+  }
+  service.removeIncident = function(){
+    currentIncidentMarker.remove();
+  }
 })

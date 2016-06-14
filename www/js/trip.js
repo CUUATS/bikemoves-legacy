@@ -89,15 +89,15 @@ Trip.prototype.guessODTypes = function(trips) {
   angular.forEach(trips, function(trip) {
     odTypes.push.apply(odTypes, trip.getODTypes());
   });
-
+  var trip = this;
   var origin = this._getLocation(0),
     destination = this._getLocation(-1),
     minOrigin = this.NEAR_THESHOLD,
     minDestination = this.NEAR_THESHOLD;
 
   angular.forEach(odTypes, function(odType) {
-    var distOrigin = this._getDistance(odType.location, origin),
-      distDestination = this._getDistance(odType.location, destination);
+    var distOrigin = trip._getDistance(odType.location, origin),
+      distDestination = trip._getDistance(odType.location, destination);
 
     if (distOrigin < minOrigin) {
       minOrigin = distOrigin;
