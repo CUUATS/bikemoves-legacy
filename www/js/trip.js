@@ -123,7 +123,7 @@ Trip.prototype.toLineString = function() {
 
 Trip.prototype.serialize = function() {
   return {
-    deviceUuid: window.device.uuid,
+    device_uuid: window.device.uuid,
     locations: this.locations,
     startTime: this.startTime,
     endTime: this.endTime,
