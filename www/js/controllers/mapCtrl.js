@@ -93,7 +93,16 @@ angular.module('bikemoves').controller('MapCtrl', [
       now = function() {
         return (new Date()).getTime();
       };
-
+      initIncidentForm = function(){
+        // mapService.setClickable(true);
+        isWarned = false;
+        $scope.isReport = false;
+        $scope.incident = {
+          category: "None",
+          comment: '',
+          Ui: "None"
+        };
+      }
       $scope.startRecording = function() {
         if ($scope.status.isStopped) {
           // This is a new trip.
@@ -197,7 +206,7 @@ angular.module('bikemoves').controller('MapCtrl', [
         });
         incidentReportModal.show();
       });
-      $scope.$on("OpenIncidentReportPopover", function(){
+      $scope.$on("OpenIncidentReportPopup", function(){
         mapService.setClickable(false)
         var confirmPopup = $ionicPopup.confirm({
           title: 'Report Incident Near:',
@@ -218,17 +227,8 @@ angular.module('bikemoves').controller('MapCtrl', [
           }
         });
 
-      })
-      var initIncidentForm = function(){
-        mapService.setClickable(true);
-        isWarned = false;
-        $scope.isReport = false;
-        $scope.incident = {
-          category: "None",
-          comment: '',
-          Ui: "None"
-        };
-      }
+      });
+
       initIncidentForm();
       $scope.submitIncident = function(){
         var incident = {
@@ -296,10 +296,10 @@ angular.module('bikemoves').controller('MapCtrl', [
       $scope.reportIncident = function(){
         if($scope.isReport)
           $scope.isReport = false;
-          else {
+        else {
             $scope.popover.show();
-        $scope.isReport = true;
-        mapService.setMapState('report');
+            $scope.isReport = true;
+            mapService.setMapState('report');
       }
       }
 

@@ -171,7 +171,7 @@ angular.module('bikemoves')
       });
       console.log(map);
       incidentService.getAddress(latLng).then(function(res,rej){
-        $rootScope.$broadcast("OpenIncidentReportPopover")
+        $rootScope.$broadcast("OpenIncidentReportPopup")
       })
     }
       else {
@@ -315,8 +315,9 @@ angular.module('bikemoves')
       isReporting = true;
     if(name == 'normal')
       isReporting = false;
+      return
   }
   service.removeIncident = function(){
-    currentIncidentMarker.remove();
+    return currentIncidentMarker.remove();
   }
-})
+});
