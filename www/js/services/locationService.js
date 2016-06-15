@@ -4,7 +4,7 @@ angular.module('bikemoves')
     BG_DEFAULT_SETTINGS = {
       activityType: 'OtherNavigation', // iOS activity type
       autoSync: false, // Do not automatically post to the server
-      debug: true, // Disable debug notifications
+      debug: false, // Disable debug notifications
       desiredAccuracy: 10, // Overridden by settings.
       distanceFilter: 20, // Generate update events every 20 meters
       disableElasticity: true, // Do not auto-adjust distanceFilter
