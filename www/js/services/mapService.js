@@ -169,7 +169,6 @@ angular.module('bikemoves')
       }, function(marker){
         currentIncidentMarker = marker;
       });
-      console.log(map);
       incidentService.getAddress(latLng).then(function(res,rej){
         $rootScope.$broadcast("OpenIncidentReportPopup")
       })

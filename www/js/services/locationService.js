@@ -4,7 +4,7 @@ angular.module('bikemoves')
     BG_DEFAULT_SETTINGS = {
       activityType: 'OtherNavigation', // iOS activity type
       autoSync: false, // Do not automatically post to the server
-      debug: false, // Disable debug notifications
+      debug: true, // Disable debug notifications
       desiredAccuracy: 10, // Overridden by settings.
       distanceFilter: 20, // Generate update events every 20 meters
       disableElasticity: true, // Do not auto-adjust distanceFilter
@@ -60,7 +60,6 @@ angular.module('bikemoves')
             bgGeo.stop(resolve);
           }
         });
-      });
     },
     setMoving = function(moving) {
       return initPlugin().then(getState).then(function(state) {
@@ -69,7 +68,8 @@ angular.module('bikemoves')
             resolve();
           } else {
             bgGeo.changePace(moving, resolve, reject);
-          }
+            }
+          })
         });
       });
     },
@@ -83,6 +83,7 @@ angular.module('bikemoves')
   service.STATUS_STOPPED = 'stopped';
   service.STATUS_RECORDING = 'recording';
   service.STATUS_PAUSED = 'paused';
+
   service.getSettings = function() {
     return geoSettings;
   };

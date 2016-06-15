@@ -2,6 +2,7 @@ angular.module('bikemoves').controller('MapCtrl', [
   '$scope',
   '$ionicPlatform',
   '$ionicModal',
+  '$ionicPopover',
   '$ionicPopup',
   'locationService',
   'mapService',
@@ -293,11 +294,11 @@ angular.module('bikemoves').controller('MapCtrl', [
         locationType: remoteService.getOptions('Trip', 'LocationType')
       };
 
-      $scope.reportIncident = function(){
+      $scope.reportIncident = function($event){
         if($scope.isReport)
           $scope.isReport = false;
         else {
-            $scope.popover.show();
+            $scope.popover.show($event);
             $scope.isReport = true;
             mapService.setMapState('report');
       }

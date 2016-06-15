@@ -48,3 +48,23 @@
 	background-color: rgba(0, 0, 0, 0);
 	color: white;
 }
+ion-popover-view.fit {
+  height: auto !important;
+  background-color:rgba(255,255,255,0.9) !important;
+
+}
+
+ion-popover-view.fit ion-content {
+  position: relative !important;
+  background-color:rgba(255,255,255,0.9)!important;
+  
+}
+ion-popover-view.fit ion-content p {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.platform-android ion-popover-view.fit {
+  margin-top: 10px !important;
+}

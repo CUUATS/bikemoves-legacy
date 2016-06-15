@@ -5,11 +5,8 @@
     <div class="button button-assertive" ng-if="status.isRecording">Recording</div>
   </ion-nav-buttons>
   <ion-nav-buttons side ="secondary">
-    <div class = "button button-assertive icon-right ion-alert-circled" ng-click = "reportIncident()"></div>
+    <div class = "button button-assertive icon-right ion-alert-circled" ng-click = "reportIncident($event)"></div>
   </ion-nav-buttons>
-  <div class = "bar bar-subheader bar-trns" ng-if="isReport">
-    Press anywhere to report incident
-  </div>
   <ion-content data-tap-disabled="true" scroll="false">
     <div id="current-map"></div>
   </ion-content>
