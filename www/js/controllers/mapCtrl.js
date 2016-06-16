@@ -14,7 +14,8 @@ angular.module('bikemoves').controller('MapCtrl', [
     var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
     START_TIME_KEY = 'bikemoves:starttime',
     currentLocation,
-    tripSubmitModal;
+    tripSubmitModal,
+    comfirmPopup;
 
     var setStatus = function(status, initial) {
       console.log('Setting status: ' + status);
@@ -209,10 +210,17 @@ angular.module('bikemoves').controller('MapCtrl', [
       });
       $scope.$on("OpenIncidentReportPopup", function(){
         mapService.setClickable(false)
-        var confirmPopup = $ionicPopup.confirm({
-          title: 'Report Incident Near:',
-          template: incidentService.incidentAddress
-        });
+        if(incidentService.incidentAddress) {
+           confirmPopup = $ionicPopup.confirm({
+            title: 'Report Incident Near:',
+            template: incidentService.incidentAddress
+          });
+        }
+        else {
+           confirmPopup = $ionicPopup.confirm({
+            title: 'Report Incident Here',
+          });
+        }
         confirmPopup.then(function(res) {
           if(res) {
             $scope.popover.hide();
@@ -295,8 +303,12 @@ angular.module('bikemoves').controller('MapCtrl', [
       };
 
       $scope.reportIncident = function($event){
-        if($scope.isReport)
+        if($scope.isReport) {
           $scope.isReport = false;
+          $scope.popover.hide($event);
+          mapService.setMapState('normal');
+}
+
         else {
             $scope.popover.show($event);
             $scope.isReport = true;

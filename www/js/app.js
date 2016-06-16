@@ -1,12 +1,16 @@
 angular.module('bikemoves', [
   'ionic',
+  // 'ionic.service.core',
+  // 'ionic.service.analytics',
   'app.directives',
   'lokijs'
 ])
 
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform ) {
   $ionicPlatform.ready(function() {
+    // $ionicAnalytics.register();
+
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins.Keyboard) {
@@ -31,7 +35,10 @@ angular.module('bikemoves', [
     }
   });
 })
-
+// .config(['$ionicAutoTrackProvider', function($ionicAutoTrackProvider) {
+//   // Don't track which elements the user clicks on.
+//   $ionicAutoTrackProvider.disableTracking('Tap');
+// }])
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
 

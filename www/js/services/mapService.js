@@ -169,9 +169,11 @@ angular.module('bikemoves')
       }, function(marker){
         currentIncidentMarker = marker;
       });
-      incidentService.getAddress(latLng).then(function(res,rej){
-        $rootScope.$broadcast("OpenIncidentReportPopup")
-      })
+      incidentService.getAddress(latLng).then(function(res){
+        $rootScope.$broadcast("OpenIncidentReportPopup")}, function(rej){
+          $rootScope.$broadcast("OpenIncidentReportPopup") ;
+        }
+      )
     }
       else {
         if (!identifyLayerIds || mapType != service.MAP_TYPE_CURRENT) return;
@@ -310,11 +312,15 @@ angular.module('bikemoves')
     });
   });
   service.setMapState = function(name) {
-    if(name == 'report')
+    if(name == 'report') {
       isReporting = true;
-    if(name == 'normal')
+      console.log("Enetered Report State")
+    }
+    else {
       isReporting = false;
-      return
+      console.log("Entered Normal State")
+    }
+    return
   }
   service.removeIncident = function(){
     return currentIncidentMarker.remove();
