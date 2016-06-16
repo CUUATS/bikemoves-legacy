@@ -3,7 +3,8 @@ angular.module('bikemoves', [
   // 'ionic.service.core',
   // 'ionic.service.analytics',
   'app.directives',
-  'lokijs'
+  'lokijs',
+  'ngCordova'
 ])
 
 
