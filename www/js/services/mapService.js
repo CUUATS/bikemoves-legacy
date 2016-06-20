@@ -169,7 +169,7 @@ angular.module('bikemoves')
       }, function(marker){
         currentIncidentMarker = marker;
       });
-      incidentService.getAddress(latLng).then(function(res){
+      incidentService.getAddress(latLng).finally(function(res){
         $rootScope.$broadcast("OpenIncidentReportPopup")}, function(rej){
           $rootScope.$broadcast("OpenIncidentReportPopup") ;
         }

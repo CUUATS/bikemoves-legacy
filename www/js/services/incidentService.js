@@ -9,14 +9,8 @@ angular.module('bikemoves')
     }
     service.getAddress = function(latlng){
       var deferred = $q.defer()
-      var timeReject = function(){
-        console.log("Timeout reject");
-        service.incidentAddress = null;
-        deferred.reject();
-      }
       incidentlocation = latlng
         console.log(incidentlocation);
-        // $timeout(function(){console.log("Started"); timeReject},3000)
         if($cordovaNetwork.isOffline()) {
           console.log("WIFI OUT")
           service.incidentAddress = null
