@@ -1,5 +1,5 @@
 angular.module('bikemoves')
-.service('tripService', ['storageService', function(storageService) {
+.service('tripService', ['storageService', 'remoteService', '$q', function(storageService, remoteService, $q) {
   var service = this,
     getTripsCollection = function() {
       return storageService.getCollection('trips');
@@ -45,4 +45,23 @@ angular.module('bikemoves')
       return storageService.save();
     });
   };
+  service.postUnposted = function() {
+    promises = []
+    getTripsCollection().then(function(collection){
+      var unsubmitted = collection.where(function(obj){
+        return obj.submitted == false
+      });
+      for(var i = 0; i < unsubmitted.length;i++){
+        promises.push(remoteService.postTrip(unsubmitted[i]));
+      }
+      $q.all(promises).then(function(data){
+        for(var i = 0; i < data.length; i++){
+          unsubmitted[i].submitted = true;
+          collection.update(unsubmitted[i])
+        }
+      }, function(reason){
+        console.log("Post Failed:", reason)
+      });
+    });
+  }
 }])

@@ -60,7 +60,6 @@ angular.module('bikemoves')
         return service.save();
       });
     };
-
     service.delete = function(docName) {
       return service.getCollection(APP_COLLECTION).then(function(collection) {
         collection.removeWhere({

@@ -1,5 +1,5 @@
 function Trip(locations, startTime, endTime, origin, destination,
-    transit, submitted, desiredAccuracy) {
+    transit, submitted, desiredAccuracy, debug) {
   this.desiredAccuracy = desiredAccuracy || null;
   this.destination = destination || 0;
   this.endTime = endTime || null;
@@ -8,6 +8,7 @@ function Trip(locations, startTime, endTime, origin, destination,
   this.startTime = startTime || null;
   this.submitted = submitted || false;
   this.transit = transit || false;
+  this.debug = debug || false;
 };
 
 // Maximum distance for location guesses, in meters
@@ -56,7 +57,7 @@ Trip.prototype.getODTypes = function() {
   return od;
 };
 
-Trip.prototype.addLocation = function(location) {
+Trip.prototype.addLocation = function(location , debug) {
   var prev = this._getLocation(-1);
   if (!(location.moving || location.speed <= 0)) return prev;  //<-- iOS never was reporting motion
 
@@ -65,18 +66,23 @@ Trip.prototype.addLocation = function(location) {
   // of each other's accuracy circles. If not, keep only the more
   // accurate of the two locations.
   console.log("Prev is:", prev)
-  if (prev) {
-    console.log("Null Case")
-    var meters = this._getDistance(prev, location),
+  if(!debug){
+    if (prev) {
+      console.log("Null Case")
+      var meters = this._getDistance(prev, location),
       seconds = (location.time - prev.time) / 1000;
-    if ((meters / seconds) > 23 || meters < location.accuracy ||
-        meters < prev.accuracy) {
-      this._replaceLocation(this._moreAccurate(prev, location));
+      if ((meters / seconds) > 23 || meters < location.accuracy ||
+      meters < prev.accuracy) {
+        this._replaceLocation(this._moreAccurate(prev, location));
+      } else {
+        this._appendLocation(location);
+      }
     } else {
+      console.log("Should add this location")
       this._appendLocation(location);
     }
-  } else {
-    console.log("Should add this location")
+  }
+  else{
     this._appendLocation(location);
   }
   return this._getLocation(-1);
@@ -130,6 +136,7 @@ Trip.prototype.serialize = function() {
     desiredAccuracy: this.desiredAccuracy,
     transit: this.transit,
     origin: this.origin,
-    destination: this.destination
+    destination: this.destination,
+    debug: this.debug
   };
 };

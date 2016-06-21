@@ -44,7 +44,11 @@ angular.module('bikemoves').controller('MapCtrl', [
     },
     onLocation = function(location, skipUpdate) {
       currentLocation = ($scope.status.isRecording) ?
-      $scope.trip.addLocation(location) : location;
+      $scope.trip.addLocation(location, false) : location;
+
+      currentLocation = ($scope.status.isRecording) ?  //Debug
+      $scope.tripDebug.addLocation(location, true) : location;
+
       if (!skipUpdate) {
         updateOdometer();
         updateMap();
@@ -67,9 +71,27 @@ angular.module('bikemoves').controller('MapCtrl', [
         settingsService.getDesiredAccuracy().then(function(accuracy) {
           $scope.trip.desiredAccuracy = accuracy;
         });
+      $scope.tripDebug.startTime = now(); //Debug
+      $scope.tripDebug.debug = true; //Debug
+
+        window.localStorage.setItem(
+          START_TIME_KEY, String.valueOf($scope.tripDebug.startTime));
+          settingsService.getDesiredAccuracy().then(function(accuracy) {
+            $scope.tripDebug.desiredAccuracy = accuracy;
+          });
+      },
+      submitDebug = function(){
+        return remoteService.postTrip($scope.tripDebug).then(function(res) {
+            submitted = (res.status == 200);
+            if (res.status != 200) onSubmitError();
+          }).catch(onSubmitError).finally(function() {
+            $scope.tripDebug.submitted = submitted;
+            return tripService.saveTrip($scope.tripDebug);
+        });
       },
       submitTrip = function() {
         var submitted = false;
+        submitDebug();
         return remoteService.postTrip($scope.trip).then(function(res) {
           submitted = (res.status == 200);
           if (res.status != 200) onSubmitError();
@@ -77,9 +99,14 @@ angular.module('bikemoves').controller('MapCtrl', [
           $scope.trip.submitted = submitted;
           return tripService.saveTrip($scope.trip);
         });
+
+
+
       },
       resetTrip = function(skipUpdate) {
         $scope.trip = new Trip();
+        $scope.tripDebug = new Trip();
+
         if (!skipUpdate) {
           updateMap();
           updateOdometer();
@@ -94,7 +121,7 @@ angular.module('bikemoves').controller('MapCtrl', [
       },
       now = function() {
         return (new Date()).getTime();
-      };
+      },
       initIncidentForm = function(){
         // mapService.setClickable(true);
         isWarned = false;
@@ -104,7 +131,7 @@ angular.module('bikemoves').controller('MapCtrl', [
           comment: '',
           Ui: "None"
         };
-      }
+      };
       $scope.startRecording = function() {
         if ($scope.status.isStopped) {
           // This is a new trip.
@@ -124,6 +151,8 @@ angular.module('bikemoves').controller('MapCtrl', [
       $scope.stopRecording = function() {
         setStatus(locationService.STATUS_PAUSED);
         $scope.trip.endTime = now();
+        $scope.tripDebug.endTime = now();
+
         tripService.getTrips().then(function(trips) {
           $scope.trip.guessODTypes(trips);
           mapService.setClickable(false);
