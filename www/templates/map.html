@@ -11,11 +11,11 @@
   <ion-content data-tap-disabled="true" scroll="false">
     <div id="current-map"></div>
   </ion-content>
-  <ion-footer-bar class="bar-stable" ng-class="isReport ? 'align-title-center' : 'align-title-left'">
+  <ion-footer-bar class="bar-stable">
     <div ng-hide="isReport">
       <a ng-click="getCurrentPosition()"
       class="button button-icon icon ion-navigate bikemoves-locate"></a>
-      <h1 class="title bikemoves-odometer">{{odometer}} mi</h1>
+      <h1 class="title bikemoves-odometer" align-title="left">{{odometer}} mi</h1>
       <div class="buttons align-right">
         <button class="button icon ion-play button-balanced bikemoves-play"
         ng-if="!status.isRecording" ng-click="startRecording()"></button>
@@ -25,7 +25,7 @@
         ng-disabled="!status.isRecording" ng-click="stopRecording()"></button>
       </div>
     </div>
-    <div ng-if="isReport">
+    <div ng-if="isReport" align-title="center">
       <h1 class="title"> Report Incident</h1>
     </div>
   </ion-footer-bar>
