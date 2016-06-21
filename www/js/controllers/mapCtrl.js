@@ -2,7 +2,6 @@ angular.module('bikemoves').controller('MapCtrl', [
   '$scope',
   '$ionicPlatform',
   '$ionicModal',
-  '$ionicPopover',
   '$ionicPopup',
   'locationService',
   'mapService',
@@ -10,7 +9,9 @@ angular.module('bikemoves').controller('MapCtrl', [
   'tripService',
   'settingsService',
   'incidentService',
-  function($scope, $ionicPlatform, $ionicModal, $ionicPopover,$ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService) {
+  '$cordovaNetwork',
+  function($scope, $ionicPlatform, $ionicModal,$ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, $cordovaNetwork) {
+    analytics.trackView("Map");
     var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
     START_TIME_KEY = 'bikemoves:starttime',
     currentLocation,
@@ -56,13 +57,23 @@ angular.module('bikemoves').controller('MapCtrl', [
     },
     onSubmitError = function() {
       mapService.setClickable(false);
-      $ionicPopup.alert({
-        title: 'Trip Submission Failed',
-        template: 'Sorry, an error occurred while submitting your trip. ' +
-        'Please try again later.'
-      }).then(function() {
-        mapService.setClickable(true);
-      });
+      if($cordovaNetwork.isOnline()) {
+        $ionicPopup.alert({
+          title: 'Trip Submission Failed',
+          template: 'Sorry, an error occurred while submitting your trip. ' +
+          'Please try again later.'
+        }).then(function() {
+          mapService.setClickable(true);
+        });
+      }
+      else {
+        $ionicPopup.alert({
+          title: 'Device is Offline',
+          template: 'Trip will be synced the next time this device is online.'
+        }).then(function() {
+          mapService.setClickable(true);
+        });
+      }
     },
     initTrip = function() {
       $scope.trip.startTime = now();
@@ -257,7 +268,6 @@ angular.module('bikemoves').controller('MapCtrl', [
         }
         confirmPopup.then(function(res) {
           if(res) {
-            $scope.popover.hide();
             $scope.incidentAddress = incidentService.incidentAddress
             incidentReportModal.show();
             mapService.setMapState('normal');
@@ -339,6 +349,16 @@ angular.module('bikemoves').controller('MapCtrl', [
       };
 
       $scope.reportIncident = function($event){
+        if($scope.status.isRecording){
+          mapService.setClickable(false);
+          var noReportPopup = $ionicPopup.alert({
+            title: 'Unable to Report Incident While Recording'
+          });
+          noReportPopup.then(function(res){
+            mapService.setClickable(true);
+          })
+        }
+        else {
         if($scope.isReport) {
           $scope.isReport = false;
           mapService.setMapState('normal');
@@ -348,6 +368,7 @@ angular.module('bikemoves').controller('MapCtrl', [
             analytics.trackEvent("Incident", "Entered Report State")
             $scope.isReport = true;
             mapService.setMapState('report');
+          }
       }
       }
 

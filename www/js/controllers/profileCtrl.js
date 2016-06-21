@@ -5,6 +5,7 @@ angular.module('bikemoves').controller('profileCtrl', [
   'remoteService',
   'tripService',
   function($scope, $ionicPopup, profileService, remoteService, tripService) {
+    analytics.trackView("Profile")
     var saveProfile = function(profile) {
         return profileService.updateProfile(profile);
       },
@@ -20,6 +21,7 @@ angular.module('bikemoves').controller('profileCtrl', [
       // Prevent save action from firing twice when the save button is tapped.
       if (!$scope.dirty) return;
       $scope.dirty = false;
+      analytics.trackEvent("Profile", "Saved");
       saveProfile($scope.profile).then(submitProfile);
     };
 

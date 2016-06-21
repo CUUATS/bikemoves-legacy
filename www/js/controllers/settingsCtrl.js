@@ -6,7 +6,7 @@ angular.module('bikemoves').controller('SettingsCtrl', [
   'settingsService',
   'tripService',
   function($scope, $q, $ionicPopup, profileService, settingsService, tripService) {
-
+    analytics.trackView("Settings")
     var reloadSettings = function() {
       return settingsService.getSettings().then(function(settings) {
         $scope.settings = settings;
@@ -14,6 +14,7 @@ angular.module('bikemoves').controller('SettingsCtrl', [
     };
 
     $scope.updateSettings = function() {
+      analytics.trackEvent("Settings", "Updated");
       return settingsService.updateSettings($scope.settings);
     };
 

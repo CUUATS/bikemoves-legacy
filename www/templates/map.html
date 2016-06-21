@@ -5,26 +5,29 @@
     <div class="button button-assertive" ng-if="status.isRecording">Recording</div>
   </ion-nav-buttons>
   <ion-nav-buttons side ="secondary" >
-    <div ng-class= "$isReport ? 'button-assertive' : 'button-stable'" class = "button icon-right ion-alert-circled" ng-click = "reportIncident($event)"></div>
+    <div ng-class= "isReport ? 'button-assertive' : 'button-stable'" class = "button icon-right ion-alert-circled" ng-click = "reportIncident($event)"></div>
   </ion-nav-buttons>
 
   <ion-content data-tap-disabled="true" scroll="false">
     <div id="current-map"></div>
   </ion-content>
-  <ion-footer-bar class="bar-stable" align-title="left" >
-    <a ng-click="getCurrentPosition()"
+  <ion-footer-bar class="bar-stable" ng-class="isReport ? 'align-title-center' : 'align-title-left'">
+    <div ng-hide="isReport">
+      <a ng-click="getCurrentPosition()"
       class="button button-icon icon ion-navigate bikemoves-locate"></a>
-    <h1 class="title bikemoves-odometer">{{odometer}} mi</h1>
-    <div class="buttons align-right">
-      <button class="button icon ion-play button-balanced bikemoves-play"
+      <h1 class="title bikemoves-odometer">{{odometer}} mi</h1>
+      <div class="buttons align-right">
+        <button class="button icon ion-play button-balanced bikemoves-play"
         ng-if="!status.isRecording" ng-click="startRecording()"></button>
-      <button class="button icon ion-pause button-energized bikemoves-pause"
+        <button class="button icon ion-pause button-energized bikemoves-pause"
         ng-if="status.isRecording" ng-click="pauseRecording()"></button>
-      <button class="button icon ion-stop button-assertive bikemoves-stop"
+        <button class="button icon ion-stop button-assertive bikemoves-stop"
         ng-disabled="!status.isRecording" ng-click="stopRecording()"></button>
+      </div>
+    </div>
+    <div ng-if="isReport">
+      <h1 class="title"> Report Incident</h1>
     </div>
   </ion-footer-bar>
-  <!-- <ion-footer-bar class="bar-stable" align-title="center" ng-if="isReport">
-    <h1 class = 'title' > Reporting Incident </h1>
-  </ion-footer-bar> -->
+
 </ion-view>

@@ -2,6 +2,7 @@ angular.module('bikemoves').controller('PreviousTripsCtrl', [
   '$scope',
   'tripService',
   function($scope, tripService) {
+    analytics.trackView("Previous Trips")
     var service = this;
     $scope.formatDate = function(timestamp) {
       return moment(timestamp).calendar(moment(), {

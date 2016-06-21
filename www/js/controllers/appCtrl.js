@@ -4,7 +4,7 @@ angular.module('bikemoves').controller('AppCtrl', [
     $scope.isRecording = false;
     document.addEventListener("deviceready", function () {
       $rootScope.$on('$cordovaNetwork:online', function(event, networkState){
-        settingsService.getSettings().then(function(data){
+        settingsService.getSettings().then(function(res){
           if(res.autoSubmit)
             tripService.postUnposted();
         })
