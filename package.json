@@ -39,7 +39,8 @@
       "id": "com.transistorsoft.cordova.background-geolocation"
     },
     "cordova-plugin-inappbrowser",
-    "cordova-plugin-file"
+    "cordova-plugin-file",
+    "cordova-plugin-google-analytics"
   ],
   "cordovaPlatforms": [
     "ios",

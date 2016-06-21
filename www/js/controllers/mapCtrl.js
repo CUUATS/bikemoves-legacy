@@ -136,6 +136,7 @@ angular.module('bikemoves').controller('MapCtrl', [
         if ($scope.status.isStopped) {
           // This is a new trip.
           initTrip();
+          analytics.trackEvent("Trip", "Started")
           locationService.clearDatabase().then(function() {
             setStatus(locationService.STATUS_RECORDING);
           });
@@ -149,6 +150,7 @@ angular.module('bikemoves').controller('MapCtrl', [
       };
 
       $scope.stopRecording = function() {
+        analytics.trackEvent("Trip", "Finished")
         setStatus(locationService.STATUS_PAUSED);
         $scope.trip.endTime = now();
         $scope.tripDebug.endTime = now();
@@ -161,6 +163,8 @@ angular.module('bikemoves').controller('MapCtrl', [
       };
 
       $scope.submitTrip = function() {
+        analytics.trackEvent("Trip", "Submitted")
+
         setStatus(locationService.STATUS_STOPPED);
         tripSubmitModal.hide();
 
@@ -225,6 +229,8 @@ angular.module('bikemoves').controller('MapCtrl', [
       });
 
       $scope.$on("OpenIncidentReportModal", function(){
+        analytics.trackEvent("Incident", "Menu Opened")
+
         mapService.setClickable(false)
         incidentService.getAddress().then(function(resolve,reject){
           if(reject){
@@ -268,6 +274,8 @@ angular.module('bikemoves').controller('MapCtrl', [
 
       initIncidentForm();
       $scope.submitIncident = function(){
+        analytics.trackEvent("Incident", "Submitted")
+
         var incident = {
           time: (new Date()).getTime(),
           category: $scope.incident.Ui != "other" ? $scope.incident.specific : "other",
@@ -338,6 +346,7 @@ angular.module('bikemoves').controller('MapCtrl', [
 }
 
         else {
+            analytics.trackEvent("Incident", "Entered Report State")
             $scope.popover.show($event);
             $scope.isReport = true;
             mapService.setMapState('report');
