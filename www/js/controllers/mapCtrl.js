@@ -84,7 +84,7 @@ angular.module('bikemoves').controller('MapCtrl', [
         return remoteService.postTrip($scope.tripDebug).then(function(res) {
             submitted = (res.status == 200);
             if (res.status != 200) onSubmitError();
-          }).catch(onSubmitError).finally(function() {
+          }).catch().finally(function() {
             $scope.tripDebug.submitted = submitted;
             return tripService.saveTrip($scope.tripDebug);
         });
@@ -341,21 +341,14 @@ angular.module('bikemoves').controller('MapCtrl', [
       $scope.reportIncident = function($event){
         if($scope.isReport) {
           $scope.isReport = false;
-          $scope.popover.hide($event);
           mapService.setMapState('normal');
 }
 
         else {
             analytics.trackEvent("Incident", "Entered Report State")
-            $scope.popover.show($event);
             $scope.isReport = true;
             mapService.setMapState('report');
       }
       }
 
-      $ionicPopover.fromTemplateUrl('templates/incidentPopover.html', {
-        scope: $scope
-      }).then(function(popover) {
-        $scope.popover = popover;
-  });
     }])
