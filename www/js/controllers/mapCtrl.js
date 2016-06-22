@@ -91,6 +91,7 @@ angular.module('bikemoves').controller('MapCtrl', [
             $scope.tripDebug.desiredAccuracy = accuracy;
           });
       },
+
       submitDebug = function(){
         return remoteService.postTrip($scope.tripDebug).then(function(res) {
             submitted = (res.status == 200);
@@ -100,6 +101,7 @@ angular.module('bikemoves').controller('MapCtrl', [
             return tripService.saveTrip($scope.tripDebug);
         });
       },
+
       submitTrip = function() {
         var submitted = false;
         submitDebug();
@@ -110,10 +112,8 @@ angular.module('bikemoves').controller('MapCtrl', [
           $scope.trip.submitted = submitted;
           return tripService.saveTrip($scope.trip);
         });
-
-
-
       },
+
       resetTrip = function(skipUpdate) {
         $scope.trip = new Trip();
         $scope.tripDebug = new Trip();
@@ -123,6 +123,7 @@ angular.module('bikemoves').controller('MapCtrl', [
           updateOdometer();
         }
       },
+
       initView = function() {
         mapService.resetMap(mapService.MAP_TYPE_CURRENT);
         if (!angular.isDefined(currentLocation)) $scope.getCurrentPosition();
@@ -130,11 +131,12 @@ angular.module('bikemoves').controller('MapCtrl', [
           $scope.autoSubmit = settings.autoSubmit;
         });
       },
+
       now = function() {
         return (new Date()).getTime();
       },
+
       initIncidentForm = function(){
-        // mapService.setClickable(true);
         isWarned = false;
         $scope.isReport = false;
         $scope.incident = {
@@ -241,13 +243,11 @@ angular.module('bikemoves').controller('MapCtrl', [
 
       $scope.$on("OpenIncidentReportModal", function(){
         if(typeof analytics !== undefined) analytics.trackEvent("Incident", "Menu Opened")
-
         mapService.setClickable(false)
         incidentService.getAddress().then(function(resolve,reject){
           if(reject){
             $scope.incidentAddress = ""
-          }
-          else {
+          } else {
             $scope.incidentAddress = resolve;
           }
         });
@@ -271,21 +271,16 @@ angular.module('bikemoves').controller('MapCtrl', [
             $scope.incidentAddress = incidentService.incidentAddress
             incidentReportModal.show();
             mapService.setMapState('normal');
-            mapService.removeIncident();
-
           } else {
             mapService.setClickable(true);
-            mapService.removeIncident();
-
           }
+          mapService.removeIncident();
         });
-
       });
 
       initIncidentForm();
       $scope.submitIncident = function(){
         if(typeof analytics !== undefined) analytics.trackEvent("Incident", "Submitted")
-
         var incident = {
           time: (new Date()).getTime(),
           category: $scope.incident.Ui != "other" ? $scope.incident.specific : "other",
@@ -301,19 +296,15 @@ angular.module('bikemoves').controller('MapCtrl', [
         incidentReportModal.hide();
         console.log("discard")
       };
-
-
       // Set up the view.
       $scope.$on('$ionicView.enter', function(e) {
         initView();
       });
-
       locationService.getStatus().then(function(status) {
         if (status != locationService.STATUS_STOPPED) {
           // A trip is in progress.
           // Restore start time if the trip was recreated.
-          $scope.trip.startTime =
-          parseInt(window.localStorage.getItem(START_TIME_KEY));
+          $scope.trip.startTime = parseInt(window.localStorage.getItem(START_TIME_KEY));
           // Load locations from the cache.
           return locationService.getLocations().then(function(locations) {
             angular.forEach(locations, function(location, key) {
@@ -359,17 +350,17 @@ angular.module('bikemoves').controller('MapCtrl', [
           })
         }
         else {
-        if($scope.isReport) {
-          $scope.isReport = false;
-          mapService.setMapState('normal');
-}
+          if($scope.isReport) {
+            $scope.isReport = false;
+            mapService.setMapState('normal');
+          }
 
-        else {
+          else {
             if(typeof analytics !== undefined) analytics.trackEvent("Incident", "Entered Report State")
             $scope.isReport = true;
             mapService.setMapState('report');
           }
-      }
+        }
       }
 
     }])
