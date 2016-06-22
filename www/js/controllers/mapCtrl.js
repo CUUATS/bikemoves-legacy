@@ -46,10 +46,6 @@ angular.module('bikemoves').controller('MapCtrl', [
     onLocation = function(location, skipUpdate) {
       currentLocation = ($scope.status.isRecording) ?
       $scope.trip.addLocation(location, false) : location;
-
-      currentLocation = ($scope.status.isRecording) ?  //Debug
-      $scope.tripDebug.addLocation(location, true) : location;
-
       if (!skipUpdate) {
         updateOdometer();
         updateMap();
@@ -82,29 +78,9 @@ angular.module('bikemoves').controller('MapCtrl', [
         settingsService.getDesiredAccuracy().then(function(accuracy) {
           $scope.trip.desiredAccuracy = accuracy;
         });
-      $scope.tripDebug.startTime = now(); //Debug
-      $scope.tripDebug.debug = true; //Debug
-
-        window.localStorage.setItem(
-          START_TIME_KEY, String.valueOf($scope.tripDebug.startTime));
-          settingsService.getDesiredAccuracy().then(function(accuracy) {
-            $scope.tripDebug.desiredAccuracy = accuracy;
-          });
       },
-
-      submitDebug = function(){
-        return remoteService.postTrip($scope.tripDebug).then(function(res) {
-            submitted = (res.status == 200);
-            if (res.status != 200) onSubmitError();
-          }).catch().finally(function() {
-            $scope.tripDebug.submitted = submitted;
-            return tripService.saveTrip($scope.tripDebug);
-        });
-      },
-
       submitTrip = function() {
         var submitted = false;
-        submitDebug();
         return remoteService.postTrip($scope.trip).then(function(res) {
           submitted = (res.status == 200);
           if (res.status != 200) onSubmitError();
@@ -116,8 +92,6 @@ angular.module('bikemoves').controller('MapCtrl', [
 
       resetTrip = function(skipUpdate) {
         $scope.trip = new Trip();
-        $scope.tripDebug = new Trip();
-
         if (!skipUpdate) {
           updateMap();
           updateOdometer();
@@ -166,8 +140,6 @@ angular.module('bikemoves').controller('MapCtrl', [
         if(typeof analytics !== undefined) analytics.trackEvent("Trip", "Finished")
         setStatus(locationService.STATUS_PAUSED);
         $scope.trip.endTime = now();
-        $scope.tripDebug.endTime = now();
-
         tripService.getTrips().then(function(trips) {
           $scope.trip.guessODTypes(trips);
           mapService.setClickable(false);
