@@ -155,10 +155,10 @@ angular.module('bikemoves').controller('MapCtrl', [
 
         // Don't submit trips that have no locations.
         if ($scope.trip.locations.length > 0) {
-          submitTrip().finally(resetTrip);
+          submitTrip().finally(resetTrip(false));
         } else {
           console.log("Submitted trip with no data points")
-          tripService.saveTrip().finally(resetTrip);
+          tripService.saveTrip().finally(resetTrip(false));
         }
       };
 

@@ -1,5 +1,5 @@
 angular.module('bikemoves')
-.service('incidentService', function($q, $rootScope, $http, $timeout,remoteService, $cordovaNetwork) {
+.service('incidentService',['$q', '$rootScope','remoteService', '$cordovaNetwork', function($q, $rootScope,remoteService, $cordovaNetwork) {
   var service = this,
   incidentlocation;
   service.openModal = function(latLng){
@@ -8,31 +8,33 @@ angular.module('bikemoves')
     // Apparently only way to open modal from service
   }
   service.getAddress = function(latlng){
-    var deferred = $q.defer()
+    var connection = $q.defer();
+    var address = $q.defer();
     incidentlocation = latlng
     console.log(incidentlocation);
     if($cordovaNetwork.isOffline()) {
       console.log("WIFI OUT")
       service.incidentAddress = null
-      deferred.reject();
+      connection.reject();
+      return connection.promise;
     }
     plugin.google.maps.Geocoder.geocode({'position' : incidentlocation}, function(results, status) {
       console.log("Status:", status, "Results",results)
       if (results.length) {
         service.incidentAddress = results[0].extra.lines[0];
-        deferred.resolve();
+        address.resolve();
       }
       else {
         console.log("Null Reject")
         service.incidentAddress = null
-        deferred.reject();
+        address.reject();
       }
     });
-    return deferred.promise;
+    return address.promise;
   };
   service.saveIncident = function(incident){
     incident.position = incidentlocation;
     remoteService.postIncident(incident)
 
   }
-});
+}]);

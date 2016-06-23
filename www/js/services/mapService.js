@@ -207,10 +207,6 @@ angular.module('bikemoves')
         }
       });
     };
-    mapLongClick = function(latLng){
-      incidentService.openModal(latLng);
-      console.log("LatLng is:" ,latLng)
-    };
 
   service.MAP_TYPE_CURRENT = 'current';
   service.MAP_TYPE_PREVIOUS = 'previous';
@@ -272,6 +268,7 @@ angular.module('bikemoves')
       if (infoMarker) infoMarker.setVisible(false);
       if (currentLocationMarker) currentLocationMarker.setVisible(false);
       if (tripPolyline) tripPolyline.setVisible(false);
+
 
       // Reset the camera if this is the current map.
       if (mapType == service.MAP_TYPE_CURRENT &&
