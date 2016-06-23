@@ -29,14 +29,18 @@
     "ionic-plugin-keyboard",
     {
       "locator": "https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
-      "id": "cordova-plugin-googlemaps"
+      "id": "cordova-plugin-googlemaps",
+      "variables": {
+        "API_KEY_FOR_ANDROID": "AIzaSyBAQVf1Q9_ZJ0Gbau-BhKPnJiJXIDkG6nA",
+        "API_KEY_FOR_IOS": "AIzaSyCLwMemMVj7q0Kgen_DMxw22ECifEzZrxA"
+      }
     },
     {
       "locator": "https://bitbucket.org/nightstomp/cordova-plugin-googlemaps-sdk.git",
       "id": "com.googlemaps.ios"
     },
     {
-      "locator": "https://github.com/transistorsoft/cordova-background-geolocation.git",
+      "locator": "https://github.com/transistorsoft/cordova-background-geolocation.git#1.6.3",
       "id": "com.transistorsoft.cordova.background-geolocation"
     },
     "cordova-plugin-dialogs",
@@ -49,16 +53,6 @@
   ],
   "cordovaPlatforms": [
     "ios",
-    "android",
-    {
-      "platform": "android",
-      "version": "",
-      "locator": "android"
-    },
-    {
-      "platform": "ios",
-      "version": "",
-      "locator": "ios"
-    }
+    "android"
   ]
 }
