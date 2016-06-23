@@ -40,7 +40,8 @@
     },
     "cordova-plugin-inappbrowser",
     "cordova-plugin-file",
-    "cordova-plugin-google-analytics"
+    "cordova-plugin-google-analytics",
+    "cordova-plugin-network-information"
   ],
   "cordovaPlatforms": [
     "ios",

@@ -305,7 +305,6 @@ angular.module('bikemoves')
     tripPolyline = mapFeatures[3];
     map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);
     map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
-    map.on(plugin.google.maps.event.MAP_LONG_CLICK, mapLongClick);
     ready = true;
     angular.forEach(readyQueue, function(callback) {
       callback();
