@@ -1,5 +1,5 @@
 angular.module('bikemoves')
-.service('settingsService', function(storageService, locationService) {
+  .service('settingsService', function(storageService, locationService, analyticsService) {
     var service = this,
       SETTINGS_KEY = 'settings',
       DEFAULT_SETTINGS = {
@@ -8,9 +8,16 @@ angular.module('bikemoves')
       },
       updateAccuracy = function() {
         return service.getDesiredAccuracy().then(function(accuracy) {
-          return locationService.updateSettings({desiredAccuracy: accuracy});
+          return locationService.updateSettings({
+            desiredAccuracy: accuracy
+          });
         });
       };
+    updateTracking = function() {
+      return service.getSettings().then(function(settings) {
+        return analyticsService.updateTracking(settings.trackData);
+      });
+    };
 
     service.getSettings = function() {
       return storageService.get(SETTINGS_KEY, DEFAULT_SETTINGS);
@@ -23,7 +30,10 @@ angular.module('bikemoves')
     };
 
     service.updateSettings = function(newSettings) {
-      return storageService.set(SETTINGS_KEY, newSettings).then(updateAccuracy);
+      return storageService.set(SETTINGS_KEY, newSettings).then(function() {
+        updateAccuracy();
+        updateTracking();
+      });
     };
 
     service.clearAll = function() {
@@ -32,4 +42,4 @@ angular.module('bikemoves')
 
     // Set initial accuracy.
     updateAccuracy();
-  })
+  });

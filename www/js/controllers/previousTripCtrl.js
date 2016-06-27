@@ -6,13 +6,14 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
   'mapService',
   'remoteService',
   'tripService',
+
   function($scope, $state, $stateParams, $ionicPopup, mapService, remoteService, tripService) {
     var SECOND = 1000,
       MINUTE = SECOND * 60,
       HOUR = MINUTE * 60,
       // Constants for rider of 187 lb on road bike
       K1 = 3.509,
-      K2 = .2581,
+      K2 = 0.2581,
       zeroPad = function(value, places) {
         var str = value.toString();
         if (str.length >= places) return str;
@@ -31,9 +32,9 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
 
       $scope.locations = trip.locations;
       $scope.origin = remoteService.getLabel(
-          'Trip', 'LocationType', trip.origin);
+        'Trip', 'LocationType', trip.origin);
       $scope.destination = remoteService.getLabel(
-          'Trip', 'LocationType', trip.destination);
+        'Trip', 'LocationType', trip.destination);
       $scope.date = moment(trip.startTime).format('MMM D, YYYY');
       $scope.time = moment(trip.startTime).format('h:mm A');
       $scope.distance = distance.toFixed(1);
@@ -43,16 +44,16 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
       $scope.calories = (
         (speed * (K1 + K2 * Math.pow(speed, 2))) / 67.78 * (duration / MINUTE)
       ).toFixed(0);
-      $scope.ghg = (distance * .8115).toFixed(1);
+      $scope.ghg = (distance * 0.8115).toFixed(1);
     });
 
     $scope.deleteTrip = function() {
       mapService.setClickable(false);
       $ionicPopup.confirm({
-         title: 'Delete Trip',
-         template: 'Are you sure you want to delete this trip?',
-         okText: 'Delete',
-         okType: 'button-assertive'
+        title: 'Delete Trip',
+        template: 'Are you sure you want to delete this trip?',
+        okText: 'Delete',
+        okType: 'button-assertive'
       }).then(function(res) {
         mapService.setClickable(true);
         if (res) {
@@ -71,4 +72,5 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
         mapService.zoomToTripPolyline();
       }
     });
-}])
+  }
+]);

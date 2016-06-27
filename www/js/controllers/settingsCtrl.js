@@ -5,8 +5,9 @@ angular.module('bikemoves').controller('SettingsCtrl', [
   'profileService',
   'settingsService',
   'tripService',
-  function($scope, $q, $ionicPopup, profileService, settingsService, tripService) {
-    if(typeof analytics !== undefined) analytics.trackView("Settings")
+  'analyticsService',
+  function($scope, $q, $ionicPopup, profileService, settingsService, tripService, analyticsService) {
+    analyticsService.trackView("Settings");
     var reloadSettings = function() {
       return settingsService.getSettings().then(function(settings) {
         $scope.settings = settings;
@@ -14,7 +15,7 @@ angular.module('bikemoves').controller('SettingsCtrl', [
     };
 
     $scope.updateSettings = function() {
-      if(typeof analytics !== undefined) analytics.trackEvent("Settings", "Updated");
+      analyticsService.trackEvent("Settings", "Updated");
       return settingsService.updateSettings($scope.settings);
     };
 
@@ -40,4 +41,5 @@ angular.module('bikemoves').controller('SettingsCtrl', [
     };
 
     reloadSettings();
-}])
+  }
+]);

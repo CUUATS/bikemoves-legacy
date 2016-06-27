@@ -1,5 +1,5 @@
 angular.module('bikemoves')
-.service('storageService', function($q, $ionicPlatform, Loki) {
+  .service('storageService', function($q, $ionicPlatform, Loki) {
     var service = this,
       APP_COLLECTION = 'app',
       TRIPS_COLLECTION = 'trips',
@@ -35,7 +35,7 @@ angular.module('bikemoves')
 
     service.save = function() {
       return loadDb().then(function() {
-        return $q(function (resolve, reject) {
+        return $q(function(resolve, reject) {
           db.saveDatabase(resolve);
         });
       });
@@ -52,7 +52,9 @@ angular.module('bikemoves')
       return service.getCollection(APP_COLLECTION).then(function(collection) {
         var oldDoc = collection.by('_name', docName);
         if (!oldDoc) {
-          collection.insert(angular.merge({'_name': docName}, doc));
+          collection.insert(angular.merge({
+            '_name': docName
+          }, doc));
         } else {
           angular.merge(oldDoc, doc);
           collection.update(oldDoc);
@@ -72,13 +74,15 @@ angular.module('bikemoves')
     $ionicPlatform.ready().then(function() {
       db = new Loki('bikemoves', {
         autosave: false,
-        adapter: new LokiCordovaFSAdapter({'prefix': 'loki'})
+        adapter: new LokiCordovaFSAdapter({
+          'prefix': 'loki'
+        })
       });
       db.loadDatabase({
         trips: {
           proto: Trip
         }
-      }, function () {
+      }, function() {
         buildCollections();
         ready = true;
         angular.forEach(readyQueue, function(callback) {
@@ -86,4 +90,4 @@ angular.module('bikemoves')
         });
       });
     });
-  })
+  });

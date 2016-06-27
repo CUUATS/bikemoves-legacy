@@ -1,8 +1,9 @@
 angular.module('bikemoves').controller('PreviousTripsCtrl', [
   '$scope',
   'tripService',
-  function($scope, tripService) {
-    if(typeof analytics !== undefined) analytics.trackView("Previous Trips")
+  'analyticsService',
+  function($scope, tripService, analyticsService) {
+    analyticsService.trackView("Previous Trips");
     var service = this;
     $scope.formatDate = function(timestamp) {
       return moment(timestamp).calendar(moment(), {
@@ -16,4 +17,5 @@ angular.module('bikemoves').controller('PreviousTripsCtrl', [
         $scope.trips = trips;
       });
     });
-}])
+  }
+]);

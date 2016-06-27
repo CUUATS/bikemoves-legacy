@@ -1,5 +1,5 @@
 function Trip(locations, startTime, endTime, origin, destination,
-    transit, submitted, desiredAccuracy, debug) {
+  transit, submitted, desiredAccuracy, debug) {
   this.desiredAccuracy = desiredAccuracy || null;
   this.destination = destination || 0;
   this.endTime = endTime || null;
@@ -9,7 +9,7 @@ function Trip(locations, startTime, endTime, origin, destination,
   this.submitted = submitted || false;
   this.transit = transit || false;
   this.debug = debug || false;
-};
+}
 
 // Maximum distance for location guesses, in meters
 Trip.prototype.NEAR_THESHOLD = 500;
@@ -57,32 +57,32 @@ Trip.prototype.getODTypes = function() {
   return od;
 };
 
-Trip.prototype.addLocation = function(location , debug) {
+Trip.prototype.addLocation = function(location, debug) {
   var prev = this._getLocation(-1);
-  if (!(location.moving || location.speed <= 0)) return prev;  //<-- iOS never was reporting motion
+  delete location.altitudeAccuracy; // Property only exists on iOS
+  if (!(location.moving || location.speed <= 0)) return prev; //<-- iOS never was reporting motion
 
   // If we have a previous location, check that the travel speed between
   // the two locations is reasonable and that the locations are outside
   // of each other's accuracy circles. If not, keep only the more
   // accurate of the two locations.
-  console.log("Prev is:", prev)
-  if(!debug){
+  console.log("Prev is:", prev);
+  if (!debug) {
     if (prev) {
-      console.log("Null Case")
+      console.log("Null Case");
       var meters = this._getDistance(prev, location),
-      seconds = (location.time - prev.time) / 1000;
+        seconds = (location.time - prev.time) / 1000;
       if ((meters / seconds) > 23 || meters < location.accuracy ||
-      meters < prev.accuracy) {
+        meters < prev.accuracy) {
         this._replaceLocation(this._moreAccurate(prev, location));
       } else {
         this._appendLocation(location);
       }
     } else {
-      console.log("Should add this location")
+      console.log("Should add this location");
       this._appendLocation(location);
     }
-  }
-  else{
+  } else {
     this._appendLocation(location);
   }
   return this._getLocation(-1);

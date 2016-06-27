@@ -1,10 +1,12 @@
 angular.module('bikemoves')
-.service('remoteService', function($http) {
+  .service('remoteService', function($http) {
     var service = this,
-      // ENDPOINT = 'http://api.bikemoves.me/v0.2/',
-      ENDPOINT = 'http://209.174.185.114:8083/v0.2/' // Debug Edndpoint
+      // ENDPOINT = 'http://api.bikemoves.me/v0b1.2/',
+      ENDPOINT = 'http://209.174.185.114:8083/v0.2/', // Debug Edndpoint
       POST_CONFIG = {
-        headers: {'Content-Type': 'application/octet-stream'},
+        headers: {
+          'Content-Type': 'application/octet-stream'
+        },
         transformRequest: []
       },
       ENUM_LABELS = {
@@ -68,7 +70,7 @@ angular.module('bikemoves')
 
     service.getLabel = function(msgName, enumName, value) {
       var options = service.getOptions(msgName, enumName);
-      for (i=0; i < options.length; i++) {
+      for (i = 0; i < options.length; i++) {
         if (options[i].id == value) return options[i].label;
       }
     };
@@ -86,20 +88,11 @@ angular.module('bikemoves')
     };
 
     service.postTrip = function(trip) {
-      for (i of trip.locations){
-        delete i.altitudeAccuracy // Property only exists on iOS, no purpose for it
-      }
       var tripMessage = new messages.bikemoves.Trip(trip.serialize());
       return postMessage('trip', tripMessage);
     };
-    service.postIncident = function(incident){
-      var incidentMessage = new messages.bikemoves.Incident({
-        deviceUuid: window.device.uuid,
-        category: incident.category,
-        comment: incident.comment,
-        time: incident.time,
-        position: {latitude: incident.position.lat, longitude: incident.position.lng}
-      });
-      return postMessage('incident',incidentMessage)
-    }
-  })
+    service.postIncident = function(incident) {
+      var incidentMessage = new messages.bikemoves.Incident(incident.serialize());
+      return postMessage('incident', incidentMessage);
+    };
+  });

@@ -5,7 +5,7 @@
     <div class="button button-assertive" ng-if="status.isRecording">Recording</div>
   </ion-nav-buttons>
   <ion-nav-buttons side ="secondary" >
-    <div ng-class= "isReport ? 'button-assertive' : 'button-stable'" class = "button icon-right ion-alert-circled" ng-click = "reportIncident($event)"></div>
+    <div id="incident" ng-class= "isReport ? 'button-assertive' : 'button-stable'" ng-disabled="status.isRecording" class = "button icon-right ion-alert-circled" ng-click = "reportIncident($event)"></div>
   </ion-nav-buttons>
 
   <ion-content data-tap-disabled="true" scroll="false">

@@ -4,15 +4,16 @@ angular.module('bikemoves').controller('profileCtrl', [
   'profileService',
   'remoteService',
   'tripService',
-  function($scope, $ionicPopup, profileService, remoteService, tripService) {
-    if(typeof analytics !== undefined) analytics.trackView("Profile")
+  'analyticsService',
+  function($scope, $ionicPopup, profileService, remoteService, tripService, analyticsService) {
+    analyticsService.trackView("Profile");
     var saveProfile = function(profile) {
         return profileService.updateProfile(profile);
       },
       submitProfile = function() {
         profileService.getProfile().then(function(profile) {
           remoteService.postUser(profile).catch(function(response) {
-            console.log(response)
+            console.log(response);
           });
         });
       };
@@ -21,7 +22,7 @@ angular.module('bikemoves').controller('profileCtrl', [
       // Prevent save action from firing twice when the save button is tapped.
       if (!$scope.dirty) return;
       $scope.dirty = false;
-      if(typeof analytics !== undefined) analytics.trackEvent("Profile", "Saved");
+      analyticsService.trackEvent("Profile", "Saved");
       saveProfile($scope.profile).then(submitProfile);
     };
 
@@ -36,8 +37,8 @@ angular.module('bikemoves').controller('profileCtrl', [
       });
       tripService.getTotalDistance().then(function(distance) {
         var miles = distance * 0.000621371;
-        $scope.distance =  miles.toFixed(1);
-        $scope.ghg = (miles * .8115).toFixed(1);
+        $scope.distance = miles.toFixed(1);
+        $scope.ghg = (miles * 0.8115).toFixed(1);
       });
     });
 
@@ -47,10 +48,10 @@ angular.module('bikemoves').controller('profileCtrl', [
       var profile = angular.copy($scope.profile);
       if ($scope.dirty) {
         $ionicPopup.confirm({
-           title: 'Save Your Profile',
-           template: 'Do you want to save the changes to your profile?',
-           cancelText: 'Discard',
-           okText: 'Save'
+          title: 'Save Your Profile',
+          template: 'Do you want to save the changes to your profile?',
+          cancelText: 'Discard',
+          okText: 'Save'
         }).then(function(res) {
           if (res) saveProfile(profile).then(submitProfile);
         });
@@ -62,4 +63,5 @@ angular.module('bikemoves').controller('profileCtrl', [
       cyclingExperience: remoteService.getOptions('User', 'ExperienceLevel'),
       gender: remoteService.getOptions('User', 'Gender')
     };
-}])
+  }
+]);

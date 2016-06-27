@@ -28,10 +28,12 @@
       </ion-checkbox>
     </div>
     <div class="padding-horizontal">
-      <button class="button button-block icon-left ion-share button-positive"
+      <button class="button button-block icon-left ion-share button-positive" ng-if="online"
         ng-click="submitTrip()">Save and Submit</button>
+      <button class="button button-block icon-left ion-share button-positive" ng-if="!online" ng-disabled= "!online"
+        >Save and Submit (Offline)</button>
       <button class="button button-block icon-left ion-folder button-calm"
-        ng-if="!autoSubmit" ng-click="saveTrip()">Save</button>
+        ng-if="!autoSubmit || !online" ng-click="saveTrip()">Save</button>
       <button class="button button-block icon-left ion-play button-stable"
         ng-click="resumeTrip()">Resume</button>
       <button class="button button-block icon-left ion-trash-b button-assertive"
