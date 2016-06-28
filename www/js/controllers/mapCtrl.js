@@ -14,7 +14,7 @@ angular.module('bikemoves').controller('MapCtrl', [
   'analyticsService',
   function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, $cordovaNetwork, $rootScope, analyticsService) {
     analyticsService.trackView("Map");
-    var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip',
+    var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip', // <-- I Dont think this is used anywhere -- Jack
       START_TIME_KEY = 'bikemoves:starttime',
       currentLocation,
       tripSubmitModal,

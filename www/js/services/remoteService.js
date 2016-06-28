@@ -1,8 +1,8 @@
 angular.module('bikemoves')
   .service('remoteService', function($http) {
     var service = this,
-      // ENDPOINT = 'http://api.bikemoves.me/v0b1.2/',
-      ENDPOINT = 'http://209.174.185.114:8083/v0.2/', // Debug Edndpoint
+      ENDPOINT = 'http://api.bikemoves.me/v0.2/', //Live Edndpoint
+      // ENDPOINT = 'http://209.174.185.114:8083/v0.2/', // Debug Endpoint
       POST_CONFIG = {
         headers: {
           'Content-Type': 'application/octet-stream'
