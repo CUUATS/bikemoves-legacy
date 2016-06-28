@@ -23,7 +23,7 @@ angular.module('bikemoves')
     };
     service.deleteTrip = function(tripID) {
       return getTripsCollection().then(function(collection) {
-        collection.remove(collection.data[tripID]);
+        collection.remove(collection.data[Number(tripID)-1]);
         return storageService.save();
       });
     };
