@@ -2,11 +2,6 @@ angular.module('bikemoves')
   .service('incidentService', ['$q', '$rootScope', 'remoteService', '$cordovaNetwork', function($q, $rootScope, remoteService, $cordovaNetwork) {
     var service = this,
       incidentlocation;
-    service.openModal = function(latLng) {
-      incidentlocation = latLng;
-      $rootScope.$broadcast("OpenIncidentReportModal");
-      // Apparently only way to open modal from service
-    };
     service.getAddress = function(latlng) {
       var connection = $q.defer();
       var address = $q.defer();
