@@ -209,21 +209,21 @@ angular.module('bikemoves').controller('MapCtrl', [
       incidentReportModal = modal;
     });
 
-    $scope.$on("OpenIncidentReportPopup", function() {
+    $scope.$on('IncidentReport', function(e, latLng) {
       mapService.setClickable(false);
-      if (incidentService.incidentAddress) {
-        confirmPopup = $ionicPopup.confirm({
+      $scope.incidentAddress = undefined;
+      incidentService.getAddress(latLng).then(function(address) {
+        $scope.incidentAddress = address;
+        return $ionicPopup.confirm({
           title: 'Report Incident Near:',
-          template: incidentService.incidentAddress
+          template: $scope.incidentAddress
         });
-      } else {
-        confirmPopup = $ionicPopup.confirm({
+      }).catch(function() {
+        return $ionicPopup.confirm({
           title: 'Report Incident Here',
         });
-      }
-      confirmPopup.then(function(res) {
+      }).then(function(res) {
         if (res) {
-          $scope.incidentAddress = incidentService.incidentAddress;
           incidentReportModal.show();
           mapService.setMapState('normal');
         } else {
