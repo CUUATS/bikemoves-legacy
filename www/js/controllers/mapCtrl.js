@@ -209,18 +209,6 @@ angular.module('bikemoves').controller('MapCtrl', [
       incidentReportModal = modal;
     });
 
-    $scope.$on("OpenIncidentReportModal", function() {
-      analyticsService.trackEvent("Incident", "Menu Opened");
-      mapService.setClickable(false);
-      incidentService.getAddress().then(function(resolve, reject) {
-        if (reject) {
-          $scope.incidentAddress = "";
-        } else {
-          $scope.incidentAddress = resolve;
-        }
-      });
-      incidentReportModal.show();
-    });
     $scope.$on("OpenIncidentReportPopup", function() {
       mapService.setClickable(false);
       if (incidentService.incidentAddress) {
