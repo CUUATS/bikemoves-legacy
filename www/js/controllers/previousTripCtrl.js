@@ -40,6 +40,7 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
       $scope.distance = distance.toFixed(1);
       $scope.duration = formatDuration(duration);
       $scope.avgSpeed = speed.toFixed(1);
+      $scope.submitted = trip.submitted;
       // Total Calories = avgSpeed * (K1 + K2 * avgSpeed ^ 2) * (duration in min)
       $scope.calories = (
         (speed * (K1 + K2 * Math.pow(speed, 2))) / 67.78 * (duration / MINUTE)
@@ -63,7 +64,30 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
         }
       });
     };
-
+    $scope.uploadTrip = function() {
+      if ($scope.locations.length > 0) {
+        tripService.getTrip($stateParams.tripID).then(function(trip) {
+          remoteService.postTrip(trip).then(function() {
+            trip.submitted = true;
+            $scope.submitted = true;
+            tripService.updateTrip(trip);
+          });
+        }).catch(function(error) {
+          mapService.setClickable(false);
+          console.log(error);
+          $ionicPopup.confirm({
+            title: 'Failed to Upload Trip'
+          }).then(function() {
+            mapService.setClickable(true);
+          });
+        });
+      }
+      else {
+        trip.submitted = true;
+        $scope.submitted = true;
+        tripService.updateTrip(trip);
+      }
+    };
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
       mapService.resetMap(mapService.MAP_TYPE_PREVIOUS);

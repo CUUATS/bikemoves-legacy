@@ -157,7 +157,7 @@ angular.module('bikemoves').controller('MapCtrl', [
     };
 
     $scope.saveTrip = function() {
-      tripService.saveTrip().finally(function() {
+      tripService.saveTrip($scope.trip).finally(function() {
         resetTrip(false);
       });
       setStatus(locationService.STATUS_STOPPED);

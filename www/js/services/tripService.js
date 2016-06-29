@@ -11,6 +11,11 @@ angular.module('bikemoves')
         return storageService.save();
       });
     };
+    service.updateTrip = function(trip){
+      return getTripsCollection().then(function(collection){
+        return collection.update(trip);
+      });
+    };
     service.getTrips = function() {
       return getTripsCollection().then(function(collection) {
         return collection.chain().simplesort('startTime', true).data();
