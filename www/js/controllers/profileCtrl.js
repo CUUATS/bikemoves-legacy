@@ -5,7 +5,8 @@ angular.module('bikemoves').controller('profileCtrl', [
   'remoteService',
   'tripService',
   'analyticsService',
-  function($scope, $ionicPopup, profileService, remoteService, tripService, analyticsService) {
+  'mapService',
+  function($scope, $ionicPopup, profileService, remoteService, tripService, analyticsService, mapService) {
     analyticsService.trackView("Profile");
     var saveProfile = function(profile) {
         return profileService.updateProfile(profile);
@@ -45,15 +46,16 @@ angular.module('bikemoves').controller('profileCtrl', [
     $scope.$on('$ionicView.beforeLeave', function(e) {
       // TODO: Prevent the view from changing until the popup has been
       // dismissed. See: https://github.com/driftyco/ionic/issues/3791
-      var profile = angular.copy($scope.profile);
       if ($scope.dirty) {
+        mapService.setClickable(false);
         $ionicPopup.confirm({
           title: 'Save Your Profile',
           template: 'Do you want to save the changes to your profile?',
           cancelText: 'Discard',
           okText: 'Save'
         }).then(function(res) {
-          if (res) saveProfile(profile).then(submitProfile);
+          if (res) saveProfile().then(submitProfile);
+          mapService.setClickable(true);
         });
       }
     });
