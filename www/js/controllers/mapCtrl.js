@@ -14,8 +14,7 @@ angular.module('bikemoves').controller('MapCtrl', [
   'analyticsService',
   function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, $cordovaNetwork, $rootScope, analyticsService) {
     analyticsService.trackView("Map");
-    var TRIPS_ENDPOINT = 'http://api.bikemoves.me/v0.1/trip', // <-- I Dont think this is used anywhere -- Jack
-      START_TIME_KEY = 'bikemoves:starttime',
+    var START_TIME_KEY = 'bikemoves:starttime',
       currentLocation,
       tripSubmitModal,
       comfirmPopup;
@@ -210,33 +209,21 @@ angular.module('bikemoves').controller('MapCtrl', [
       incidentReportModal = modal;
     });
 
-    $scope.$on("OpenIncidentReportModal", function() {
-      analyticsService.trackEvent("Incident", "Menu Opened");
+    $scope.$on('IncidentReport', function(e, latLng) {
       mapService.setClickable(false);
-      incidentService.getAddress().then(function(resolve, reject) {
-        if (reject) {
-          $scope.incidentAddress = "";
-        } else {
-          $scope.incidentAddress = resolve;
-        }
-      });
-      incidentReportModal.show();
-    });
-    $scope.$on("OpenIncidentReportPopup", function() {
-      mapService.setClickable(false);
-      if (incidentService.incidentAddress) {
-        confirmPopup = $ionicPopup.confirm({
+      $scope.incidentAddress = undefined;
+      incidentService.getAddress(latLng).then(function(address) {
+        $scope.incidentAddress = address;
+        return $ionicPopup.confirm({
           title: 'Report Incident Near:',
-          template: incidentService.incidentAddress
+          template: $scope.incidentAddress
         });
-      } else {
-        confirmPopup = $ionicPopup.confirm({
+      }).catch(function() {
+        return $ionicPopup.confirm({
           title: 'Report Incident Here',
         });
-      }
-      confirmPopup.then(function(res) {
+      }).then(function(res) {
         if (res) {
-          $scope.incidentAddress = incidentService.incidentAddress;
           incidentReportModal.show();
           mapService.setMapState('normal');
         } else {

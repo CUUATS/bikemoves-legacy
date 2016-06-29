@@ -174,11 +174,7 @@ angular.module('bikemoves')
         if (isReporting) {
           currentIncidentMarker.setVisible(true);
           currentIncidentMarker.setPosition(latLng);
-          incidentService.getAddress(latLng).finally(function(res) {
-            $rootScope.$broadcast("OpenIncidentReportPopup");
-          }, function(rej) {
-            $rootScope.$broadcast("OpenIncidentReportPopup");
-          });
+          $rootScope.$broadcast('IncidentReport', latLng);
         } else {
           if (!identifyLayerIds || mapType != service.MAP_TYPE_CURRENT) return;
           getIdentifyParams(latLng).then(function(params) {
