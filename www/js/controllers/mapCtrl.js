@@ -317,6 +317,7 @@ angular.module('bikemoves').controller('MapCtrl', [
       $scope.online = $cordovaNetwork.isOnline();
     });
     $rootScope.$on('$cordovaNetwork:online', function(event, networkState) {
+      incidentService.postUnposted();
       $scope.online = true;
     });
     $rootScope.$on('$cordovaNetwork:offline', function(event, networkState) {

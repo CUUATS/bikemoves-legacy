@@ -3,6 +3,7 @@ angular.module('bikemoves')
     var service = this,
       APP_COLLECTION = 'app',
       TRIPS_COLLECTION = 'trips',
+      INCIDENTS_COLLECTION = 'incidents',
       collections = {},
       ready = false,
       readyQueue = [],
@@ -25,6 +26,9 @@ angular.module('bikemoves')
         // Trips collection
         collections[TRIPS_COLLECTION] = db.getCollection(TRIPS_COLLECTION) ||
           db.addCollection(TRIPS_COLLECTION);
+
+        collections[INCIDENTS_COLLECTION] = db.getCollection(INCIDENTS_COLLECTION) ||
+          db.addCollection(INCIDENTS_COLLECTION);
       };
 
     service.getCollection = function(collectionName) {
