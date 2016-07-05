@@ -48,7 +48,8 @@ angular.module('bikemoves')
       addTileOverlay = function(map) {
         return $q(function(resolve, reject) {
           map.addTileOverlay({
-            tileUrlFormat: "http://tiles.bikemoves.me/tiles/<zoom>/<y>/<x>.png"
+            tileUrlFormat: "http://tiles.bikemoves.me/tiles/<zoom>/<y>/<x>.png",
+            tileSize: 1024
           }, resolve);
         });
       },
@@ -100,6 +101,8 @@ angular.module('bikemoves')
         }).then(function(res) {
           if (res.status == 200) {
             layers = res.data.layers;
+            console.log(layers)
+
             angular.forEach(res.data.layers, function(layer, idx) {
               if (identifyLayerNames.indexOf(layer.name) != -1) {
                 identifyLayerIds.push(layer.id);
@@ -172,8 +175,8 @@ angular.module('bikemoves')
       },
       mapClick = function(latLng, map) {
         if (isReporting) {
-          currentIncidentMarker.setVisible(true);
           currentIncidentMarker.setPosition(latLng);
+          currentIncidentMarker.setVisible(true);
           $rootScope.$broadcast('IncidentReport', latLng);
         } else {
           if (!identifyLayerIds || mapType != service.MAP_TYPE_CURRENT) return;
