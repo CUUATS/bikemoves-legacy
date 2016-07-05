@@ -15,41 +15,54 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
 
-      files: [
-        '../www/lib/ionic/js/ionic.bundle.js',
-        '../www/lib/ngCordova/dist/*.js',
-        '../www/lib/karma-read-json/karma-read-json.js',
-        // '../www/lib/**/*.js',
-        '../www/js/app.js',
+    files: [
+      '../www/lib/ionic/js/ionic.bundle.js',
+      '../www/lib/ngCordova/dist/*.js',
+      '../www/lib/karma-read-json/karma-read-json.js',
+      // '../www/lib/**/*.js',
+      '../www/js/app.js',
 
-        '../www/js/*.js',
-        {pattern:"../www/js/messages.json",included: false},
-        '../www/js/controllers/*.js',
-        '../www/js/services/*.js',
-        // '../www/lib/angular-mocks/ngMock.js',
-        '../www/lib/*.js',
+      '../www/js/*.js', {
+        pattern: "../www/js/messages.json",
+        included: false
+      },
+      '../www/js/controllers/*.js',
+      '../www/js/services/*.js',
+      // '../www/lib/angular-mocks/ngMock.js',
+      '../www/lib/*.js',
 
-        '../www/lib/angular-mocks/angular-mocks.js',
+      '../www/lib/angular-mocks/angular-mocks.js',
 
-        // '../www/js/*.json',
-        '../tests/unit-tests/*.js'
-      ],
-    // list of files to exclude
-    exclude: [
+      // '../www/js/*.json',
+      '../tests/unit-tests/*.js'
     ],
+    // list of files to exclude
+    exclude: [],
 
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      '../www/js/**/*.js': ['coverage'],
+      // '../www/js/trip.js': ['coverage'],
+      // '../www/js/incident.js': ['coverage'],
     },
 
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: ['progress', 'coverage'],
 
+    coverageReporter: {
+      type: 'html',
+      dir: 'coverage/',
+      instrumenterOptions: {
+        istanbul: {
+          noCompact: true
+        }
+      }
+    },
 
     // web server port
     port: 9876,

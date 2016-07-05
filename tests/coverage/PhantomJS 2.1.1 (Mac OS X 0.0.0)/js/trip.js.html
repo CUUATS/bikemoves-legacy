@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for js/trip.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">js/</a> trip.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">18.75% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>15/80</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/58</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/17</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">20.55% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>15/73</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="fstat-no" title="function not covered" >function Trip(locations, startTime, endTime, origin, destination,</span>
+  transit, submitted, desiredAccuracy, debug) {
+<span class="cstat-no" title="statement not covered" >  this.desiredAccuracy = desiredAccuracy || null;</span>
+<span class="cstat-no" title="statement not covered" >  this.destination = destination || 0;</span>
+<span class="cstat-no" title="statement not covered" >  this.endTime = endTime || null;</span>
+<span class="cstat-no" title="statement not covered" >  this.locations = locations || [];</span>
+<span class="cstat-no" title="statement not covered" >  this.origin = origin || 0;</span>
+<span class="cstat-no" title="statement not covered" >  this.startTime = startTime || null;</span>
+<span class="cstat-no" title="statement not covered" >  this.submitted = submitted || false;</span>
+<span class="cstat-no" title="statement not covered" >  this.transit = transit || false;</span>
+<span class="cstat-no" title="statement not covered" >  this.debug = debug || false;</span>
+}
+&nbsp;
+// Maximum distance for location guesses, in meters
+Trip.prototype.NEAR_THESHOLD = 500;
+&nbsp;
+Trip.prototype._appendLocation = <span class="fstat-no" title="function not covered" >function(location) {</span>
+<span class="cstat-no" title="statement not covered" >  this.locations.push(location);</span>
+};
+&nbsp;
+Trip.prototype._replaceLocation = <span class="fstat-no" title="function not covered" >function(location) {</span>
+<span class="cstat-no" title="statement not covered" >  this.locations[this.locations.length - 1] = location;</span>
+};
+&nbsp;
+Trip.prototype._toPoint = <span class="fstat-no" title="function not covered" >function(location) {</span>
+<span class="cstat-no" title="statement not covered" >  return turf.point([location.longitude, location.latitude]);</span>
+};
+&nbsp;
+Trip.prototype._getDistance = <span class="fstat-no" title="function not covered" >function(loc1, loc2) {</span>
+<span class="cstat-no" title="statement not covered" >  return turf.distance(</span>
+    this._toPoint(loc1), this._toPoint(loc2), 'kilometers') * 1000;
+};
+&nbsp;
+Trip.prototype._moreAccurate = <span class="fstat-no" title="function not covered" >function(loc1, loc2) {</span>
+<span class="cstat-no" title="statement not covered" >  if (loc1.accuracy == loc2.accuracy)</span>
+<span class="cstat-no" title="statement not covered" >    return (loc1.time &gt; loc2.time) ? loc1 : loc2;</span>
+<span class="cstat-no" title="statement not covered" >  return (loc1.accuracy &lt; loc2.accuracy) ? loc1 : loc2;</span>
+};
+&nbsp;
+Trip.prototype._getLocation = <span class="fstat-no" title="function not covered" >function(idx) {</span>
+<span class="cstat-no" title="statement not covered" >  if (idx &lt; 0) <span class="cstat-no" title="statement not covered" >idx = this.locations.length + idx;</span></span>
+<span class="cstat-no" title="statement not covered" >  return this.locations[idx] || null;</span>
+};
+&nbsp;
+Trip.prototype._locationInfo = <span class="fstat-no" title="function not covered" >function(type, idx) {</span>
+<span class="cstat-no" title="statement not covered" >  return {</span>
+    type: type,
+    location: this._getLocation(idx)
+  };
+};
+&nbsp;
+Trip.prototype.getODTypes = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >  if (this.locations.length &lt; 2) <span class="cstat-no" title="statement not covered" >return [];</span></span>
+<span class="cstat-no" title="statement not covered" >  var od = [];</span>
+<span class="cstat-no" title="statement not covered" >  if (this.origin &gt; 0) <span class="cstat-no" title="statement not covered" >od.push(this._locationInfo(this.origin, 0));</span></span>
+<span class="cstat-no" title="statement not covered" >  if (this.destination &gt; 0) <span class="cstat-no" title="statement not covered" >od.push(this._locationInfo(this.destination, -1));</span></span>
+<span class="cstat-no" title="statement not covered" >  return od;</span>
+};
+&nbsp;
+Trip.prototype.addLocation = <span class="fstat-no" title="function not covered" >function(location, debug) {</span>
+<span class="cstat-no" title="statement not covered" >  var prev = this._getLocation(-1);</span>
+<span class="cstat-no" title="statement not covered" >  delete location.altitudeAccuracy; </span>// Property only exists on iOS
+<span class="cstat-no" title="statement not covered" >  if (!(location.moving || location.speed &lt;= 0)) <span class="cstat-no" title="statement not covered" >return prev; </span></span>//&lt;-- iOS never was reporting motion
+&nbsp;
+  // If we have a previous location, check that the travel speed between
+  // the two locations is reasonable and that the locations are outside
+  // of each other's accuracy circles. If not, keep only the more
+  // accurate of the two locations.
+<span class="cstat-no" title="statement not covered" >  console.log("Prev is:", prev);</span>
+<span class="cstat-no" title="statement not covered" >  if (!debug) {</span>
+<span class="cstat-no" title="statement not covered" >    if (prev) {</span>
+<span class="cstat-no" title="statement not covered" >      console.log("Null Case");</span>
+<span class="cstat-no" title="statement not covered" >      var meters = this._getDistance(prev, location),</span>
+        seconds = (location.time - prev.time) / 1000;
+<span class="cstat-no" title="statement not covered" >      if ((meters / seconds) &gt; 23 || meters &lt; location.accuracy ||</span>
+        meters &lt; prev.accuracy) {
+<span class="cstat-no" title="statement not covered" >        this._replaceLocation(this._moreAccurate(prev, location));</span>
+      } else {
+<span class="cstat-no" title="statement not covered" >        this._appendLocation(location);</span>
+      }
+    } else {
+<span class="cstat-no" title="statement not covered" >      console.log("Should add this location");</span>
+<span class="cstat-no" title="statement not covered" >      this._appendLocation(location);</span>
+    }
+  } else {
+<span class="cstat-no" title="statement not covered" >    this._appendLocation(location);</span>
+  }
+<span class="cstat-no" title="statement not covered" >  return this._getLocation(-1);</span>
+};
+&nbsp;
+Trip.prototype.guessODTypes = <span class="fstat-no" title="function not covered" >function(trips) {</span>
+<span class="cstat-no" title="statement not covered" >  if (!this.locations.length || this.origin || this.destination) <span class="cstat-no" title="statement not covered" >return;</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var odTypes = [];</span>
+<span class="cstat-no" title="statement not covered" >  angular.forEach(trips, <span class="fstat-no" title="function not covered" >function(trip) {</span></span>
+<span class="cstat-no" title="statement not covered" >    odTypes.push.apply(odTypes, trip.getODTypes());</span>
+  });
+<span class="cstat-no" title="statement not covered" >  var trip = this;</span>
+<span class="cstat-no" title="statement not covered" >  var origin = this._getLocation(0),</span>
+    destination = this._getLocation(-1),
+    minOrigin = this.NEAR_THESHOLD,
+    minDestination = this.NEAR_THESHOLD;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  angular.forEach(odTypes, <span class="fstat-no" title="function not covered" >function(odType) {</span></span>
+<span class="cstat-no" title="statement not covered" >    var distOrigin = trip._getDistance(odType.location, origin),</span>
+      distDestination = trip._getDistance(odType.location, destination);
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (distOrigin &lt; minOrigin) {</span>
+<span class="cstat-no" title="statement not covered" >      minOrigin = distOrigin;</span>
+<span class="cstat-no" title="statement not covered" >      this.origin = odType.type;</span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (distDestination &lt; minDestination) {</span>
+<span class="cstat-no" title="statement not covered" >      minDestination = distDestination;</span>
+<span class="cstat-no" title="statement not covered" >      this.destination = odType.type;</span>
+    }
+  });
+};
+&nbsp;
+Trip.prototype.getDistance = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >  if (this.locations.length &lt; 2) <span class="cstat-no" title="statement not covered" >return 0;</span></span>
+<span class="cstat-no" title="statement not covered" >  return turf.lineDistance(this.toLineString(), 'kilometers') * 1000;</span>
+};
+&nbsp;
+Trip.prototype.toLineString = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >  return turf.linestring(this.locations.map(<span class="fstat-no" title="function not covered" >function(location) {</span></span>
+<span class="cstat-no" title="statement not covered" >    return [location.longitude, location.latitude];</span>
+  }));
+};
+&nbsp;
+Trip.prototype.serialize = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >  return {</span>
+    deviceUuid: window.device.uuid,
+    locations: this.locations,
+    startTime: this.startTime,
+    endTime: this.endTime,
+    desiredAccuracy: this.desiredAccuracy,
+    transit: this.transit,
+    origin: this.origin,
+    destination: this.destination,
+    debug: this.debug
+  };
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Jul 05 2016 15:05:36 GMT-0500 (CDT)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>
