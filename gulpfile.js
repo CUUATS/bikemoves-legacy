@@ -6,13 +6,30 @@ var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var sh = require('shelljs');
+var exec = require('child_process').exec;
 
 var paths = {
   sass: ['./scss/**/*.scss']
 };
 
 gulp.task('default', ['sass']);
-
+gulp.task('e2e', function() {
+  //manual uninstall, the apk will else not reflect the new changes
+  // exec('adb uninstall com.ionicframework.bikemoves', function(err, stdout, stderr) {
+  //   console.log(stdout);
+  //   console.log(stderr);
+    //generate a new android-debug.apk
+    exec('ionic build android', function(err, stdout, stderr) {
+      console.log(stdout);
+      console.log(stderr);
+      //finally run protractor tests
+      exec('protractor protractor-config.js', function(err, stdout, stderr) {
+        console.log(stdout);
+        console.log(stderr);
+      });
+    });
+  // });
+});
 gulp.task('sass', function(done) {
   gulp.src('./scss/ionic.app.scss')
     .pipe(sass())
