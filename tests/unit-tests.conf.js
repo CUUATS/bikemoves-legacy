@@ -34,7 +34,9 @@ module.exports = function(config) {
       '../www/lib/angular-mocks/angular-mocks.js',
 
       // '../www/js/*.json',
-      '../tests/unit-tests/*.js'
+      '../tests/unit-tests/spec-helper.js',
+      '../tests/unit-tests/**/*.js'
+
     ],
     // list of files to exclude
     exclude: [],
@@ -52,7 +54,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', 'coverage'],
+    reporters: ['dots', 'coverage'],
 
     coverageReporter: {
       type: 'html',
