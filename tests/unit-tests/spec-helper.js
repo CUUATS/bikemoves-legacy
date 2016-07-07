@@ -46,7 +46,7 @@ beforeEach(inject(function($window, $q, $ionicPopup, analyticsService, incidentS
   incidentReportModal = jasmine.createSpyObj("incidentReportModal", ["show", "hide", "remove"]);
 
   window = $window;
-  window.analytics = jasmine.createSpyObj("analytics", ['startTrackerWithId']);
+  window.analytics = jasmine.createSpyObj("analytics", ['startTrackerWithId', "trackEvent"]);
   window.cordova = jasmine.createSpyObj("cordova", ["plugins"]);
   window.cordova.plugins.Keyboard = {
     close: function(){}
@@ -87,7 +87,6 @@ beforeEach(inject(function($window, $q, $ionicPopup, analyticsService, incidentS
   spyOn(settingsServiceMock, "updateSettings").and.callThrough()
   spyOn(settingsServiceMock, "clearAll").and.callThrough()
   spyOn(settingsServiceMock, "getSettings").and.callThrough()
-
 
   spyOn(tripServiceMock, "clearAll").and.callThrough();
   spyOn(tripServiceMock, "saveTrip").and.callThrough();

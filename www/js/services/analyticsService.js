@@ -1,5 +1,5 @@
 angular.module('bikemoves')
-  .service('analyticsService', [function() {
+  .service('analyticsService', function() {
     var service = this,
       isTracking = false;
     service.updateTracking = function(trackData) {
@@ -12,4 +12,4 @@ angular.module('bikemoves')
     service.trackView = function(view) {
       if (typeof analytics !== undefined && isTracking) analytics.trackEvent(view);
     };
-  }]);
+  });
