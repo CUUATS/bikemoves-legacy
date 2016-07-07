@@ -54,7 +54,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['dots', 'coverage'],
+    reporters: ['mocha', 'coverage'],
 
     coverageReporter: {
       type: 'html',
@@ -66,17 +66,13 @@ module.exports = function(config) {
       }
     },
 
+    mochaReporter:{
+      output: 'autoWatch'
+    },
+
+
     // web server port
     port: 9876,
-
-
-    // enable / disable colors in the output (reporters and logs)
-    colors: true,
-
-
-    // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO,
 
 
     // enable / disable watching file and executing tests whenever any file changes
@@ -88,12 +84,8 @@ module.exports = function(config) {
     browsers: ['PhantomJS'],
 
 
-    // Continuous Integration mode
-    // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
-
-    // Concurrency level
+//rency level
     // how many browser should be started simultaneous
     concurrency: Infinity
-  })
-}
+  });
+};

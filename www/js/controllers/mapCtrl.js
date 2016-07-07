@@ -13,14 +13,15 @@ angular.module('bikemoves').controller('MapCtrl', [
   '$rootScope',
   'analyticsService',
   function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, $cordovaNetwork, $rootScope, analyticsService) {
+    var that = this;
     analyticsService.trackView("Map");
-    var START_TIME_KEY = 'bikemoves:starttime',
-      currentLocation,
-      tripSubmitModal,
-      comfirmPopup;
+    that.START_TIME_KEY = 'bikemoves:starttime',
+      that.currentLocation,
+      that.tripSubmitModal,
+      that.comfirmPopup;
 
-    var setStatus = function(status, initial) {
-        console.log('Setting status: ' + status);
+    that.setStatus = function(status, initial) {
+        // console.log('Setting status: ' + status);
         $scope.status = {
           isStopped: status == locationService.STATUS_STOPPED,
           isPaused: status == locationService.STATUS_PAUSED,
@@ -28,15 +29,15 @@ angular.module('bikemoves').controller('MapCtrl', [
         };
         // Disable other tabs while recording.
         // TODO: Find a way around this $parent nonsense.
-        $scope.$parent.$parent.$parent.isRecording = $scope.status.isRecording;
+        // $scope.$parent.$parent.$parent.isRecording = $scope.status.isRecording;
 
         if (initial) return;
         return locationService.setStatus(status);
       },
       updateMap = function() {
-        if (currentLocation) {
-          mapService.setCurrentLocation(currentLocation);
-          mapService.setCenter(currentLocation);
+        if (that.currentLocation) {
+          mapService.setCurrentLocation(that.currentLocation);
+          mapService.setCenter(that.currentLocation);
         }
         mapService.setTripLocations($scope.trip.locations);
       },
@@ -45,7 +46,7 @@ angular.module('bikemoves').controller('MapCtrl', [
         $scope.odometer = ($scope.trip.getDistance() * 0.000621371).toFixed(1);
       },
       onLocation = function(location, skipUpdate) {
-        currentLocation = ($scope.status.isRecording) ?
+        this.currentLocation = ($scope.status.isRecording) ?
           $scope.trip.addLocation(location, false) : location;
         if (!skipUpdate) {
           updateOdometer();
@@ -65,7 +66,7 @@ angular.module('bikemoves').controller('MapCtrl', [
       initTrip = function() {
         $scope.trip.startTime = now();
         window.localStorage.setItem(
-          START_TIME_KEY, String.valueOf($scope.trip.startTime));
+          that.START_TIME_KEY, String.valueOf($scope.trip.startTime));
         settingsService.getDesiredAccuracy().then(function(accuracy) {
           $scope.trip.desiredAccuracy = accuracy;
         });
@@ -81,7 +82,7 @@ angular.module('bikemoves').controller('MapCtrl', [
         });
       },
 
-      resetTrip = function(skipUpdate) {
+      that.resetTrip = function(skipUpdate) {
         $scope.trip = new Trip();
         if (!skipUpdate) {
           updateMap();
@@ -91,7 +92,7 @@ angular.module('bikemoves').controller('MapCtrl', [
 
       initView = function() {
         mapService.resetMap(mapService.MAP_TYPE_CURRENT);
-        if (!angular.isDefined(currentLocation)) $scope.getCurrentPosition();
+        if (!angular.isDefined(this.currentLocation)) $scope.getCurrentPosition();
         settingsService.getSettings().then(function(settings) {
           $scope.autoSubmit = settings.autoSubmit;
         });
@@ -115,20 +116,20 @@ angular.module('bikemoves').controller('MapCtrl', [
         // This is a new trip.
         initTrip();
         locationService.clearDatabase().then(function() {
-          setStatus(locationService.STATUS_RECORDING);
+          that.setStatus(locationService.STATUS_RECORDING);
         });
       } else {
-        setStatus(locationService.STATUS_RECORDING);
+        that.setStatus(locationService.STATUS_RECORDING);
       }
     };
 
     $scope.pauseRecording = function() {
-      setStatus(locationService.STATUS_PAUSED);
+      that.setStatus(locationService.STATUS_PAUSED);
     };
 
     $scope.stopRecording = function() {
       analyticsService.trackEvent("Trip", "Finished");
-      setStatus(locationService.STATUS_PAUSED);
+      that.setStatus(locationService.STATUS_PAUSED);
       $scope.trip.endTime = now();
       tripService.getTrips().then(function(trips) {
         $scope.trip.guessODTypes(trips);
@@ -140,38 +141,38 @@ angular.module('bikemoves').controller('MapCtrl', [
     $scope.submitTrip = function() {
       analyticsService.trackEvent("Trip", "Submitted");
 
-      setStatus(locationService.STATUS_STOPPED);
+      that.setStatus(locationService.STATUS_STOPPED);
       tripSubmitModal.hide();
 
       // Don't submit trips that have no locations.
       if ($scope.trip.locations.length > 0) {
         submitTrip().finally(function() {
-          resetTrip(false);
+          that.resetTrip(false);
         });
       } else {
-        console.log("Submitted trip with no data points");
+        // console.log("Submitted trip with no data points");
         tripService.saveTrip().finally(function() {
-          resetTrip(false);
+          that.resetTrip(false);
         });
       }
     };
 
     $scope.saveTrip = function() {
       tripService.saveTrip($scope.trip).finally(function() {
-        resetTrip(false);
+        that.resetTrip(false);
       });
-      setStatus(locationService.STATUS_STOPPED);
+      that.setStatus(locationService.STATUS_STOPPED);
       tripSubmitModal.hide();
     };
 
     $scope.resumeTrip = function() {
-      setStatus(locationService.STATUS_RECORDING);
+      that.setStatus(locationService.STATUS_RECORDING);
       tripSubmitModal.hide();
     };
 
     $scope.discardTrip = function() {
-      resetTrip();
-      setStatus(locationService.STATUS_STOPPED);
+      that.resetTrip();
+      that.setStatus(locationService.STATUS_STOPPED);
       tripSubmitModal.hide();
     };
 
@@ -182,8 +183,8 @@ angular.module('bikemoves').controller('MapCtrl', [
     };
 
     // Create a new trip, and set the initial status.
-    resetTrip(true);
-    setStatus(locationService.STATUS_STOPPED, true);
+    that.resetTrip(true);
+    that.setStatus(locationService.STATUS_STOPPED, true);
 
     // Create the modal window for trip submission.
     $ionicModal.fromTemplateUrl('templates/trip_form.html', {
@@ -214,15 +215,16 @@ angular.module('bikemoves').controller('MapCtrl', [
       $scope.incidentAddress = undefined;
       incidentService.getAddress(latLng).then(function(address) {
         $scope.incidentAddress = address;
-        return $ionicPopup.confirm({
+         return $ionicPopup.confirm({
           title: 'Report Incident Near:',
           template: $scope.incidentAddress
         });
       }).catch(function() {
-        return $ionicPopup.confirm({
+         return $ionicPopup.confirm({
           title: 'Report Incident Here',
         });
       }).then(function(res) {
+        console.log(res + "  res")
         if (res) {
           incidentReportModal.show();
           mapService.setMapState('normal');
@@ -258,7 +260,7 @@ angular.module('bikemoves').controller('MapCtrl', [
       if (status != locationService.STATUS_STOPPED) {
         // A trip is in progress.
         // Restore start time if the trip was recreated.
-        $scope.trip.startTime = parseInt(window.localStorage.getItem(START_TIME_KEY));
+        $scope.trip.startTime = parseInt(window.localStorage.getItem(that.START_TIME_KEY));
         // Load locations from the cache.
         return locationService.getLocations().then(function(locations) {
           angular.forEach(locations, function(location, key) {
@@ -271,7 +273,7 @@ angular.module('bikemoves').controller('MapCtrl', [
       return status;
     }).then(function(status) {
       updateOdometer();
-      setStatus(status, true);
+      that.setStatus(status, true);
     });
     isWarned = false;
     var crashWarning = function() {
@@ -316,11 +318,11 @@ angular.module('bikemoves').controller('MapCtrl', [
     document.addEventListener("deviceready", function() {
       $scope.online = $cordovaNetwork.isOnline();
     });
-    $rootScope.$on('$cordovaNetwork:online', function(event, networkState) {
+    $scope.$on('$cordovaNetwork:online', function(event, networkState) {
       incidentService.postUnposted();
       $scope.online = true;
     });
-    $rootScope.$on('$cordovaNetwork:offline', function(event, networkState) {
+    $scope.$on('$cordovaNetwork:offline', function(event, networkState) {
       $scope.online = false;
     });
 

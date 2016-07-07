@@ -5,7 +5,7 @@ describe('Profile Controller Test', function() {
       $scope: scope
     });
   }));
-  describe("#Save Settings", function() {
+  describe("Save Settings", function() {
     beforeEach(function(){
       scope.dirty = true;
       scope.saveProfile();
@@ -20,7 +20,7 @@ describe('Profile Controller Test', function() {
       expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Profile", "Saved");
     });
   });
-  describe("#On load",function(){
+  describe("On load",function(){
     beforeEach(function(){
       scope.$emit("$ionicView.enter");
       scope.$digest();
@@ -38,7 +38,7 @@ describe('Profile Controller Test', function() {
       expect(scope.ghg).toBeGreaterThan(1);
     });
   });
-  describe("#On exit", function(){
+  describe("On exit", function(){
     it("should block if dirty", function(){
         scope.dirty = true;
         scope.$emit("$ionicView.beforeLeave");

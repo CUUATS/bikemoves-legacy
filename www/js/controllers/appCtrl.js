@@ -1,3 +1,5 @@
-angular.module('bikemoves').controller('AppCtrl', [
-  function() {}
+angular.module('bikemoves').controller('AppCtrl', ['$scope',
+  function($scope) {
+    $scope.isRecording;
+  }
 ]);

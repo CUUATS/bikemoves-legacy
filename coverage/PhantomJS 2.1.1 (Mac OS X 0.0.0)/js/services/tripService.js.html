@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">22.73% </span>
+        <span class="strong">31.82% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>10/44</span>
+        <span class='fraction'>14/44</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
@@ -30,14 +30,14 @@
         <span class='fraction'>0/2</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">4.17% </span>
+        <span class="strong">20.83% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>1/24</span>
+        <span class='fraction'>5/24</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">23.26% </span>
+        <span class="strong">32.56% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>10/43</span>
+        <span class='fraction'>14/43</span>
       </div>
     </div>
   </div>
@@ -117,41 +117,41 @@
 72
 73</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">64×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">64×</span>
+<span class="cline-any cline-yes">8×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">64×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">64×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">64×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">64×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">64×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -161,13 +161,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">64×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">64×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -190,12 +190,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">angular.module('bikemoves')
   .service('tripService', ['storageService', 'remoteService', '$q', function(storageService, remoteService, $q) {
     var service = this,
-      getTripsCollection = <span class="fstat-no" title="function not covered" >function() {</span>
-<span class="cstat-no" title="statement not covered" >        return storageService.getCollection('trips');</span>
+      getTripsCollection = function() {
+        return storageService.getCollection('trips');
       };
 &nbsp;
-    service.saveTrip = <span class="fstat-no" title="function not covered" >function(trip) {</span>
-<span class="cstat-no" title="statement not covered" >      return getTripsCollection().then(<span class="fstat-no" title="function not covered" >function(collection) {</span></span>
+    service.saveTrip = function(trip) {
+      return getTripsCollection().then(<span class="fstat-no" title="function not covered" >function(collection) {</span>
 <span class="cstat-no" title="statement not covered" >        collection.insert(trip);</span>
 <span class="cstat-no" title="statement not covered" >        return storageService.save();</span>
       });
@@ -215,8 +215,8 @@
 <span class="cstat-no" title="statement not covered" >        return collection.get(tripID);</span>
       });
     };
-    service.deleteTrip = <span class="fstat-no" title="function not covered" >function(tripID) {</span>
-<span class="cstat-no" title="statement not covered" >      return getTripsCollection().then(<span class="fstat-no" title="function not covered" >function(collection) {</span></span>
+    service.deleteTrip = function(tripID) {
+      return getTripsCollection().then(<span class="fstat-no" title="function not covered" >function(collection) {</span>
 <span class="cstat-no" title="statement not covered" >        collection.remove(collection.data[Number(tripID)-1]);</span>
 <span class="cstat-no" title="statement not covered" >        return storageService.save();</span>
       });
@@ -233,8 +233,8 @@
         });
       });
     };
-    service.clearAll = <span class="fstat-no" title="function not covered" >function() {</span>
-<span class="cstat-no" title="statement not covered" >      return getTripsCollection().then(<span class="fstat-no" title="function not covered" >function(collection) {</span></span>
+    service.clearAll = function() {
+      return getTripsCollection().then(<span class="fstat-no" title="function not covered" >function(collection) {</span>
 <span class="cstat-no" title="statement not covered" >        collection.removeDataOnly();</span>
 <span class="cstat-no" title="statement not covered" >        return storageService.save();</span>
       });
@@ -265,7 +265,7 @@
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jul 06 2016 10:25:35 GMT-0500 (CDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jul 07 2016 13:49:58 GMT-0500 (CDT)
 </div>
 </div>
 <script src="../../prettify.js"></script>

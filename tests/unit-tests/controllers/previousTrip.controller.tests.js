@@ -7,7 +7,7 @@ describe("Pervious Trip Controller", function() {
     });
   }));
 
-  describe("#Load Values", function() {
+  describe("Load Values", function() {
     it("should attempt to load trip", function() {
       expect(tripServiceMock.getTrip).toHaveBeenCalled();
     });

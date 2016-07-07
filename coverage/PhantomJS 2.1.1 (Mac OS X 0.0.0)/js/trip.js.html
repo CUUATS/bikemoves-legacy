@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">18.75% </span>
+        <span class="strong">35% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>15/80</span>
+        <span class='fraction'>28/80</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">36.21% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/58</span>
+        <span class='fraction'>21/58</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">17.65% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>0/17</span>
+        <span class='fraction'>3/17</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">20.55% </span>
+        <span class="strong">35.62% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>15/73</span>
+        <span class='fraction'>26/73</span>
       </div>
     </div>
   </div>
@@ -187,15 +187,15 @@
 142
 143</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-yes">49×</span>
+<span class="cline-any cline-yes">49×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -276,7 +276,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -304,7 +304,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -327,17 +327,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="fstat-no" title="function not covered" >function Trip(locations, startTime, endTime, origin, destination,</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">function Trip(locations, startTime, endTime, origin, destination,
   transit, submitted, desiredAccuracy, debug) {
-<span class="cstat-no" title="statement not covered" >  this.desiredAccuracy = desiredAccuracy || null;</span>
-<span class="cstat-no" title="statement not covered" >  this.destination = destination || 0;</span>
-<span class="cstat-no" title="statement not covered" >  this.endTime = endTime || null;</span>
-<span class="cstat-no" title="statement not covered" >  this.locations = locations || [];</span>
-<span class="cstat-no" title="statement not covered" >  this.origin = origin || 0;</span>
-<span class="cstat-no" title="statement not covered" >  this.startTime = startTime || null;</span>
-<span class="cstat-no" title="statement not covered" >  this.submitted = submitted || false;</span>
-<span class="cstat-no" title="statement not covered" >  this.transit = transit || false;</span>
-<span class="cstat-no" title="statement not covered" >  this.debug = debug || false;</span>
+  this.desiredAccuracy = desiredAccuracy || null;
+  this.destination = destination || 0;
+  this.endTime = endTime || null;
+  this.locations = locations || [];
+  this.origin = origin || 0;
+  this.startTime = startTime || null;
+  this.submitted = submitted || false;
+  this.transit = transit || false;
+  this.debug = debug || false;
 }
 &nbsp;
 // Maximum distance for location guesses, in meters
@@ -417,8 +417,8 @@ Trip.prototype.addLocation = <span class="fstat-no" title="function not covered"
 <span class="cstat-no" title="statement not covered" >  return this._getLocation(-1);</span>
 };
 &nbsp;
-Trip.prototype.guessODTypes = <span class="fstat-no" title="function not covered" >function(trips) {</span>
-<span class="cstat-no" title="statement not covered" >  if (!this.locations.length || this.origin || this.destination) <span class="cstat-no" title="statement not covered" >return;</span></span>
+Trip.prototype.guessODTypes = function(trips) {
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (!this.locations.length || <span class="branch-1 cbranch-no" title="branch not covered" >this.origin </span>|| <span class="branch-2 cbranch-no" title="branch not covered" >this.destination)</span> return;
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  var odTypes = [];</span>
 <span class="cstat-no" title="statement not covered" >  angular.forEach(trips, <span class="fstat-no" title="function not covered" >function(trip) {</span></span>
@@ -445,8 +445,8 @@ Trip.prototype.guessODTypes = <span class="fstat-no" title="function not covered
   });
 };
 &nbsp;
-Trip.prototype.getDistance = <span class="fstat-no" title="function not covered" >function() {</span>
-<span class="cstat-no" title="statement not covered" >  if (this.locations.length &lt; 2) <span class="cstat-no" title="statement not covered" >return 0;</span></span>
+Trip.prototype.getDistance = function() {
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (this.locations.length &lt; 2) return 0;
 <span class="cstat-no" title="statement not covered" >  return turf.lineDistance(this.toLineString(), 'kilometers') * 1000;</span>
 };
 &nbsp;
@@ -475,7 +475,7 @@ Trip.prototype.serialize = <span class="fstat-no" title="function not covered" >
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jul 06 2016 10:25:35 GMT-0500 (CDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jul 07 2016 13:49:58 GMT-0500 (CDT)
 </div>
 </div>
 <script src="../prettify.js"></script>

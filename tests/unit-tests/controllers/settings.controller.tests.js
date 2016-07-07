@@ -6,7 +6,7 @@ describe('Settings Controller Test', function() {
       $scope: scope
     });
   }));
-  describe('#updateSettings', function() {
+  describe('Update Settings', function() {
     beforeEach(function() {
       scope.updateSettings();
     })
@@ -17,7 +17,7 @@ describe('Settings Controller Test', function() {
       expect(settingsServiceMock.updateSettings).toHaveBeenCalled();
     });
   });
-  describe('resetData', function() {
+  describe('Reset Data', function() {
     beforeEach(function() {
       scope.reset();
     });
