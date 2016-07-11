@@ -30,7 +30,31 @@ angular.module('bikemoves')
         collections[INCIDENTS_COLLECTION] = db.getCollection(INCIDENTS_COLLECTION) ||
           db.addCollection(INCIDENTS_COLLECTION);
       };
-
+    service.initalizeDb = function(isTest) {
+      if (isTest) {
+        db = new Loki('bikemoves', {
+          autosave: false
+        });
+      } else {
+        db = new Loki('bikemoves', {
+          autosave: false,
+          adapter: new LokiCordovaFSAdapter({
+            'prefix': 'loki'
+          })
+        });
+      }
+      db.loadDatabase({
+        trips: {
+          proto: Trip
+        }
+      }, function() {
+        buildCollections();
+        ready = true;
+        angular.forEach(readyQueue, function(callback) {
+          callback();
+        });
+      });
+    };
     service.getCollection = function(collectionName) {
       return loadDb().then(function() {
         return collections[collectionName];
@@ -74,24 +98,5 @@ angular.module('bikemoves')
         return service.save();
       });
     };
-
-    $ionicPlatform.ready().then(function() {
-      db = new Loki('bikemoves', {
-        autosave: false,
-        adapter: new LokiCordovaFSAdapter({
-          'prefix': 'loki'
-        })
-      });
-      db.loadDatabase({
-        trips: {
-          proto: Trip
-        }
-      }, function() {
-        buildCollections();
-        ready = true;
-        angular.forEach(readyQueue, function(callback) {
-          callback();
-        });
-      });
-    });
+    $ionicPlatform.ready().then(service.initalizeDb);
   });

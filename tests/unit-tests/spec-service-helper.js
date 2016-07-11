@@ -17,5 +17,8 @@ beforeEach(inject(function($window, $q, $rootScope) {
   window.cordova.plugins.Keyboard = {
     close: function() {}
   };
+  window.$ionicPlatform = {
+    ready: function(){return $q.resolve();}
+  }
   genPromise = $q.defer()
 }));

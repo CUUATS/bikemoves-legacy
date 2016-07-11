@@ -4,7 +4,8 @@ angular.module('bikemoves')
       SETTINGS_KEY = 'settings',
       DEFAULT_SETTINGS = {
         accuracyLevel: 1,
-        autoSubmit: true
+        autoSubmit: true,
+        trackData: false
       },
       updateAccuracy = function() {
         return service.getDesiredAccuracy().then(function(accuracy) {

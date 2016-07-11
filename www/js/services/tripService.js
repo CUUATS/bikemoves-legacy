@@ -7,7 +7,7 @@ angular.module('bikemoves')
 
     service.saveTrip = function(trip) {
       return service.getTripsCollection().then(function(collection) {
-        collection.insert(trip);
+        collection.insertOne(trip);
         return storageService.save();
       });
     };
