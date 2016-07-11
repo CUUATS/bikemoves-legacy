@@ -15,8 +15,7 @@ describe("Pervious Trip Controller", function() {
       genPromise.resolve(new Trip());
       scope.$digest();
       expect(scope.submitted).toBeDefined();
-
-    })
+    });
   });
   describe("Delete Trip", function(){
     it("should call trip delete service", function(){
@@ -24,6 +23,6 @@ describe("Pervious Trip Controller", function() {
       confirm.resolve(true);
       scope.$digest();
       expect(tripServiceMock.deleteTrip).toHaveBeenCalled();
-    })
+    });
   });
 });

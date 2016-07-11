@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">26.92% </span>
+        <span class="strong">34.48% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>7/26</span>
+        <span class='fraction'>10/29</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">25% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/4</span>
+        <span class='fraction'>1/4</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">21.43% </span>
+        <span class="strong">13.33% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>3/14</span>
+        <span class='fraction'>2/15</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">26.92% </span>
+        <span class="strong">34.48% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>7/26</span>
+        <span class='fraction'>10/29</span>
       </div>
     </div>
   </div>
@@ -92,32 +92,38 @@
 47
 48
 49
-50</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+50
+51
+52
+53</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">70×</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">70×</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">70×</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -126,8 +132,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">70×</span>
-<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -145,27 +151,30 @@
   .service('incidentService', ['$q', '$rootScope', 'remoteService', '$cordovaNetwork', 'storageService', function($q, $rootScope, remoteService, $cordovaNetwork, storageService) {
     var service = this,
       incidentlocation,
-      getIncidentsCollection = function() {
-        return storageService.getCollection("incidents");
+      getIncidentsCollection = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >        return storageService.getCollection("incidents");</span>
       };
-    service.getAddress = <span class="fstat-no" title="function not covered" >function(latlng) {</span>
-<span class="cstat-no" title="statement not covered" >      incidentlocation = latlng;</span>
-<span class="cstat-no" title="statement not covered" >      return $q(<span class="fstat-no" title="function not covered" >function(resolve, reject) {</span></span>
-<span class="cstat-no" title="statement not covered" >        if ($cordovaNetwork.isOffline()) {</span>
-<span class="cstat-no" title="statement not covered" >          reject();</span>
+    service.geoCode = <span class="fstat-no" title="function not covered" >function(location){</span>
+<span class="cstat-no" title="statement not covered" >      return $q(<span class="fstat-no" title="function not covered" >function(resolve,reject){</span></span>
+<span class="cstat-no" title="statement not covered" >        plugin.google.maps.Geocoder.geocode({</span>
+        'position': location
+      }, <span class="fstat-no" title="function not covered" >function(results, status) {</span>
+<span class="cstat-no" title="statement not covered" >        if (results.length) {</span>
+<span class="cstat-no" title="statement not covered" >          resolve(results[0].extra.lines[0]);</span>
         } else {
-<span class="cstat-no" title="statement not covered" >          plugin.google.maps.Geocoder.geocode({</span>
-            'position': incidentlocation
-          }, <span class="fstat-no" title="function not covered" >function(results, status) {</span>
-<span class="cstat-no" title="statement not covered" >            if (results.length) {</span>
-<span class="cstat-no" title="statement not covered" >              resolve(results[0].extra.lines[0]);</span>
-            } else {
-<span class="cstat-no" title="statement not covered" >              reject();</span>
-            }
-          });
+<span class="cstat-no" title="statement not covered" >          reject("No address");</span>
         }
       });
-    };
+    })
+    }
+    service.getAddress = function(latlng) {
+      incidentlocation = latlng;
+      <span class="missing-if-branch" title="else path not taken" >E</span>if($cordovaNetwork.isOffline) {
+        console.log($cordovaNetwork.isOffline);
+        return $q.reject("online");
+      }
+<span class="cstat-no" title="statement not covered" >      return geocode(incidentlocation);</span>
+    }
     service.saveIncident = <span class="fstat-no" title="function not covered" >function(incident) {</span>
 <span class="cstat-no" title="statement not covered" >      incident.setLocation(incidentlocation.lat, incidentlocation.lng);</span>
 <span class="cstat-no" title="statement not covered" >      remoteService.postIncident(incident).catch(<span class="fstat-no" title="function not covered" >function() {</span></span>
@@ -175,8 +184,8 @@
         });
       })
     }
-    service.postUnposted = function() {
-      getIncidentsCollection().then(<span class="fstat-no" title="function not covered" >function(collection) {</span>
+    service.postUnposted = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >      getIncidentsCollection().then(<span class="fstat-no" title="function not covered" >function(collection) {</span></span>
 <span class="cstat-no" title="statement not covered" >        var promises = collection.chain().data().map(<span class="fstat-no" title="function not covered" >function(incident) {</span></span>
 <span class="cstat-no" title="statement not covered" >          return remoteService.postIncident(incident);</span>
         });
@@ -196,7 +205,7 @@
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Jul 07 2016 16:15:59 GMT-0500 (CDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jul 08 2016 12:40:29 GMT-0500 (CDT)
 </div>
 </div>
 <script src="../../prettify.js"></script>

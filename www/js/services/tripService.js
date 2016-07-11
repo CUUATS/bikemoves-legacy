@@ -1,39 +1,39 @@
 angular.module('bikemoves')
   .service('tripService', ['storageService', 'remoteService', '$q', function(storageService, remoteService, $q) {
-    var service = this,
-      getTripsCollection = function() {
-        return storageService.getCollection('trips');
-      };
+    var service = this;
+    service.getTripsCollection = function() {
+      return storageService.getCollection('trips');
+    };
 
     service.saveTrip = function(trip) {
-      return getTripsCollection().then(function(collection) {
+      return service.getTripsCollection().then(function(collection) {
         collection.insert(trip);
         return storageService.save();
       });
     };
-    service.updateTrip = function(trip){
-      return getTripsCollection().then(function(collection){
+    service.updateTrip = function(trip) {
+      return service.getTripsCollection().then(function(collection) {
         return collection.update(trip);
       });
     };
     service.getTrips = function() {
-      return getTripsCollection().then(function(collection) {
+      return service.getTripsCollection().then(function(collection) {
         return collection.chain().simplesort('startTime', true).data();
       });
     };
     service.getTrip = function(tripID) {
-      return getTripsCollection().then(function(collection) {
+      return service.getTripsCollection().then(function(collection) {
         return collection.get(tripID);
       });
     };
     service.deleteTrip = function(tripID) {
-      return getTripsCollection().then(function(collection) {
-        collection.remove(collection.data[Number(tripID)-1]);
+      return service.getTripsCollection().then(function(collection) {
+        collection.remove(collection.data[Number(tripID) - 1]);
         return storageService.save();
       });
     };
     service.getTotalDistance = function() {
-      return getTripsCollection().then(function(collection) {
+      return service.getTripsCollection().then(function(collection) {
         if (collection.data.length === 0) return 0;
         return collection.mapReduce(function(trip) {
           return trip.getDistance();
@@ -45,14 +45,14 @@ angular.module('bikemoves')
       });
     };
     service.clearAll = function() {
-      return getTripsCollection().then(function(collection) {
+      return service.getTripsCollection().then(function(collection) {
         collection.removeDataOnly();
         return storageService.save();
       });
     };
     service.postUnposted = function() {
       promises = [];
-      getTripsCollection().then(function(collection) {
+      service.getTripsCollection().then(function(collection) {
         var unsubmitted = collection.where(function(obj) {
           return obj.submitted === false;
         });

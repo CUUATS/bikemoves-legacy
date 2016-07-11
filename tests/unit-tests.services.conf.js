@@ -22,10 +22,7 @@ module.exports = function(config) {
       // '../www/lib/**/*.js',
       '../www/js/app.js',
 
-      '../www/js/*.js', {
-        pattern: "../www/js/messages.json",
-        included: false
-      },
+      '../www/js/*.js',
       '../www/js/controllers/*.js',
       '../www/js/services/*.js',
       // '../www/lib/angular-mocks/ngMock.js',
@@ -34,8 +31,8 @@ module.exports = function(config) {
       '../www/lib/angular-mocks/angular-mocks.js',
 
       // '../www/js/*.json',
-      '../tests/unit-tests/spec-helper.js',
-      '../tests/unit-tests/**/*.js'
+      '../tests/unit-tests/spec-service-helper.js',
+      '../tests/unit-tests/services/*.js'
 
     ],
     // list of files to exclude
@@ -67,7 +64,7 @@ module.exports = function(config) {
     },
 
     mochaReporter:{
-      output: 'autoWatch'
+      output: 'error'
     },
 
 
@@ -81,7 +78,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+    browsers: ['Chrome'],
 
 
 //rency level
