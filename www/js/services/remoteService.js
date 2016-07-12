@@ -126,7 +126,7 @@ angular.module('bikemoves')
                                   "id": 1
                               },
                               {
-                                  "name": "AGE_15_TO_19",
+                                  "name": "",
                                   "id": 2
                               },
                               {
@@ -423,17 +423,17 @@ angular.module('bikemoves')
               }
           ]
       }
-).build(),
-      postMessage = function(url, msg) {
+).build();
+      service.postMessage = function(url, msg) {
         return $http.post(
           ENDPOINT + url, msg.encode().toArrayBuffer(), POST_CONFIG);
-      },
-      getEnum = function(msgName, enumName) {
+      };
+      service.getEnum = function(msgName, enumName) {
         return messages.bikemoves[msgName][enumName];
       };
 
     service.getOptions = function(msgName, enumName) {
-      var values = getEnum(msgName, enumName),
+      var values = service.getEnum(msgName, enumName),
         labels = ENUM_LABELS[msgName][enumName];
       return labels.map(function(labelInfo) {
         return {
@@ -459,15 +459,15 @@ angular.module('bikemoves')
         cyclingExperience: profile.cyclingExperience,
         gender: profile.gender
       });
-      return postMessage('user', userMessage);
+      return service.postMessage('user', userMessage);
     };
 
     service.postTrip = function(trip) {
       var tripMessage = new messages.bikemoves.Trip(trip.serialize());
-      return postMessage('trip', tripMessage);
+      return service.postMessage('trip', tripMessage);
     };
     service.postIncident = function(incident) {
       var incidentMessage = new messages.bikemoves.Incident(incident.serialize());
-      return postMessage('incident', incidentMessage);
+      return service.postMessage('incident', incidentMessage);
     };
   });

@@ -1,7 +1,6 @@
 angular.module('bikemoves')
   .service('mapService', function($http, $q, $ionicPlatform, incidentService, $rootScope) {
     var service = this,
-      isReporting = false,
       DEFAULT_LOCATION = {
         latitude: 40.109403,
         longitude: -88.227203
@@ -19,19 +18,21 @@ angular.module('bikemoves')
       defaultCenter,
       tileOverlay,
       infoMarker,
-      currentLocationMarker,
       tripPolyline,
       mapType,
       currentMapCamera,
       disableDoubleClickZoom = true,
-      currentLocation,
       currentIncidentMarker;
-    location2LatLng = function(location) {
+    service.isReporting = false;
+    service.currentLocation = "A";
+
+
+    service.location2LatLng = function(location) {
         return new plugin.google.maps.LatLng(location.latitude, location.longitude);
-      },
-      createMap = function() {
+      };
+    var createMap = function() {
         if (!map) {
-          defaultCenter = location2LatLng(DEFAULT_LOCATION);
+          defaultCenter = service.location2LatLng(DEFAULT_LOCATION);
           container = document.getElementById('current-map');
           getLayerInfo();
           map = plugin.google.maps.Map.getMap(container, {
@@ -174,7 +175,7 @@ angular.module('bikemoves')
         });
       },
       mapClick = function(latLng, map) {
-        if (isReporting) {
+        if (service.isReporting) {
           currentIncidentMarker.setPosition(latLng);
           currentIncidentMarker.setVisible(true);
           $rootScope.$broadcast('IncidentReport', latLng);
@@ -216,20 +217,20 @@ angular.module('bikemoves')
 
     service.setCurrentLocation = function(location) {
       return initMap().then(function() {
-        currentLocation = location;
-        currentLocationMarker.setPosition(location2LatLng(location));
-        currentLocationMarker.setVisible(true);
+        service.currentLocation = location;
+        service.currentLocationMarker.setPosition(service.location2LatLng(location));
+        service.currentLocationMarker.setVisible(true);
       });
     };
     service.setCenter = function(location, duration) {
       return initMap().then(function() {
         if (typeof duration === 'undefined') var duration = 0;
         if (duration === 0) {
-          map.setCenter(location2LatLng(location));
+          map.setCenter(service.location2LatLng(location));
         } else {
           return $q(function(resolve, reject) {
             map.getCameraPosition(function(camera) {
-              camera.target = location2LatLng(location);
+              camera.target = service.location2LatLng(location);
               camera.duration = duration;
               map.animateCamera(camera, resolve);
             });
@@ -244,7 +245,7 @@ angular.module('bikemoves')
     };
     service.setTripLocations = function(locations) {
       return initMap().then(function() {
-        tripPolyline.setPoints(locations.map(location2LatLng));
+        tripPolyline.setPoints(locations.map(service.location2LatLng));
         tripPolyline.setVisible(locations.length > 1);
       });
     };
@@ -269,15 +270,15 @@ angular.module('bikemoves')
         if (tileOverlay)
           tileOverlay.setVisible(mapType == service.MAP_TYPE_CURRENT);
         if (infoMarker) infoMarker.setVisible(false);
-        if (currentLocationMarker) currentLocationMarker.setVisible(false);
+        if (service.currentLocationMarker) service.currentLocationMarker.setVisible(false);
         if (tripPolyline) tripPolyline.setVisible(false);
 
 
         // Reset the camera if this is the current map.
         if (mapType == service.MAP_TYPE_CURRENT &&
           angular.isDefined(currentMapCamera)) {
-          if (angular.isDefined(currentLocation))
-            service.setCurrentLocation(currentLocation);
+          if (angular.isDefined(service.currentLocation))
+            service.setCurrentLocation(service.currentLocation);
           return $q(function(resolve, reject) {
             map.moveCamera(currentMapCamera, resolve);
           });
@@ -289,35 +290,37 @@ angular.module('bikemoves')
         map.getLicenseInfo(resolve);
       });
     };
-
-    // Initialize the map.
-    $ionicPlatform.ready().then(createMap).then(function() {
-      return $q.all([
-        addTileOverlay(map),
-        addInfoMarker(map),
-        addCurrentLocationMarker(map),
-        addTripPolyline(map),
-        addCurrentIncidentMarker(map)
-      ]);
-    }).then(function(mapFeatures) {
-      tileOverlay = mapFeatures[0];
-      infoMarker = mapFeatures[1];
-      currentLocationMarker = mapFeatures[2];
-      tripPolyline = mapFeatures[3];
-      currentIncidentMarker = mapFeatures[4];
-      map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);
-      map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
-      ready = true;
-      angular.forEach(readyQueue, function(callback) {
-        callback();
+    service.initalizeMap = function(){
+      createMap().then(function() {
+        return $q.all([
+          addTileOverlay(map),
+          addInfoMarker(map),
+          addCurrentLocationMarker(map),
+          addTripPolyline(map),
+          addCurrentIncidentMarker(map)
+        ]);
+      }).then(function(mapFeatures) {
+        tileOverlay = mapFeatures[0];
+        infoMarker = mapFeatures[1];
+        service.currentLocationMarker = mapFeatures[2];
+        tripPolyline = mapFeatures[3];
+        currentIncidentMarker = mapFeatures[4];
+        map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);
+        map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
+        ready = true;
+        angular.forEach(readyQueue, function(callback) {
+          callback();
+        });
       });
-    });
+    }
+    // Initialize the map.
+    $ionicPlatform.ready().then(service.initalizeMap);
     service.setMapState = function(name) {
       if (name == 'report') {
-        isReporting = true;
+        service.isReporting = true;
         console.log("Enetered Report State");
       } else {
-        isReporting = false;
+        service.isReporting = false;
         console.log("Entered Normal State");
       }
       return;

@@ -8,7 +8,7 @@ describe("Trip Service Test", function() {
   beforeEach(function(){
     storageService.initalizeDb(true);
     service.getTripsCollection().then(function(collection){
-      collection.clear()
+      collection.clear();
     });
     rootScope.$digest();
   });

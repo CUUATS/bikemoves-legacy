@@ -17,8 +17,8 @@ module.exports = function(config) {
 
     files: [
       '../www/lib/ionic/js/ionic.bundle.js',
-      '../www/lib/ngCordova/dist/*.js',
-      '../www/lib/karma-read-json/karma-read-json.js',
+      '../www/lib/ngCordova/dist/ng-cordova-mocks.js',
+      '../plugins/cordova-plugin-googlemaps/www/googlemaps-cdv-plugin.js'
       // '../www/lib/**/*.js',
       '../www/js/app.js',
 
