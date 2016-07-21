@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">19.87% </span>
+        <span class="strong">19.74% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>30/151</span>
+        <span class='fraction'>30/152</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">3.85% </span>
+        <span class="strong">1.92% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>2/52</span>
+        <span class='fraction'>1/52</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">12.73% </span>
+        <span class="strong">10.91% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>7/55</span>
+        <span class='fraction'>6/55</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">20.55% </span>
+        <span class="strong">20.41% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>30/146</span>
+        <span class='fraction'>30/147</span>
       </div>
     </div>
   </div>
@@ -418,8 +418,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -578,12 +578,12 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -735,8 +735,8 @@
 &nbsp;
 &nbsp;
     service.location2LatLng = <span class="fstat-no" title="function not covered" >function(location) {</span>
-<span class="cstat-no" title="statement not covered" >        return new plugin.google.maps.LatLng(location.latitude, location.longitude);</span>
-      };
+<span class="cstat-no" title="statement not covered" >      return new plugin.google.maps.LatLng(location.latitude, location.longitude);</span>
+    };
     var createMap = function() {
         <span class="missing-if-branch" title="else path not taken" >E</span>if (!map) {
           defaultCenter = service.location2LatLng(DEFAULT_LOCATION);
@@ -749,8 +749,8 @@
             }
           });
         }
-<span class="cstat-no" title="statement not covered" >        return $q(<span class="fstat-no" title="function not covered" >function(resolve, reject) {</span></span>
-<span class="cstat-no" title="statement not covered" >          map.addEventListener(plugin.google.maps.event.MAP_READY, resolve);</span>
+        return $q(function(resolve, reject) {
+          map.addEventListener(plugin.google.maps.event.MAP_READY, resolve);
         });
       },
       addTileOverlay = <span class="fstat-no" title="function not covered" >function(map) {</span>
@@ -908,29 +908,29 @@
 <span class="cstat-no" title="statement not covered" >        if (mapType == service.MAP_TYPE_CURRENT) {</span>
 <span class="cstat-no" title="statement not covered" >          currentMapCamera = camera;</span>
         }
-      },
-      initMap = function() {
-        return $q(function(resolve, reject) {
-          <span class="missing-if-branch" title="if path not taken" >I</span>if (ready) {
-<span class="cstat-no" title="statement not covered" >            resolve();</span>
-          } else {
-            readyQueue.push(resolve);
-          }
-        });
       };
+    service.initMap = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >      return $q(<span class="fstat-no" title="function not covered" >function(resolve, reject) {</span></span>
+<span class="cstat-no" title="statement not covered" >        if (ready) {</span>
+<span class="cstat-no" title="statement not covered" >          resolve();</span>
+        } else {
+<span class="cstat-no" title="statement not covered" >          readyQueue.push(resolve);</span>
+        }
+      });
+    };
 &nbsp;
     service.MAP_TYPE_CURRENT = 'current';
     service.MAP_TYPE_PREVIOUS = 'previous';
 &nbsp;
     service.setCurrentLocation = function(location) {
-      return initMap().then(<span class="fstat-no" title="function not covered" >function() {</span>
+      return service.initMap().then(<span class="fstat-no" title="function not covered" >function() {</span>
 <span class="cstat-no" title="statement not covered" >        service.currentLocation = location;</span>
 <span class="cstat-no" title="statement not covered" >        service.currentLocationMarker.setPosition(service.location2LatLng(location));</span>
 <span class="cstat-no" title="statement not covered" >        service.currentLocationMarker.setVisible(true);</span>
       });
     };
     service.setCenter = <span class="fstat-no" title="function not covered" >function(location, duration) {</span>
-<span class="cstat-no" title="statement not covered" >      return initMap().then(<span class="fstat-no" title="function not covered" >function() {</span></span>
+<span class="cstat-no" title="statement not covered" >      return service.initMap().then(<span class="fstat-no" title="function not covered" >function() {</span></span>
 <span class="cstat-no" title="statement not covered" >        if (typeof duration === 'undefined') <span class="cstat-no" title="statement not covered" >var duration = 0;</span></span>
 <span class="cstat-no" title="statement not covered" >        if (duration === 0) {</span>
 <span class="cstat-no" title="statement not covered" >          map.setCenter(service.location2LatLng(location));</span>
@@ -946,18 +946,18 @@
       });
     };
     service.setClickable = <span class="fstat-no" title="function not covered" >function(clickable) {</span>
-<span class="cstat-no" title="statement not covered" >      return initMap().then(<span class="fstat-no" title="function not covered" >function() {</span></span>
+<span class="cstat-no" title="statement not covered" >      return service.initMap().then(<span class="fstat-no" title="function not covered" >function() {</span></span>
 <span class="cstat-no" title="statement not covered" >        map.setClickable(clickable);</span>
       });
     };
     service.setTripLocations = <span class="fstat-no" title="function not covered" >function(locations) {</span>
-<span class="cstat-no" title="statement not covered" >      return initMap().then(<span class="fstat-no" title="function not covered" >function() {</span></span>
+<span class="cstat-no" title="statement not covered" >      return service.initMap().then(<span class="fstat-no" title="function not covered" >function() {</span></span>
 <span class="cstat-no" title="statement not covered" >        tripPolyline.setPoints(locations.map(service.location2LatLng));</span>
 <span class="cstat-no" title="statement not covered" >        tripPolyline.setVisible(locations.length &gt; 1);</span>
       });
     };
     service.zoomToTripPolyline = <span class="fstat-no" title="function not covered" >function() {</span>
-<span class="cstat-no" title="statement not covered" >      return initMap().then(<span class="fstat-no" title="function not covered" >function() {</span></span>
+<span class="cstat-no" title="statement not covered" >      return service.initMap().then(<span class="fstat-no" title="function not covered" >function() {</span></span>
 <span class="cstat-no" title="statement not covered" >        return $q(<span class="fstat-no" title="function not covered" >function(resolve, reject) {</span></span>
 <span class="cstat-no" title="statement not covered" >          map.moveCamera({</span>
             'target': tripPolyline.getPoints()
@@ -966,7 +966,7 @@
       });
     };
     service.resetMap = <span class="fstat-no" title="function not covered" >function(newMapType) {</span>
-<span class="cstat-no" title="statement not covered" >      return initMap().then(<span class="fstat-no" title="function not covered" >function() {</span></span>
+<span class="cstat-no" title="statement not covered" >      return service.initMap().then(<span class="fstat-no" title="function not covered" >function() {</span></span>
 <span class="cstat-no" title="statement not covered" >        mapType = newMapType;</span>
 <span class="cstat-no" title="statement not covered" >        var containerId = (mapType == service.MAP_TYPE_CURRENT) ?</span>
           'current-map' : 'previous-map';
@@ -997,30 +997,30 @@
 <span class="cstat-no" title="statement not covered" >        map.getLicenseInfo(resolve);</span>
       });
     };
-    service.initalizeMap = function(){
-      createMap().then(<span class="fstat-no" title="function not covered" >function() {</span>
-<span class="cstat-no" title="statement not covered" >        return $q.all([</span>
-          addTileOverlay(map),
-          addInfoMarker(map),
-          addCurrentLocationMarker(map),
-          addTripPolyline(map),
-          addCurrentIncidentMarker(map)
-        ]);
-      }).then(<span class="fstat-no" title="function not covered" >function(mapFeatures) {</span>
-<span class="cstat-no" title="statement not covered" >        tileOverlay = mapFeatures[0];</span>
-<span class="cstat-no" title="statement not covered" >        infoMarker = mapFeatures[1];</span>
-<span class="cstat-no" title="statement not covered" >        service.currentLocationMarker = mapFeatures[2];</span>
-<span class="cstat-no" title="statement not covered" >        tripPolyline = mapFeatures[3];</span>
-<span class="cstat-no" title="statement not covered" >        currentIncidentMarker = mapFeatures[4];</span>
-<span class="cstat-no" title="statement not covered" >        map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);</span>
-<span class="cstat-no" title="statement not covered" >        map.on(plugin.google.maps.event.MAP_CLICK, mapClick);</span>
-<span class="cstat-no" title="statement not covered" >        ready = true;</span>
-<span class="cstat-no" title="statement not covered" >        angular.forEach(readyQueue, <span class="fstat-no" title="function not covered" >function(callback) {</span></span>
-<span class="cstat-no" title="statement not covered" >          callback();</span>
+    service.initalizeMap = function() {
+        createMap().then(<span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >          return $q.all([</span>
+            addTileOverlay(map),
+            addInfoMarker(map),
+            addCurrentLocationMarker(map),
+            addTripPolyline(map),
+            addCurrentIncidentMarker(map)
+          ]);
+        }).then(<span class="fstat-no" title="function not covered" >function(mapFeatures) {</span>
+<span class="cstat-no" title="statement not covered" >          tileOverlay = mapFeatures[0];</span>
+<span class="cstat-no" title="statement not covered" >          infoMarker = mapFeatures[1];</span>
+<span class="cstat-no" title="statement not covered" >          service.currentLocationMarker = mapFeatures[2];</span>
+<span class="cstat-no" title="statement not covered" >          tripPolyline = mapFeatures[3];</span>
+<span class="cstat-no" title="statement not covered" >          currentIncidentMarker = mapFeatures[4];</span>
+<span class="cstat-no" title="statement not covered" >          map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);</span>
+<span class="cstat-no" title="statement not covered" >          map.on(plugin.google.maps.event.MAP_CLICK, mapClick);</span>
+<span class="cstat-no" title="statement not covered" >          ready = true;</span>
+<span class="cstat-no" title="statement not covered" >          angular.forEach(readyQueue, <span class="fstat-no" title="function not covered" >function(callback) {</span></span>
+<span class="cstat-no" title="statement not covered" >            callback();</span>
+          });
         });
-      });
-    }
-    // Initialize the map.
+      }
+      // Initialize the map.
     $ionicPlatform.ready().then(service.initalizeMap);
     service.setMapState = <span class="fstat-no" title="function not covered" >function(name) {</span>
 <span class="cstat-no" title="statement not covered" >      if (name == 'report') {</span>
@@ -1042,7 +1042,7 @@
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Jul 12 2016 16:11:16 GMT-0500 (CDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jul 13 2016 09:23:32 GMT-0500 (CDT)
 </div>
 </div>
 <script src="../../prettify.js"></script>

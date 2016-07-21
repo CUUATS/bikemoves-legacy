@@ -19,21 +19,10 @@ beforeEach(inject(function( $window, $q, $rootScope, $httpBackend) {
   window.cordova.plugins.Keyboard = {
     close: function() {}
   };
-  // window.$ionicPlatform = {
-  //   ready: function() {
-  //     return $q.resolve();
-  //   }
-  // }
-  // if (window.parent.cordova === undefined) {
-  //  console.log("Loading cordova");
-  //
-  //  var elem = document.createElement("script");
-  //  elem.src = "http://localhost:9876/absolute/Users/bikeapp/bikemoves/www/lib/ngCordova/dist/ng-cordova.js";
-  //  window.parent.document.head.appendChild(elem);
-  //  window.cordova = window.parent.cordova;
-  //  window.analytics = window.parent.analytics;
-
- // }
-  window.plugin = new plugin.google.map
+  window.$ionicPlatform = {
+    ready: function() {
+      return $q.resolve();
+    }
+  }
   genPromise = $q.defer()
 }));

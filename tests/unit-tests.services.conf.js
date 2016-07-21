@@ -17,15 +17,13 @@ module.exports = function(config) {
 
     files: [
       '../www/lib/ionic/js/ionic.bundle.js',
-      '../www/lib/ngCordova/dist/ng-cordova-mocks.js',
-      '../plugins/cordova-plugin-googlemaps/www/googlemaps-cdv-plugin.js'
+      '../www/lib/ngCordova/dist/*.js',
       // '../www/lib/**/*.js',
       '../www/js/app.js',
 
       '../www/js/*.js',
       '../www/js/controllers/*.js',
       '../www/js/services/*.js',
-      // '../www/lib/angular-mocks/ngMock.js',
       '../www/lib/*.js',
 
       '../www/lib/angular-mocks/angular-mocks.js',
@@ -78,7 +76,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
 
 
 //rency level

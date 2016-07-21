@@ -28,8 +28,8 @@ angular.module('bikemoves')
 
 
     service.location2LatLng = function(location) {
-        return new plugin.google.maps.LatLng(location.latitude, location.longitude);
-      };
+      return new plugin.google.maps.LatLng(location.latitude, location.longitude);
+    };
     var createMap = function() {
         if (!map) {
           defaultCenter = service.location2LatLng(DEFAULT_LOCATION);
@@ -201,29 +201,29 @@ angular.module('bikemoves')
         if (mapType == service.MAP_TYPE_CURRENT) {
           currentMapCamera = camera;
         }
-      },
-      initMap = function() {
-        return $q(function(resolve, reject) {
-          if (ready) {
-            resolve();
-          } else {
-            readyQueue.push(resolve);
-          }
-        });
       };
+    service.initMap = function() {
+      return $q(function(resolve, reject) {
+        if (ready) {
+          resolve();
+        } else {
+          readyQueue.push(resolve);
+        }
+      });
+    };
 
     service.MAP_TYPE_CURRENT = 'current';
     service.MAP_TYPE_PREVIOUS = 'previous';
 
     service.setCurrentLocation = function(location) {
-      return initMap().then(function() {
+      return service.initMap().then(function() {
         service.currentLocation = location;
         service.currentLocationMarker.setPosition(service.location2LatLng(location));
         service.currentLocationMarker.setVisible(true);
       });
     };
     service.setCenter = function(location, duration) {
-      return initMap().then(function() {
+      return service.initMap().then(function() {
         if (typeof duration === 'undefined') var duration = 0;
         if (duration === 0) {
           map.setCenter(service.location2LatLng(location));
@@ -239,18 +239,18 @@ angular.module('bikemoves')
       });
     };
     service.setClickable = function(clickable) {
-      return initMap().then(function() {
+      return service.initMap().then(function() {
         map.setClickable(clickable);
       });
     };
     service.setTripLocations = function(locations) {
-      return initMap().then(function() {
+      return service.initMap().then(function() {
         tripPolyline.setPoints(locations.map(service.location2LatLng));
         tripPolyline.setVisible(locations.length > 1);
       });
     };
     service.zoomToTripPolyline = function() {
-      return initMap().then(function() {
+      return service.initMap().then(function() {
         return $q(function(resolve, reject) {
           map.moveCamera({
             'target': tripPolyline.getPoints()
@@ -259,7 +259,7 @@ angular.module('bikemoves')
       });
     };
     service.resetMap = function(newMapType) {
-      return initMap().then(function() {
+      return service.initMap().then(function() {
         mapType = newMapType;
         var containerId = (mapType == service.MAP_TYPE_CURRENT) ?
           'current-map' : 'previous-map';
@@ -290,7 +290,7 @@ angular.module('bikemoves')
         map.getLicenseInfo(resolve);
       });
     };
-    service.initalizeMap = function(){
+    service.initializeMap = function() {
       createMap().then(function() {
         return $q.all([
           addTileOverlay(map),
@@ -300,21 +300,24 @@ angular.module('bikemoves')
           addCurrentIncidentMarker(map)
         ]);
       }).then(function(mapFeatures) {
-        tileOverlay = mapFeatures[0];
-        infoMarker = mapFeatures[1];
-        service.currentLocationMarker = mapFeatures[2];
-        tripPolyline = mapFeatures[3];
-        currentIncidentMarker = mapFeatures[4];
-        map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);
-        map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
-        ready = true;
-        angular.forEach(readyQueue, function(callback) {
-          callback();
-        });
+        declareMapFeatures(mapFeatures);
       });
-    }
+    };
+    var declareMapFeatures = function(mapFeatures) {
+      tileOverlay = mapFeatures[0];
+      infoMarker = mapFeatures[1];
+      service.currentLocationMarker = mapFeatures[2];
+      tripPolyline = mapFeatures[3];
+      currentIncidentMarker = mapFeatures[4];
+      map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);
+      map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
+      ready = true;
+      angular.forEach(readyQueue, function(callback) {
+        callback();
+      });
+    };
     // Initialize the map.
-    $ionicPlatform.ready().then(service.initalizeMap);
+    $ionicPlatform.ready().then(service.initializeMap);
     service.setMapState = function(name) {
       if (name == 'report') {
         service.isReporting = true;
@@ -328,4 +331,8 @@ angular.module('bikemoves')
     service.removeIncident = function() {
       return currentIncidentMarker.setVisible(false);
     };
+    service.testMap = function(mapSpy) { // Only Used for Browser Testing
+      map = mapSpy;
+      declareMapFeatures(map.mapFeatures)
+    }
   });
