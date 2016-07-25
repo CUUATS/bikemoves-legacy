@@ -15,24 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
 
-    files: [
-      '../www/lib/ionic/js/ionic.bundle.js',
-      '../www/lib/ngCordova/dist/*.js',
-      // '../www/lib/**/*.js',
-      '../www/js/app.js',
 
-      '../www/js/*.js',
-      '../www/js/controllers/*.js',
-      '../www/js/services/*.js',
-      '../www/lib/*.js',
-
-      '../www/lib/angular-mocks/angular-mocks.js',
-
-      // '../www/js/*.json',
-      '../tests/unit-tests/spec-service-helper.js',
-      '../tests/unit-tests/services/*.js'
-
-    ],
     // list of files to exclude
     exclude: [],
 
@@ -62,7 +45,7 @@ module.exports = function(config) {
     },
 
     mochaReporter:{
-      output: 'error'
+      output: 'minimal'
     },
 
 
@@ -71,7 +54,7 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    // autoWatch: true,
 
 
     // start these browsers

@@ -19,6 +19,7 @@ var analyticsServiceMock,
   profileServiceMock,
   remoteServiceMock,
   settingsServiceMock,
+  smootherServiceMock,
   storageServiceMock,
   tripServiceMock,
   tripMock,
@@ -31,7 +32,7 @@ var analyticsServiceMock,
   // window,
   confirm;
 
-beforeEach(inject(function($window, $q, $ionicPopup, analyticsService, incidentService, locationService, mapService, profileService, remoteService, settingsService, storageService, tripService) {
+beforeEach(inject(function($window, $q, $ionicPopup, analyticsService, incidentService, smootherService, locationService, mapService, profileService, remoteService, settingsService, storageService, tripService) {
   analyticsServiceMock = analyticsService;
   incidentServiceMock = incidentService;
   locationServiceMock = locationService;
@@ -39,6 +40,7 @@ beforeEach(inject(function($window, $q, $ionicPopup, analyticsService, incidentS
   profileServiceMock = profileService;
   remoteServiceMock = remoteService;
   settingsServiceMock = settingsService;
+  smootherServiceMock = smootherService;
   storageServiceMock = storageService;
   tripServiceMock = tripService;
   ionicPopupMock = $ionicPopup;
@@ -74,7 +76,8 @@ beforeEach(inject(function($window, $q, $ionicPopup, analyticsService, incidentS
   spyOn(mapServiceMock, "getLegalText").and.callFake(function(){
     return genPromise.promise;
   });
-
+  spyOn(mapServiceMock, "setCurrentLocation");
+  spyOn(mapServiceMock, "setCenter");
 
   spyOn(profileServiceMock, "clearAll").and.callThrough();
   spyOn(profileServiceMock, "updateProfile").and.callThrough();
@@ -84,9 +87,12 @@ beforeEach(inject(function($window, $q, $ionicPopup, analyticsService, incidentS
     return genPromise.promise;
   });
 
-  spyOn(settingsServiceMock, "updateSettings").and.callThrough()
-  spyOn(settingsServiceMock, "clearAll").and.callThrough()
-  spyOn(settingsServiceMock, "getSettings").and.callThrough()
+  spyOn(settingsServiceMock, "updateSettings").and.callThrough();
+  spyOn(settingsServiceMock, "clearAll").and.callThrough();
+  spyOn(settingsServiceMock, "getSettings").and.callThrough();
+
+  spyOn(smootherServiceMock, "removeSpikes").and.callThrough();
+  spyOn(smootherServiceMock, "standardFilter").and.callThrough();
 
   spyOn(tripServiceMock, "clearAll").and.callThrough();
   spyOn(tripServiceMock, "saveTrip").and.callThrough();

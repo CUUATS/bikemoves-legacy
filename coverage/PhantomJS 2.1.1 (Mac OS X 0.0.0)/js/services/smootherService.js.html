@@ -20,28 +20,28 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">30.77% </span>
+        <span class="strong">82.35% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>4/13</span>
+        <span class='fraction'>14/17</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">0% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>0/2</span>
+        <span class='fraction'>0/0</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">33.33% </span>
+        <span class="strong">85.71% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>1/3</span>
+        <span class='fraction'>6/7</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">30.77% </span>
+        <span class="strong">82.35% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>4/13</span>
+        <span class='fraction'>14/17</span>
       </div>
     </div>
   </div>
-  <div class='status-line low'></div>
+  <div class='status-line high'></div>
 <pre><table class="coverage">
 <tr><td class="line-count quiet">1
 2
@@ -64,47 +64,62 @@
 19
 20
 21
-22</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+22
+23
+24
+25
+26
+27</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-yes">1×</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">angular.module("bikemoves")
   .service("smootherService", function() {
       var service = this;
-      service.trackReduce = <span class="fstat-no" title="function not covered" >function(trip, precision) {</span>
-<span class="cstat-no" title="statement not covered" >        var j = 0,</span>
-          locations = [trip.locations[0]];
-<span class="cstat-no" title="statement not covered" >        for (var i = 1; i &lt; trip.locations.length; i++) {</span>
-<span class="cstat-no" title="statement not covered" >          while (trip.getDistance(trip.location[j], trip.location[i]) &lt; precision) {</span>
-<span class="cstat-no" title="statement not covered" >            i++;</span>
-<span class="cstat-no" title="statement not covered" >            if (i &gt; trip.locations.length)</span>
-<span class="cstat-no" title="statement not covered" >              break;</span>
-          }
-<span class="cstat-no" title="statement not covered" >          locations.push(trip.location[i]);</span>
-<span class="cstat-no" title="statement not covered" >          j = i;</span>
-        }
-<span class="cstat-no" title="statement not covered" >        return locations;</span>
-    };
-    service.kalmanReduce = <span class="fstat-no" title="function not covered" >function(){</span>
-      
-    }
+      var filter = new Filter();
+      service.positionFilter = function(points,min,max){
+        return filter.positionFilter(points,min,max);
+      };
+      service.velocityFilter = function(points,min,max){
+        return filter.velocityFilter(points,min,max);
+      };
+      service.accelerationFilter = function(points,min,max){
+        return filter.accelerationFilter(points,min,max);
+      };
+      service.removeSpikes = function(points, threshold, iterations){
+        return filter.removeSpikes(points,threshold);
+      };
+      service.smoothLine = function(points, threshold, iterations){
+        return filter.smoothLine(points,threshold);
+      };
+      service.standardFilter = <span class="fstat-no" title="function not covered" >function(points){</span>
+<span class="cstat-no" title="statement not covered" >        var firstPass = service.removeSpike(points,150,5);</span>
+<span class="cstat-no" title="statement not covered" >        var secondPass = service.smoothLine(firstPass,20);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return secondPass;</span>
+      };
   });
 &nbsp;</pre></td></tr>
 </table></pre>
@@ -112,7 +127,7 @@
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jul 13 2016 11:07:01 GMT-0500 (CDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Jul 25 2016 11:15:34 GMT-0500 (CDT)
 </div>
 </div>
 <script src="../../prettify.js"></script>

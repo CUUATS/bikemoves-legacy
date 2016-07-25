@@ -1,5 +1,5 @@
 describe('Map Controller Test', function() {
-  var scope, mapCtrl;
+  var MapCtrl;
   beforeEach(inject(function($rootScope, $controller, $q) {
     scope = $rootScope.$new();
     confirm = $q.defer();
@@ -67,6 +67,24 @@ describe('Map Controller Test', function() {
       });
       expect(remoteServiceMock.postTrip).toHaveBeenCalled();
     });
+    it("should report error if status isn't 200", function(){
+      scope.trip.locations = [1, 2];
+      scope.submitTrip();
+      genPromise.resolve({
+        status: 202
+      });
+      scope.$digest();
+      expect(ionicPopupMock.alert).toHaveBeenCalled();
+    })
+    it("should report error if promise rejects", function(){
+      scope.trip.locations = [1, 2];
+      scope.submitTrip();
+      genPromise.reject({
+        status: 202
+      });
+      scope.$digest();
+      expect(ionicPopupMock.alert).toHaveBeenCalled();
+    })
     it("should save trip if trip has no length", function() {
       expect(tripServiceMock.saveTrip).toHaveBeenCalled();
     });
@@ -271,4 +289,18 @@ describe('Map Controller Test', function() {
       expect(scope.online).toBeFalsy();
     });
   });
+
+  describe("Update Map", function() {
+    beforeEach(function() {
+      MapCtrl.currentLocation = "here"
+      MapCtrl.updateMap();
+    })
+    it("shoud filter locations", function() {
+      expect(smootherServiceMock.standardFilter).toHaveBeenCalledWith(scope.trip.locations)
+    });
+    it("should update map location", function(){
+      expect(mapServiceMock.setCurrentLocation).toHaveBeenCalledWith("here");
+      expect(mapServiceMock.setCenter).toHaveBeenCalledWith("here")
+    })
+  })
 });

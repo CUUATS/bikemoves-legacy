@@ -9,16 +9,17 @@ angular.module('bikemoves').controller('MapCtrl', [
   'tripService',
   'settingsService',
   'incidentService',
+  'smootherService',
+  'analyticsService',
   '$cordovaNetwork',
   '$rootScope',
-  'analyticsService',
-  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, $cordovaNetwork, $rootScope, analyticsService) {
+  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, smootherService, analyticsService, $cordovaNetwork, $rootScope) {
     var that = this;
     analyticsService.trackView("Map");
-    that.START_TIME_KEY = 'bikemoves:starttime',
-      that.currentLocation,
-      that.tripSubmitModal,
-      that.comfirmPopup;
+    that.START_TIME_KEY = 'bikemoves:starttime';
+    that.currentLocation;
+    that.tripSubmitModal;
+    that.comfirmPopup;
 
     that.setStatus = function(status, initial) {
         // console.log('Setting status: ' + status);
@@ -28,18 +29,16 @@ angular.module('bikemoves').controller('MapCtrl', [
           isRecording: status == locationService.STATUS_RECORDING
         };
         // Disable other tabs while recording.
-        // TODO: Find a way around this $parent nonsense.
-        // $scope.$parent.$parent.$parent.isRecording = $scope.status.isRecording;
-
         if (initial) return;
         return locationService.setStatus(status);
       },
-      updateMap = function() {
+      that.updateMap = function() {
         if (that.currentLocation) {
           mapService.setCurrentLocation(that.currentLocation);
           mapService.setCenter(that.currentLocation);
         }
-        mapService.setTripLocations($scope.trip.locations);
+        var filteredLocations = smootherService.standardFilter($scope.trip.locations);
+        mapService.setTripLocations(filteredLocations);
       },
       updateOdometer = function() {
         // Convert meters to miles.
@@ -50,7 +49,7 @@ angular.module('bikemoves').controller('MapCtrl', [
           $scope.trip.addLocation(location, false) : location;
         if (!skipUpdate) {
           updateOdometer();
-          updateMap();
+          that.updateMap();
         }
       },
       onSubmitError = function() {
@@ -85,7 +84,7 @@ angular.module('bikemoves').controller('MapCtrl', [
       that.resetTrip = function(skipUpdate) {
         $scope.trip = new Trip();
         if (!skipUpdate) {
-          updateMap();
+          that.updateMap();
           updateOdometer();
         }
       },
@@ -215,16 +214,16 @@ angular.module('bikemoves').controller('MapCtrl', [
       $scope.incidentAddress = undefined;
       incidentService.getAddress(latLng).then(function(address) {
         $scope.incidentAddress = address;
-         return $ionicPopup.confirm({
+        return $ionicPopup.confirm({
           title: 'Report Incident Near:',
           template: $scope.incidentAddress
         });
       }).catch(function() {
-         return $ionicPopup.confirm({
+        return $ionicPopup.confirm({
           title: 'Report Incident Here',
         });
       }).then(function(res) {
-        console.log(res + "  res")
+        console.log(res + "  res");
         if (res) {
           incidentReportModal.show();
           mapService.setMapState('normal');
@@ -266,7 +265,7 @@ angular.module('bikemoves').controller('MapCtrl', [
           angular.forEach(locations, function(location, key) {
             onLocation(location, true);
           });
-          updateMap();
+          that.updateMap();
           return status;
         });
       }
