@@ -20,24 +20,24 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">52.63% </span>
+        <span class="strong">56.52% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>10/19</span>
+        <span class='fraction'>13/23</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">50% </span>
+        <span class="strong">0% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>1/2</span>
+        <span class='fraction'>0/6</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">28.57% </span>
+        <span class="strong">85.71% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>2/7</span>
+        <span class='fraction'>6/7</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">52.63% </span>
+        <span class="strong">56.52% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>10/19</span>
+        <span class='fraction'>13/23</span>
       </div>
     </div>
   </div>
@@ -72,71 +72,92 @@
 27
 28
 29
-30</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+30
+31
+32
+33
+34
+35
+36
+37</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">88×</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">88×</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">88×</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">88×</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">88×</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">88×</span>
 <span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">angular.module("bikemoves")
-  .service("smootherService", ["filterService", function(filterService) {
-    var service = this;
+	.service("smootherService", ["filterService", function(filterService) {
+		var service = this;
 &nbsp;
-    service.positionFilter = <span class="fstat-no" title="function not covered" >function(points, min, max) {</span>
-<span class="cstat-no" title="statement not covered" >      return filterService.positionFilter(points, min, max);</span>
-    };
-    service.velocityFilter = <span class="fstat-no" title="function not covered" >function(points, min, max) {</span>
-<span class="cstat-no" title="statement not covered" >      return filterService.velocityFilter(points, min, max);</span>
-    };
-    service.accelerationFilter = <span class="fstat-no" title="function not covered" >function(points, min, max) {</span>
-<span class="cstat-no" title="statement not covered" >      return filterService.accelerationFilter(points, min, max);</span>
-    };
-    service.removeSpikes = <span class="fstat-no" title="function not covered" >function(points, threshold, iterations) {</span>
-<span class="cstat-no" title="statement not covered" >      return filterService.removeSpikes(points, threshold);</span>
-    };
-    service.smoothLine = <span class="fstat-no" title="function not covered" >function(points, threshold, iterations) {</span>
-<span class="cstat-no" title="statement not covered" >      return filterService.smoothLine(points, threshold);</span>
-    };
-    service.standardFilter = function(points) {
-      <span class="missing-if-branch" title="if path not taken" >I</span>if (points.length &gt; 3) {
-<span class="cstat-no" title="statement not covered" >        var firstPass = service.removeSpikes(points, 160, 5);</span>
-<span class="cstat-no" title="statement not covered" >        var secondPass = service.smoothLine(firstPass, 20,5);</span>
-<span class="cstat-no" title="statement not covered" >        var thirdPass = service.removeSpikes(points,140,3);</span>
-<span class="cstat-no" title="statement not covered" >        return thirdPass;</span>
-      }
-      return points;
-    };
-  }]);
+		service.positionFilter = function(points, min, max) {
+			return filterService.positionFilter(points, min, max);
+		};
+		service.velocityFilter = function(points, min, max) {
+			return filterService.velocityFilter(points, min, max);
+		};
+		service.accelerationFilter = function(points, min, max) {
+			return filterService.accelerationFilter(points, min, max);
+		};
+		service.removeSpikes = function(points, threshold, iterations) {
+			return filterService.removeSpikes(points, threshold);
+		};
+		service.smoothLine = function(points, threshold, iterations) {
+			return filterService.smoothLine(points, threshold);
+		};
+		service.standardFilter = <span class="fstat-no" title="function not covered" >function(points) {</span>
+<span class="cstat-no" title="statement not covered" >			if (points.length &gt; 3) {</span>
+<span class="cstat-no" title="statement not covered" >				var firstPass = service.removeSpikes(points, 160, 5);</span>
+<span class="cstat-no" title="statement not covered" >				if (firstPass.length &gt; 3) {</span>
+<span class="cstat-no" title="statement not covered" >					var secondPass = service.smoothLine(firstPass, 20, 5);</span>
+<span class="cstat-no" title="statement not covered" >					if (secondPass.length &gt; 3) {</span>
+<span class="cstat-no" title="statement not covered" >						var thirdPass = service.removeSpikes(points, 140, 3);</span>
+<span class="cstat-no" title="statement not covered" >						return thirdPass;</span>
+					}
+<span class="cstat-no" title="statement not covered" >					return secondPass;</span>
+				}
+&nbsp;
+<span class="cstat-no" title="statement not covered" >				return firstPass;</span>
+			}
+<span class="cstat-no" title="statement not covered" >			return points;</span>
+		};
+	}]);
 &nbsp;</pre></td></tr>
 </table></pre>
 <div class='push'></div><!-- for sticky footer -->
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jul 27 2016 13:58:37 GMT-0500 (CDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jul 27 2016 14:50:56 GMT-0500 (CDT)
 </div>
 </div>
 <script src="../../prettify.js"></script>
