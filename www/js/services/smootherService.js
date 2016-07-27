@@ -19,9 +19,10 @@ angular.module("bikemoves")
     };
     service.standardFilter = function(points) {
       if (points.length > 3) {
-        var firstPass = service.removeSpikes(points, 150, 5);
-        var secondPass = service.smoothLine(firstPass, 20);
-        return secondPass;
+        var firstPass = service.removeSpikes(points, 160, 5);
+        var secondPass = service.smoothLine(firstPass, 20,5);
+        var thirdPass = service.removeSpikes(points,140,3);
+        return thirdPass;
       }
       return points;
     };

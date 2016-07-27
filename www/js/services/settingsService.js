@@ -26,7 +26,7 @@ angular.module('bikemoves')
 
     service.getDesiredAccuracy = function() {
       return service.getSettings().then(function(settings) {
-        return [100, 10, 0][settings.accuracyLevel];
+        return [10, 0][settings.accuracyLevel];
       });
     };
 

@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for js/services/filterService.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">js/services/</a> filterService.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">14.56% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>23/158</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/46</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">4% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>1/25</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">14.56% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>23/158</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">angular.module('bikemoves').service("filterService", function() {
+&nbsp;
+	var service = this;
+&nbsp;
+	service.produceVectors = <span class="fstat-no" title="function not covered" >function(points) {</span>
+<span class="cstat-no" title="statement not covered" >		return {</span>
+			positions: toPositions(points), //Meters
+			velocities: toVelocities(points), //Meters / Second
+			accelerations: toAccelerations(points) //Meters / Second^2
+		};
+	};
+	//Bounds Maginitude of Position Vector
+	service.positionFilter = <span class="fstat-no" title="function not covered" >function(points, min, max) {</span>
+<span class="cstat-no" title="statement not covered" >		var outputPoints = [];</span>
+<span class="cstat-no" title="statement not covered" >		var positions = this.produceVectors(points).positions;</span>
+<span class="cstat-no" title="statement not covered" >		var filtered = vectorFilter(min, max, positions);</span>
+<span class="cstat-no" title="statement not covered" >		var j = 0;</span>
+<span class="cstat-no" title="statement not covered" >		for (var i = 0; i &lt; filtered.length; i++) { //Pushes points that werent removed by filter</span>
+<span class="cstat-no" title="statement not covered" >			while (filtered[i] != positions[i + j]) {</span>
+<span class="cstat-no" title="statement not covered" >				j++;</span>
+			}
+			//Stores the two points that define the vector
+<span class="cstat-no" title="statement not covered" >			if (outputPoints.indexOf(points[i + j]) == -1)</span>
+<span class="cstat-no" title="statement not covered" >				outputPoints.push(points[i + j]);</span>
+<span class="cstat-no" title="statement not covered" >			if (outputPoints.indexOf(points[i + j + 1]) == -1)</span>
+<span class="cstat-no" title="statement not covered" >				outputPoints.push(points[i + j + 1]);</span>
+		}
+<span class="cstat-no" title="statement not covered" >		return outputPoints;</span>
+	};
+&nbsp;
+	//Bounds Magnitude of Velocity Vector
+	service.velocityFilter = <span class="fstat-no" title="function not covered" >function(points, min, max) {</span>
+<span class="cstat-no" title="statement not covered" >		var outputPoints = [];</span>
+<span class="cstat-no" title="statement not covered" >		var velocities = this.produceVectors(points).velocities;</span>
+<span class="cstat-no" title="statement not covered" >		var filtered = vectorFilter(min, max, velocities);</span>
+<span class="cstat-no" title="statement not covered" >		var j = 0;</span>
+<span class="cstat-no" title="statement not covered" >		for (var i = 0; i &lt; filtered.length; i++) { //Pushes points that werent removed by filter</span>
+<span class="cstat-no" title="statement not covered" >			while (filtered[i] != velocities[i + j]) {</span>
+<span class="cstat-no" title="statement not covered" >				j++;</span>
+			}
+			//Stores the two points that define the vector
+<span class="cstat-no" title="statement not covered" >			if (outputPoints.indexOf(points[i + j]) == -1)</span>
+<span class="cstat-no" title="statement not covered" >				outputPoints.push(points[i + j]);</span>
+<span class="cstat-no" title="statement not covered" >			if (outputPoints.indexOf(points[i + j + 1]) == -1)</span>
+<span class="cstat-no" title="statement not covered" >				outputPoints.push(points[i + j + 1]);</span>
+		}
+<span class="cstat-no" title="statement not covered" >		return outputPoints;</span>
+	};
+&nbsp;
+	//Bounds Acceleration of Acceleration Vector
+	service.accelerationFilter = <span class="fstat-no" title="function not covered" >function(points, min, max) {</span>
+<span class="cstat-no" title="statement not covered" >		var outputPoints = [];</span>
+<span class="cstat-no" title="statement not covered" >		var accelerations = this.produceVectors(points).accelerations;</span>
+<span class="cstat-no" title="statement not covered" >		var filtered = vectorFilter(min, max, accelerations);</span>
+<span class="cstat-no" title="statement not covered" >		var j = 0;</span>
+<span class="cstat-no" title="statement not covered" >		for (var i = 0; i &lt; filtered.length; i++) { //Pushes points that werent removed by filter</span>
+<span class="cstat-no" title="statement not covered" >			while (filtered[i] != accelerations[i + j]) {</span>
+<span class="cstat-no" title="statement not covered" >				j++;</span>
+			}
+			//Stores the three points that define the vector
+<span class="cstat-no" title="statement not covered" >			if (outputPoints.indexOf(points[i + j]) == -1)</span>
+<span class="cstat-no" title="statement not covered" >				outputPoints.push(points[i + j]);</span>
+<span class="cstat-no" title="statement not covered" >			if (outputPoints.indexOf(points[i + j + 1]) == -1)</span>
+<span class="cstat-no" title="statement not covered" >				outputPoints.push(points[i + j + 1]);</span>
+<span class="cstat-no" title="statement not covered" >			if (outputPoints.indexOf(points[i + j + 2]) == -1)</span>
+<span class="cstat-no" title="statement not covered" >				outputPoints.push(points[i + j + 2]);</span>
+		}
+<span class="cstat-no" title="statement not covered" >		return outputPoints;</span>
+	};
+&nbsp;
+	// Removes points where the angleBetween Vectors is too greater than than the sharpness
+	// Sharpness of 0 removes all points, 180 removes none;
+	service.removeSpikes = <span class="fstat-no" title="function not covered" >function(points, sharpness, iterations) {</span>
+<span class="cstat-no" title="statement not covered" >		var outputPoints = points;</span>
+<span class="cstat-no" title="statement not covered" >		for (var k = 0; k &lt; iterations; k++) {</span>
+<span class="cstat-no" title="statement not covered" >			var diff = 0;</span>
+<span class="cstat-no" title="statement not covered" >			var vels = this.produceVectors(outputPoints).velocities;</span>
+<span class="cstat-no" title="statement not covered" >			for (var i = 0; i &lt; vels.length - 1; i++) {</span>
+<span class="cstat-no" title="statement not covered" >				if (this.angleBetween(vels[i], vels[i + 1]) &gt; sharpness) {</span>
+<span class="cstat-no" title="statement not covered" >					outputPoints.splice(i + 1 - diff, 1);</span>
+<span class="cstat-no" title="statement not covered" >					diff += 1;</span>
+				}
+			}
+		}
+<span class="cstat-no" title="statement not covered" >		return outputPoints;</span>
+	};
+&nbsp;
+	// Checks if a vectors is ~parallel to the sum of the vectors following it
+	// Threshold define ~parallel 0-Must be perfectly parallel 180-All lines are considered parallel
+	service.smoothLine = <span class="fstat-no" title="function not covered" >function(points, threshold) {</span>
+<span class="cstat-no" title="statement not covered" >    var initThreshold = threshold;</span>
+<span class="cstat-no" title="statement not covered" >    var outputPoints = points;</span>
+<span class="cstat-no" title="statement not covered" >    var positions = this.produceVectors(points).positions;</span>
+<span class="cstat-no" title="statement not covered" >    var diff = 0;</span>
+<span class="cstat-no" title="statement not covered" >    for (var i = 0; i &lt; positions.length - 2; i++) {</span>
+<span class="cstat-no" title="statement not covered" >        if (this.angleBetween(positions[i], positions[i + 1].add(positions[i + 2])) &lt; threshold) {</span>
+<span class="cstat-no" title="statement not covered" >            outputPoints.splice(i + 2 - diff, 1);</span>
+<span class="cstat-no" title="statement not covered" >            diff += 1;</span>
+<span class="cstat-no" title="statement not covered" >            threshold -= 5;</span>
+        } else {
+<span class="cstat-no" title="statement not covered" >            threshold = initThreshold;</span>
+        }
+    }
+<span class="cstat-no" title="statement not covered" >    return outputPoints;</span>
+};
+	service.angleBetween = <span class="fstat-no" title="function not covered" >function(vec1, vec2) {</span>
+<span class="cstat-no" title="statement not covered" >		return (Math.acos(vec1.dot(vec2) / (vec1.magnitude() * vec2.magnitude())) * 180) / Math.PI;</span>
+	};
+&nbsp;
+	var vectorFilter = <span class="fstat-no" title="function not covered" >function(min, max, vectors) {</span>
+<span class="cstat-no" title="statement not covered" >		return vectors.filter(<span class="fstat-no" title="function not covered" >function(v) {</span></span>
+<span class="cstat-no" title="statement not covered" >			return v.magnitude() &gt; min &amp;&amp; v.magnitude() &lt; max;</span>
+		});
+	};
+&nbsp;
+	var toAccelerations = <span class="fstat-no" title="function not covered" >function(points) {</span>
+<span class="cstat-no" title="statement not covered" >		points = standardize(points);</span>
+<span class="cstat-no" title="statement not covered" >		var velocities = toVelocities(points);</span>
+<span class="cstat-no" title="statement not covered" >		var accels = [],</span>
+			time;
+<span class="cstat-no" title="statement not covered" >		for (var i = 0; i &lt; velocities.length - 1; i++) {</span>
+<span class="cstat-no" title="statement not covered" >			time = calcElapsed(points[i + 1].time, points[i + 2].time);</span>
+<span class="cstat-no" title="statement not covered" >			accels.push(accelerationVector(velocities[i], velocities[i + 1], time));</span>
+		}
+<span class="cstat-no" title="statement not covered" >		return accels;</span>
+	};
+	var accelerationVector = <span class="fstat-no" title="function not covered" >function(v1, v2, time) {</span>
+<span class="cstat-no" title="statement not covered" >		var vDif = v2.subtract(v1);</span>
+<span class="cstat-no" title="statement not covered" >		return new Victor(vDif.x / time, vDif.y / time);</span>
+	};
+	var toVelocities = <span class="fstat-no" title="function not covered" >function(points) {</span>
+<span class="cstat-no" title="statement not covered" >		points = standardize(points);</span>
+<span class="cstat-no" title="statement not covered" >		var vectors = [];</span>
+<span class="cstat-no" title="statement not covered" >		for (var i = 0; i &lt; points.length - 1; i++) {</span>
+<span class="cstat-no" title="statement not covered" >			vectors.push(velocityVector(points[i], points[i + 1]));</span>
+		}
+<span class="cstat-no" title="statement not covered" >		return vectors;</span>
+	};
+	var velocityVector = <span class="fstat-no" title="function not covered" >function(pt1, pt2) {</span>
+<span class="cstat-no" title="statement not covered" >		var speed = calcSpeeds([pt1, pt2]),</span>
+			latDif = pt2.lat - pt1.lat,
+			lngDif = pt2.lng - pt1.lng,
+			x = Math.abs(speed * Math.cos(Math.atan(latDif / lngDif)));
+<span class="cstat-no" title="statement not covered" >		y = Math.abs(speed * Math.sin(Math.atan(latDif / lngDif)));</span>
+<span class="cstat-no" title="statement not covered" >		if (pt1.lat &gt; pt2.lat)</span>
+<span class="cstat-no" title="statement not covered" >			y *= -1;</span>
+<span class="cstat-no" title="statement not covered" >		if (pt1.lng &gt; pt2.lng)</span>
+<span class="cstat-no" title="statement not covered" >			x *= -1;</span>
+<span class="cstat-no" title="statement not covered" >		return new Victor(x, y);</span>
+	};
+	var toPositions = <span class="fstat-no" title="function not covered" >function(points) {</span>
+<span class="cstat-no" title="statement not covered" >		points = standardize(points);</span>
+<span class="cstat-no" title="statement not covered" >		var vectors = [];</span>
+<span class="cstat-no" title="statement not covered" >		for (var i = 0; i &lt; points.length - 1; i++) {</span>
+<span class="cstat-no" title="statement not covered" >			vectors.push(positionVector(points[i], points[i + 1]));</span>
+		}
+<span class="cstat-no" title="statement not covered" >		return vectors;</span>
+	};
+	var positionVector = <span class="fstat-no" title="function not covered" >function(pt1, pt2) {</span>
+<span class="cstat-no" title="statement not covered" >		var dist = getDistance(pt1.lat, pt1.lng, pt2.lat, pt2.lng),</span>
+			latDif = pt2.lat - pt1.lat,
+			lngDif = pt2.lng - pt1.lng,
+			x = Math.abs(dist * Math.cos(Math.atan(latDif / lngDif))),
+			y = Math.abs(dist * Math.sin(Math.atan(latDif / lngDif)));
+<span class="cstat-no" title="statement not covered" >		if (pt1.lat &gt; pt2.lat)</span>
+<span class="cstat-no" title="statement not covered" >			y *= -1;</span>
+<span class="cstat-no" title="statement not covered" >		if (pt1.lng &gt; pt2.lng)</span>
+<span class="cstat-no" title="statement not covered" >			x *= -1;</span>
+<span class="cstat-no" title="statement not covered" >		return new Victor(x, y);</span>
+	};
+	var standardize = <span class="fstat-no" title="function not covered" >function(points) {</span>
+<span class="cstat-no" title="statement not covered" >		return points.map(<span class="fstat-no" title="function not covered" >function(v) {</span></span>
+<span class="cstat-no" title="statement not covered" >			var obj;</span>
+<span class="cstat-no" title="statement not covered" >			if (v.hasOwnProperty('lat'))</span>
+<span class="cstat-no" title="statement not covered" >				obj = {</span>
+					lat: v.lat,
+					lng: v.lng
+				};
+<span class="cstat-no" title="statement not covered" >			if (v.hasOwnProperty('latitude'))</span>
+<span class="cstat-no" title="statement not covered" >				obj = {</span>
+					lat: v.latitude,
+					lng: v.longitude
+				};
+<span class="cstat-no" title="statement not covered" >			if (v.hasOwnProperty('y'))</span>
+<span class="cstat-no" title="statement not covered" >				obj = {</span>
+					lat: v.y,
+					lng: v.x
+				};
+<span class="cstat-no" title="statement not covered" >			if (v.hasOwnProperty('time'))</span>
+<span class="cstat-no" title="statement not covered" >				obj.time = v.time;</span>
+<span class="cstat-no" title="statement not covered" >			if (v.hasOwnProperty('timestamp'))</span>
+<span class="cstat-no" title="statement not covered" >				obj.time = v.timestamp;</span>
+<span class="cstat-no" title="statement not covered" >			if (v.hasOwnProperty('starttime'))</span>
+<span class="cstat-no" title="statement not covered" >				obj.time = v.starttime;</span>
+<span class="cstat-no" title="statement not covered" >			return obj;</span>
+		});
+	};
+&nbsp;
+	var getDistance = <span class="fstat-no" title="function not covered" >function(lat1, lon1, lat2, lon2) {</span>
+<span class="cstat-no" title="statement not covered" >		var R = 6371; </span>// Radius of the earth in km
+<span class="cstat-no" title="statement not covered" >		var dLat = deg2rad(lat2 - lat1); </span>// deg2rad below
+<span class="cstat-no" title="statement not covered" >		var dLon = deg2rad(lon2 - lon1);</span>
+<span class="cstat-no" title="statement not covered" >		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);</span>
+<span class="cstat-no" title="statement not covered" >		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));</span>
+<span class="cstat-no" title="statement not covered" >		var d = R * c; </span>// Distance in km
+<span class="cstat-no" title="statement not covered" >		return d * 1000; </span>// Distance in Meters
+	};
+	var deg2rad = <span class="fstat-no" title="function not covered" >function deg2rad(deg) {</span>
+<span class="cstat-no" title="statement not covered" >		return deg * (Math.PI / 180);</span>
+	};
+&nbsp;
+	var calcSpeeds = <span class="fstat-no" title="function not covered" >function(points) {</span>
+<span class="cstat-no" title="statement not covered" >		var elapsed = [],</span>
+			distances = calcDists(points);
+<span class="cstat-no" title="statement not covered" >		for (var i = 0; i &lt; points.length - 1; i++) {</span>
+<span class="cstat-no" title="statement not covered" >			elapsed.push(calcElapsed(points[i].time, points[i + 1].time));</span>
+		}
+<span class="cstat-no" title="statement not covered" >		return distances.map(<span class="fstat-no" title="function not covered" >function(v, i) {</span></span>
+<span class="cstat-no" title="statement not covered" >			return v / elapsed[i]; </span>//Speeds are in meters per second;
+		});
+	};
+&nbsp;
+	var calcElapsed = <span class="fstat-no" title="function not covered" >function(time1, time2) {</span>
+<span class="cstat-no" title="statement not covered" >		time1 = moment(time1);</span>
+<span class="cstat-no" title="statement not covered" >		time2 = moment(time2);</span>
+<span class="cstat-no" title="statement not covered" >		return Math.abs(time1.diff(time2, "seconds")); </span>// returns difference in seconds;
+	};
+	var calcDists = <span class="fstat-no" title="function not covered" >function(points) {</span>
+<span class="cstat-no" title="statement not covered" >		var dists = [];</span>
+<span class="cstat-no" title="statement not covered" >		for (var i = 0; i &lt; points.length - 1; i++) {</span>
+<span class="cstat-no" title="statement not covered" >			dists.push(dist(points[i], points[i + 1]));</span>
+		}
+<span class="cstat-no" title="statement not covered" >		return dists;</span>
+	};
+	var dist = <span class="fstat-no" title="function not covered" >function(pt1, pt2) {</span>
+<span class="cstat-no" title="statement not covered" >		if (pt1.hasOwnProperty('x')) {</span>
+<span class="cstat-no" title="statement not covered" >			return getDistance(pt1.y, pt1.x, pt2.y, pt2.x);</span>
+		}
+<span class="cstat-no" title="statement not covered" >		if (pt1.hasOwnProperty('lat')) {</span>
+<span class="cstat-no" title="statement not covered" >			return getDistance(pt1.lat, pt1.lng, pt2.lat, pt2.lng);</span>
+		}
+<span class="cstat-no" title="statement not covered" >		if (pt1.hasOwnProperty('latitude')) {</span>
+<span class="cstat-no" title="statement not covered" >			return getDistance(pt1.latitude, pt1.longitude, pt2.latitude, pt2.longitude);</span>
+		}
+	};
+});
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jul 27 2016 13:58:37 GMT-0500 (CDT)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>
