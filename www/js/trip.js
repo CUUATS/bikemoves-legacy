@@ -66,10 +66,8 @@ Trip.prototype.addLocation = function(location, debug) {
   // the two locations is reasonable and that the locations are outside
   // of each other's accuracy circles. If not, keep only the more
   // accurate of the two locations.
-  console.log("Prev is:", prev);
   if (!debug) {
     if (prev) {
-      console.log("Null Case");
       var meters = this._getDistance(prev, location),
         seconds = (location.time - prev.time) / 1000;
       if ((meters / seconds) > 23 || meters < location.accuracy ||
@@ -95,6 +93,7 @@ Trip.prototype.guessODTypes = function(trips) {
   angular.forEach(trips, function(trip) {
     odTypes.push.apply(odTypes, trip.getODTypes());
   });
+  console.log(odTypes);
   var trip = this;
   var origin = this._getLocation(0),
     destination = this._getLocation(-1),

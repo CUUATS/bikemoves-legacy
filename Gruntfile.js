@@ -26,7 +26,8 @@ module.exports = function(grunt) {
               './tests/unit-tests/spec-controller-helper.js',
               './tests/unit-tests/controllers/*.js',
               './tests/unit-tests/spec-service-helper.js',
-              './tests/unit-tests/services/*.js'
+              './tests/unit-tests/services/*.js',
+              './tests/unit-tests/classes/*.js'
             ]
           },
           tasks: ['karma:controllers:run', "karma:services:run"]
@@ -42,7 +43,8 @@ module.exports = function(grunt) {
           files: [
             '<%= meta.commonFiles %>',
             {src: './tests/unit-tests/spec-controller-helper.js'},
-            {src: './tests/unit-tests/controllers/*.js'}
+            {src: './tests/unit-tests/controllers/*.js'},
+            {src: './tests/unit-tests/classes/*.js'}
             ]
       },
       services: {

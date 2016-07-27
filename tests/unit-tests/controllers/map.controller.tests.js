@@ -48,15 +48,17 @@ describe('Map Controller Test', function() {
   });
   describe("Submit Trip", function() {
     beforeEach(function() {
-      scope.submitTrip();
     });
     it("should call analytics event", function() {
+      scope.submitTrip();
       expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Trip", "Submitted");
     });
     it("should hide modal", function() {
+      scope.submitTrip();
       expect(tripSubmitModal.hide).toHaveBeenCalled();
     });
     it("should set status to stopped", function() {
+      scope.submitTrip();
       expect(scope.status.isStopped).toBeTruthy();
     });
     it("should submit trip if trip has length", function() {
@@ -67,27 +69,30 @@ describe('Map Controller Test', function() {
       });
       expect(remoteServiceMock.postTrip).toHaveBeenCalled();
     });
-    it("should report error if status isn't 200", function(){
-      scope.trip.locations = [1, 2];
-      scope.submitTrip();
-      genPromise.resolve({
-        status: 202
-      });
-      scope.$digest();
-      expect(ionicPopupMock.alert).toHaveBeenCalled();
-    })
-    it("should report error if promise rejects", function(){
-      scope.trip.locations = [1, 2];
-      scope.submitTrip();
-      genPromise.reject({
-        status: 202
-      });
-      scope.$digest();
-      expect(ionicPopupMock.alert).toHaveBeenCalled();
-    })
     it("should save trip if trip has no length", function() {
-      expect(tripServiceMock.saveTrip).toHaveBeenCalled();
+      scope.submitTrip();
+
+      expect(tripServiceMock.saveTrip).toHaveBeenCalledWith();
     });
+    describe("On Connction Failure", function() {
+      beforeEach(function() {
+        scope.trip.locations = [1, 2];
+        scope.submitTrip();
+        genPromise.resolve({
+          status: 202
+        });
+        scope.$digest();
+      })
+      it("should report error if status isn't 200", function() {
+        expect(ionicPopupMock.alert).toHaveBeenCalled();
+      })
+      it("should report error if promise rejects", function() {
+        expect(ionicPopupMock.alert).toHaveBeenCalled();
+      })
+      it("should save trip", function(){
+        expect(tripServiceMock.saveTrip).toHaveBeenCalledWith(scope.trip)
+      })
+    })
   });
   describe("Save Trip", function() {
     beforeEach(function() {
@@ -298,7 +303,7 @@ describe('Map Controller Test', function() {
     it("shoud filter locations", function() {
       expect(smootherServiceMock.standardFilter).toHaveBeenCalledWith(scope.trip.locations)
     });
-    it("should update map location", function(){
+    it("should update map location", function() {
       expect(mapServiceMock.setCurrentLocation).toHaveBeenCalledWith("here");
       expect(mapServiceMock.setCenter).toHaveBeenCalledWith("here")
     })

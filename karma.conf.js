@@ -23,7 +23,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '../www/js/**/*.js': ['coverage'],
+      './www/js/**/*.js': ['coverage'],
       // '../www/js/trip.js': ['coverage'],
       // '../www/js/incident.js': ['coverage'],
     },
@@ -36,7 +36,7 @@ module.exports = function(config) {
 
     coverageReporter: {
       type: 'html',
-      dir: '../coverage/',
+      dir: './coverage/',
       instrumenterOptions: {
         istanbul: {
           noCompact: true
@@ -59,7 +59,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+    browsers: ['Chrome'],
 
 
 //rency level

@@ -23,6 +23,7 @@ beforeEach(inject(function( $window, $q, $rootScope, $httpBackend) {
     ready: function() {
       return $q.resolve();
     }
-  }
-  genPromise = $q.defer()
+  };
+  window.ready = true;
+  genPromise = $q.defer();
 }));

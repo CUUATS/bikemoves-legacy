@@ -17,30 +17,26 @@ angular.module('bikemoves').controller('MapCtrl', [
     var that = this;
     analyticsService.trackView("Map");
     that.START_TIME_KEY = 'bikemoves:starttime';
-    that.currentLocation;
-    that.tripSubmitModal;
-    that.comfirmPopup;
-
     that.setStatus = function(status, initial) {
-        // console.log('Setting status: ' + status);
-        $scope.status = {
-          isStopped: status == locationService.STATUS_STOPPED,
-          isPaused: status == locationService.STATUS_PAUSED,
-          isRecording: status == locationService.STATUS_RECORDING
-        };
-        // Disable other tabs while recording.
-        if (initial) return;
-        return locationService.setStatus(status);
-      },
-      that.updateMap = function() {
+      // console.log('Setting status: ' + status);
+      $scope.status = {
+        isStopped: status == locationService.STATUS_STOPPED,
+        isPaused: status == locationService.STATUS_PAUSED,
+        isRecording: status == locationService.STATUS_RECORDING
+      };
+      // Disable other tabs while recording.
+      if (initial) return;
+      return locationService.setStatus(status);
+    };
+    that.updateMap = function() {
         if (that.currentLocation) {
           mapService.setCurrentLocation(that.currentLocation);
           mapService.setCenter(that.currentLocation);
         }
         var filteredLocations = smootherService.standardFilter($scope.trip.locations);
         mapService.setTripLocations(filteredLocations);
-      },
-      updateOdometer = function() {
+      };
+    var updateOdometer = function() {
         // Convert meters to miles.
         $scope.odometer = ($scope.trip.getDistance() * 0.000621371).toFixed(1);
       },
@@ -79,7 +75,7 @@ angular.module('bikemoves').controller('MapCtrl', [
           $scope.trip.submitted = submitted;
           return tripService.saveTrip($scope.trip);
         });
-      },
+      };
 
       that.resetTrip = function(skipUpdate) {
         $scope.trip = new Trip();
@@ -87,9 +83,9 @@ angular.module('bikemoves').controller('MapCtrl', [
           that.updateMap();
           updateOdometer();
         }
-      },
+      };
 
-      initView = function() {
+      var initView = function() {
         mapService.resetMap(mapService.MAP_TYPE_CURRENT);
         if (!angular.isDefined(this.currentLocation)) $scope.getCurrentPosition();
         settingsService.getSettings().then(function(settings) {
@@ -149,7 +145,6 @@ angular.module('bikemoves').controller('MapCtrl', [
           that.resetTrip(false);
         });
       } else {
-        // console.log("Submitted trip with no data points");
         tripService.saveTrip().finally(function() {
           that.resetTrip(false);
         });
