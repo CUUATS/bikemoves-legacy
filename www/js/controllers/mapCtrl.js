@@ -113,14 +113,27 @@ angular.module('bikemoves').controller('MapCtrl', [
         locationService.clearDatabase().then(function() {
           that.setStatus(locationService.STATUS_RECORDING);
         });
-      } else {
+      }
+      else if($scope.status.isPaused){
+        addPausePoint();
+        that.setStatus(locationService.STATUS_RECORDING);
+      }
+        else {
         that.setStatus(locationService.STATUS_RECORDING);
       }
     };
-
+    var addPausePoint = function(){
+      locationService.getCurrentPosition({
+        maximumAge: 0
+      }).then(function(location){
+        location.isPausePoint = true;
+        $scope.trip.addLocation(location, false);
+      })
+    }
     $scope.pauseRecording = function() {
       that.setStatus(locationService.STATUS_PAUSED);
-    };
+      addPausePoint();
+    }
 
     $scope.stopRecording = function() {
       analyticsService.trackEvent("Trip", "Finished");

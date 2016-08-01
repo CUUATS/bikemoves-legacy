@@ -114,7 +114,8 @@ angular.module('bikemoves')
       });
     };
     service.getCurrentPosition = function(options) {
-      return doGeoTask('getCurrentPosition', options).then(makeLocation);
+      return doGeoTask('getCurrentPosition', options).then(function(position){
+        return makeLocation(position)});
     };
     service.clearDatabase = function() {
       return initPlugin().then(function() {

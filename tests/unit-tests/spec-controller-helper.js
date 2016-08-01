@@ -67,8 +67,9 @@ beforeEach(inject(function($window, $q, $ionicPopup, analyticsService, incidentS
   });
 
   spyOn(locationServiceMock, "clearDatabase").and.callThrough();
-  spyOn(locationServiceMock, "getCurrentPosition").and.callThrough();
-
+  spyOn(locationServiceMock, "getCurrentPosition").and.callFake(function(){
+    return genPromise.promise;
+  });
   spyOn(mapServiceMock, "setClickable").and.callThrough();
   spyOn(mapServiceMock, "removeIncident");
   spyOn(mapServiceMock, "resetMap").and.callThrough();

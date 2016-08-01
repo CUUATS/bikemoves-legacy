@@ -27,7 +27,7 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
 
     tripService.getTrip($stateParams.tripID).then(function(trip) {
       trip.locations = smootherService.standardFilter(trip.locations);
-      var duration = new Date(trip.endTime) - new Date(trip.startTime), // In milliseconds
+      var duration = new Date(trip.calcRunningTime()), // In milliseconds
         distance = trip.getDistance() * 0.000621371, // In miles
         speed = distance / (duration / HOUR); // In MPH
 

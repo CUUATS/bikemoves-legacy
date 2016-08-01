@@ -28,6 +28,11 @@ describe('Map Controller Test', function() {
     it("should set status to paused", function() {
       expect(scope.status.isPaused).toBeTruthy();
     });
+    it("should add a pause point", function(){
+      genPromise.resolve({lat:40, lng:40})
+      scope.$digest();
+      expect(scope.trip.locations).toEqual([{lat: 40, lng: 40, isPausePoint: true}])
+    })
   });
   describe("Stop Recording", function() {
     beforeEach(function() {
