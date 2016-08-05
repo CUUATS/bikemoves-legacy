@@ -2,13 +2,13 @@ describe("Trip Class Test", function() {
 	var testTrip;
 	beforeEach(function() {
 		testTrip = new Trip();
-	})
+	});
 	describe("Append Location", function() {
 		it("should add a location", function() {
 			testTrip._appendLocation({
 				lat: 40,
 				lng: 40
-			})
+			});
 			expect(testTrip.locations).toEqual([{
 				lat: 40,
 				lng: 40
@@ -36,8 +36,8 @@ describe("Trip Class Test", function() {
 			var point = testTrip._toPoint({
 				latitude: 40,
 				longitude: 40
-			})
-			expect(point).toEqual(turf.point([40, 40]))
+			});
+			expect(point).toEqual(turf.point([40, 40]));
 		});
 	});
 	describe("Get Distance", function() {
@@ -67,7 +67,7 @@ describe("Trip Class Test", function() {
 			};
 			var moreAccurate = testTrip._moreAccurate(pt1, pt2);
 			expect(moreAccurate).toEqual(pt2);
-		})
+		});
 		it("Should return the most recent point if tie", function() {
 			var pt1 = {
 				accuracy: 10,
@@ -83,7 +83,7 @@ describe("Trip Class Test", function() {
 	});
 	describe("Get Location", function() {
 		beforeEach(function() {
-			testTrip.locations = [1, 2, 3, 4, 5, 6]
+			testTrip.locations = [1, 2, 3, 4, 5, 6];
 		});
 		it("should return corresponding point", function() {
 			var point = testTrip._getLocation(3);
@@ -96,7 +96,7 @@ describe("Trip Class Test", function() {
 	});
 	describe("Location Info", function() {
 		beforeEach(function() {
-			testTrip.locations = [1, 2, 3, 4, 5, 6]
+			testTrip.locations = [1, 2, 3, 4, 5, 6];
 		});
 		it("should return object", function() {
 			var info = testTrip._locationInfo("test", 2);
@@ -104,13 +104,13 @@ describe("Trip Class Test", function() {
 				type: "test",
 				location: 3
 			});
-		})
-	})
+		});
+	});
 	describe("Get OD Types", function() {
 		it("should return types", function() {
 			testTrip.locations = [1, 2, 3, 4, 5, 6];
 			testTrip.origin = 1;
-			testTrip.destination = 3
+			testTrip.destination = 3;
 			var types = testTrip.getODTypes();
 			expect(types).toEqual([{
 				type: 1,
@@ -118,12 +118,12 @@ describe("Trip Class Test", function() {
 			}, {
 				type: 3,
 				location: 6
-			}])
+			}]);
 		});
 		it("should return blank if less than 2 points", function() {
 			testTrip.locations = [];
 			var types = testTrip.getODTypes();
-			expect(types).toEqual([])
+			expect(types).toEqual([]);
 		});
 	});
 	describe("Add Location", function() {
@@ -135,33 +135,32 @@ describe("Trip Class Test", function() {
 				accuracy: 40,
 				time: 10,
 				moving: true
-			}
+			};
 			pt2 = {
 				latitude: 41,
 				longitude: 41,
 				accuracy: 10,
 				time: 1100,
 				moving: true
-			}
+			};
 			pt3 = {
 				latitude: 40.0001,
 				longitude: 40.0001,
 				accuracy: 10,
 				time: 11000000,
 				moving: true
-			}
+			};
 			pt4 = {
 				latitude: 40.0001,
 				longitude: 40.0001,
 				accuracy: 10,
 				time: 11000000,
 				isPausePoint: true
-			}
-
-		})
+			};
+		});
 		it("should append location if no previous", function() {
 			testTrip.addLocation(pt1, false);
-			expect(testTrip.locations).toEqual([pt1])
+			expect(testTrip.locations).toEqual([pt1]);
 		});
 		it("should replace less accurate if too fast", function() {
 			testTrip._appendLocation(pt1);
@@ -187,16 +186,16 @@ describe("Trip Class Test", function() {
 			}, {
 				longitude: 41,
 				latitude: 41
-			}], 1, 2, 4, 5)
+			}], 1, 2, 4, 5);
 			trip2 = new Trip([{
 				longitude: 40,
 				latitude: 40
 			}, {
 				longitude: 41,
 				latitude: 41
-			}])
-			trips = [trip1]
-		})
+			}]);
+			trips = [trip1];
+		});
 		it("should auto determine origin", function() {
 			trip2.guessODTypes(trips);
 			expect(trip2.origin).toEqual(trip1.origin);
@@ -205,7 +204,7 @@ describe("Trip Class Test", function() {
 			trip2.guessODTypes(trips);
 			expect(trip2.destination).toEqual(trip1.destination);
 		});
-	})
+	});
 	describe("Get Distance", function() {
 		it("should return total distance", function() {
 			testTrip.locations = [{
@@ -217,8 +216,8 @@ describe("Trip Class Test", function() {
 			}, {
 				latitude: 60,
 				longitude: 60
-			}]
-			var total = testTrip._getDistance(testTrip.locations[0], testTrip.locations[1]) + testTrip._getDistance(testTrip.locations[1], testTrip.locations[2])
+			}];
+			var total = testTrip._getDistance(testTrip.locations[0], testTrip.locations[1]) + testTrip._getDistance(testTrip.locations[1], testTrip.locations[2]);
 			var dist = testTrip.getDistance();
 			expect(Math.abs(dist - total)).toBeLessThan(1);
 		});
@@ -234,7 +233,7 @@ describe("Trip Class Test", function() {
 			}, {
 				latitude: 60,
 				longitude: 60
-			}]
+			}];
 			var testString = turf.linestring([
 				[40, 40],
 				[50, 50],
@@ -248,21 +247,21 @@ describe("Trip Class Test", function() {
     beforeEach(function(){
       testTrip.startTime = 0;
       testTrip.endTime = 30;
-    })
+    });
 		it("Test Case, Pause Start", function() {
 			testTrip.locations = [{time: 0, isPausePoint: true},{time:10,isPausePoint:true},{time:20},{time:30}];
 			var runningTime = testTrip.calcRunningTime();
-			expect(runningTime).toEqual(20)
+			expect(runningTime).toEqual(20);
 		});
     it("Test Case, Pause Middle", function(){
       testTrip.locations = [{time: 0},{time:10,isPausePoint:true},{time:20, isPausePoint: true},{time:30}];
 			var runningTime = testTrip.calcRunningTime();
-			expect(runningTime).toEqual(20)
+			expect(runningTime).toEqual(20);
     });
     it("Test Case, Pause End", function(){
       testTrip.locations = [{time: 0},{time:10},{time:20, isPausePoint: true},{time:30,isPausePoint:true}];
 			var runningTime = testTrip.calcRunningTime();
-			expect(runningTime).toEqual(20)
-    })
+			expect(runningTime).toEqual(20);
+    });
 	});
 });
