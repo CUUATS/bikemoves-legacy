@@ -102,8 +102,6 @@ angular.module('bikemoves')
 				}).then(function(res) {
 					if (res.status == 200) {
 						layers = res.data.layers;
-						console.log(layers)
-
 						angular.forEach(res.data.layers, function(layer, idx) {
 							if (identifyLayerNames.indexOf(layer.name) != -1) {
 								identifyLayerIds.push(layer.id);
