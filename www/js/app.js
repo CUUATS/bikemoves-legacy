@@ -10,8 +10,8 @@ angular.module('bikemoves', [
   $ionicPlatform.ready(function() {
 
     //Starts Google analytics
-     if(typeof analytics !== undefined) window.analytics.startTrackerWithId('UA-79702100-1')
-     if(typeof analytics !== undefined) window.analytics.setUserId(window.device.uuid)
+     if(typeof analytics !== undefined) window.analytics.startTrackerWithId('UA-79702100-1');
+     if(typeof analytics !== undefined) window.analytics.setUserId(window.device.uuid);
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins.Keyboard) {
