@@ -51,28 +51,28 @@ angular.module('bikemoves')
 			},
 			setGeolocationEnabled = function(on) {
 				return initPlugin().then(getState).then(function(state) {
-						return $q(function(resolve, reject) {
-							if (state.enabled === on) {
-								resolve();
-							} else if (on) {
-								bgGeo.start(resolve);
-							} else {
-								bgGeo.stop(resolve);
-							}
-						});
-					},
-					setMoving = function(moving) {
-						return initPlugin().then(getState).then(function(state) {
-							return $q(function(resolve, reject) {
-								if (angular.isDefined(state.isMoving) === moving) {
-									resolve();
-								} else {
-									bgGeo.changePace(moving, resolve, reject);
-								}
-							});
-						});
+					return $q(function(resolve, reject) {
+						if (state.enabled === on) {
+							resolve();
+						} else if (on) {
+							bgGeo.start(resolve);
+						} else {
+							bgGeo.stop(resolve);
+						}
 					});
+				});
 			},
+			setMoving = function(moving) {
+				return initPlugin().then(getState).then(function(state) {
+					return $q(function(resolve, reject) {
+						if (angular.isDefined(state.isMoving) === moving) {
+							resolve();
+						} else {
+							bgGeo.changePace(moving, resolve, reject);
+						}
+					});
+				});
+			}),
 			makeLocation = function(e) {
 				return angular.merge({
 					moving: e.is_moving,
