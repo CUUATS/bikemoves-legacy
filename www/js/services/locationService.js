@@ -72,7 +72,7 @@ angular.module('bikemoves')
 						}
 					});
 				});
-			}),
+			},
 			makeLocation = function(e) {
 				return angular.merge({
 					moving: e.is_moving,
