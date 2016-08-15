@@ -18,7 +18,6 @@ angular.module('bikemoves').controller('MapCtrl', [
     analyticsService.trackView("Map");
     that.START_TIME_KEY = 'bikemoves:starttime';
     that.setStatus = function(status, initial) {
-      // console.log('Setting status: ' + status);
       $scope.status = {
         isStopped: status == locationService.STATUS_STOPPED,
         isPaused: status == locationService.STATUS_PAUSED,
@@ -26,7 +25,7 @@ angular.module('bikemoves').controller('MapCtrl', [
       };
       // Disable other tabs while recording.
       if (initial) return;
-      return locationService.setStatus(status);
+      locationService.setStatus(status);
     };
     that.updateMap = function() {
         if (that.currentLocation) {
@@ -41,6 +40,7 @@ angular.module('bikemoves').controller('MapCtrl', [
         $scope.odometer = ($scope.trip.getDistance() * 0.000621371).toFixed(1);
       },
       onLocation = function(location, skipUpdate) {
+        console.log(location);
         that.currentLocation = ($scope.status.isRecording) ?
           $scope.trip.addLocation(location, false) : location;
         if (!skipUpdate) {
@@ -106,38 +106,22 @@ angular.module('bikemoves').controller('MapCtrl', [
           Ui: "None"
         };
       };
+
     $scope.startRecording = function() {
-      if ($scope.status.isStopped) {
-        // This is a new trip.
-        initTrip();
-        locationService.clearDatabase().then(function() {
-          that.setStatus(locationService.STATUS_RECORDING);
-        });
-      }
-      else if($scope.status.isPaused){
-        addPausePoint();
-        that.setStatus(locationService.STATUS_RECORDING);
-      }
-        else {
-        that.setStatus(locationService.STATUS_RECORDING);
-      }
+      if ($scope.status.isStopped) initTrip();
+      that.setStatus(locationService.STATUS_RECORDING);
+      locationService.getCurrentPosition();
     };
-    var addPausePoint = function(){
-      locationService.getCurrentPosition({
-        maximumAge: 0
-      }).then(function(location){
-        location.isPausePoint = true;
-        $scope.trip.addLocation(location, false);
-      })
-    }
+
     $scope.pauseRecording = function() {
       that.setStatus(locationService.STATUS_PAUSED);
-      addPausePoint();
+      locationService.getCurrentPosition();
     }
 
     $scope.stopRecording = function() {
       analyticsService.trackEvent("Trip", "Finished");
       that.setStatus(locationService.STATUS_PAUSED);
+      locationService.getCurrentPosition();
       $scope.trip.endTime = now();
       tripService.getTrips().then(function(trips) {
         $scope.trip.guessODTypes(trips);
@@ -184,9 +168,7 @@ angular.module('bikemoves').controller('MapCtrl', [
     };
 
     $scope.getCurrentPosition = function() {
-      locationService.getCurrentPosition({
-        maximumAge: 0
-      });
+      locationService.getCurrentPosition();
     };
 
     // Create a new trip, and set the initial status.
@@ -263,25 +245,10 @@ angular.module('bikemoves').controller('MapCtrl', [
     $scope.$on('$ionicView.enter', function(e) {
       initView();
     });
-    locationService.getStatus().then(function(status) {
-      if (status != locationService.STATUS_STOPPED) {
-        // A trip is in progress.
-        // Restore start time if the trip was recreated.
-        $scope.trip.startTime = parseInt(window.localStorage.getItem(that.START_TIME_KEY));
-        // Load locations from the cache.
-        return locationService.getLocations().then(function(locations) {
-          angular.forEach(locations, function(location, key) {
-            onLocation(location, true);
-          });
-          that.updateMap();
-          return status;
-        });
-      }
-      return status;
-    }).then(function(status) {
-      updateOdometer();
-      that.setStatus(status, true);
-    });
+
+    updateOdometer();
+    that.setStatus(locationService.getStatus(), true);
+
     isWarned = false;
     var crashWarning = function() {
       var crashPopup = $ionicPopup.alert({

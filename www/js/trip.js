@@ -1,5 +1,5 @@
 function Trip(locations, startTime, endTime, origin, destination,
-	transit, submitted, desiredAccuracy, debug) {
+	transit, submitted, desiredAccuracy) {
 	this.desiredAccuracy = desiredAccuracy || null;
 	this.destination = destination || 0;
 	this.endTime = endTime || null;
@@ -8,7 +8,6 @@ function Trip(locations, startTime, endTime, origin, destination,
 	this.startTime = startTime || null;
 	this.submitted = submitted || false;
 	this.transit = transit || false;
-	this.debug = debug || false;
 }
 
 // Maximum distance for location guesses, in meters
@@ -57,27 +56,16 @@ Trip.prototype.getODTypes = function() {
 	return od;
 };
 
-Trip.prototype.addLocation = function(location, debug) {
+Trip.prototype.addLocation = function(location) {
 	var prev = this._getLocation(-1);
-	delete location.altitudeAccuracy; // Property only exists on iOS
-	if (location.isPausePoint) {
-		this._appendLocation(location);
-	} else if (!(location.moving || location.speed <= 0)) return prev; //<-- iOS never was reporting motion
-
-	// If we have a previous location, check that the travel speed between
-	// the two locations is reasonable and that the locations are outside
-	// of each other's accuracy circles. If not, keep only the more
-	// accurate of the two locations.
-	else if (!debug) {
-		if (prev) {
-			var meters = this._getDistance(prev, location),
-				seconds = (location.time - prev.time) / 1000;
-			if ((meters / seconds) > 23 || meters < location.accuracy ||
-				meters < prev.accuracy) {
-				this._replaceLocation(this._moreAccurate(prev, location));
-			} else {
-				this._appendLocation(location);
-			}
+	if (prev) {
+		var meters = this._getDistance(prev, location),
+			seconds = (location.time - prev.time) / 1000;
+		if (location.paused != prev.paused) {
+			this._appendLocation(location);
+		} else if ((meters / seconds) > 23 || meters < location.accuracy ||
+			meters < prev.accuracy) {
+			this._replaceLocation(this._moreAccurate(prev, location));
 		} else {
 			this._appendLocation(location);
 		}
@@ -131,7 +119,7 @@ Trip.prototype.calcRunningTime = function(){
   for(var i = 0; i < this.locations.length -1;i++){
     if(this.locations[i].isPausePoint){
       totalTime-=this.locations[i+1].time - this.locations[i].time;
-      i++
+      i++;
     }
   }
   return totalTime;
@@ -145,7 +133,6 @@ Trip.prototype.serialize = function() {
 		desiredAccuracy: this.desiredAccuracy,
 		transit: this.transit,
 		origin: this.origin,
-		destination: this.destination,
-		debug: this.debug
+		destination: this.destination
 	};
 };
