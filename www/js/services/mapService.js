@@ -5,7 +5,7 @@ angular.module('bikemoves')
 				latitude: 40.109403,
 				longitude: -88.227203
 			},
-			DEFAULT_ZOOM = 16.1,
+			DEFAULT_ZOOM = 16,
 			SERVICE_ENDPOINT = 'http://utility.arcgis.com/usrsvcs/servers/c9e754f1fc35468a9392372c79452704/rest/services/CCRPC/BikeMovesBase/MapServer',
 			excludedFields = ['OBJECTID', 'Shape', 'SHAPE'],
 			layers = [],
@@ -28,23 +28,27 @@ angular.module('bikemoves')
 
 
 		service.location2LatLng = function(location) {
-			return new plugin.google.maps.LatLng(location.latitude, location.longitude);
+			return L.latLng(location.latitude, location.longitude);
 		};
 		var createMap = function() {
 				if (!map) {
 					defaultCenter = service.location2LatLng(DEFAULT_LOCATION);
-					container = document.getElementById('current-map');
 					getLayerInfo();
-					map = plugin.google.maps.Map.getMap(container, {
-						'camera': {
-							'latLng': defaultCenter,
-							'zoom': DEFAULT_ZOOM
-						}
+					map = L.map('current-map', {
+				    center: defaultCenter,
+				    zoom: DEFAULT_ZOOM
 					});
+					// L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+					// 	detectRetina: true
+					// }).addTo(map);
+					Tangram.leafletLayer({
+            scene: 'lib/tangram/cinnabar-style.yaml',
+            attribution: '<a href="https://mapzen.com/tangram" target="_blank">Tangram</a> | &copy; OSM contributors | <a href="https://mapzen.com/" target="_blank">Mapzen</a>'
+        	}).addTo(map);
+					L.tileLayer('http://tiles.bikemoves.me/tiles/{z}/{y}/{x}.png', {
+						detectRetina: true
+					}).addTo(map);
 				}
-				return $q(function(resolve, reject) {
-					map.addEventListener(plugin.google.maps.event.MAP_READY, resolve);
-				});
 			},
 			addTileOverlay = function(map) {
 				return $q(function(resolve, reject) {
