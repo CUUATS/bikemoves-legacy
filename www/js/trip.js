@@ -16,10 +16,12 @@ Trip.prototype.NEAR_THESHOLD = 500;
 
 Trip.prototype._appendLocation = function(location) {
 	this.locations.push(location);
+	return location;
 };
 
 Trip.prototype._replaceLocation = function(location) {
 	this.locations[this.locations.length - 1] = location;
+	return location;
 };
 
 Trip.prototype._toPoint = function(location) {
@@ -58,33 +60,20 @@ Trip.prototype.getODTypes = function() {
 };
 
 Trip.prototype.addLocation = function(location, debug) {
-	var prev = this._getLocation(-1);
 	delete location.altitudeAccuracy; // Property only exists on iOS
-	if (location.isPausePoint) {
-		this._appendLocation(location);
-	} else if (!(location.moving || location.speed <= 0)) return prev; //<-- iOS never was reporting motion
+	var prev = this._getLocation(-1);
 
 	// If we have a previous location, check that the travel speed between
-	// the two locations is reasonable and that the locations are outside
-	// of each other's accuracy circles. If not, keep only the more
+	// the two locations is reasonable. If not, keep only the more
 	// accurate of the two locations.
-	else if (!debug) {
-		if (prev) {
-			var meters = this._getDistance(prev, location),
-				seconds = (location.time - prev.time) / 1000;
-			if ((meters / seconds) > 23 || meters < location.accuracy ||
-				meters < prev.accuracy) {
-				this._replaceLocation(this._moreAccurate(prev, location));
-			} else {
-				this._appendLocation(location);
-			}
-		} else {
-			this._appendLocation(location);
+	if (prev && !location.isPausePoint) {
+		var meters = this._getDistance(prev, location),
+			seconds = (location.time - prev.time) / 1000;
+		if ((meters / seconds) > 23) {
+			return this._replaceLocation(this._moreAccurate(prev, location));
 		}
-	} else {
-		this._appendLocation(location);
 	}
-	return this._getLocation(-1);
+	return this._appendLocation(location);
 };
 
 Trip.prototype.guessODTypes = function(trips) {
