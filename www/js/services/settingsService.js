@@ -13,15 +13,27 @@ angular.module('bikemoves')
             desiredAccuracy: accuracy
           });
         });
+      },
+      updateTracking = function() {
+        return service.getSettings().then(function(settings) {
+          return analyticsService.updateTracking(settings.trackData);
+        });
+      },
+      migrateSettings = function() {
+        return service.getSettings().then(function(settings) {
+          // Make sure accuracyLevel is an integer <= 1.
+          if (typeof settings.accuracyLevel === 'string')
+            settings.accuracyLevel = parseInt(settings.accuracyLevel);
+          if (settings.accuracyLevel > 1) settings.accuracyLevel = 1;
+          return settings;
+        }).then(service.updateSettings);
       };
-    updateTracking = function() {
-      return service.getSettings().then(function(settings) {
-        return analyticsService.updateTracking(settings.trackData);
-      });
-    };
 
     service.getSettings = function() {
-      return storageService.get(SETTINGS_KEY, DEFAULT_SETTINGS);
+      return storageService.get(SETTINGS_KEY, DEFAULT_SETTINGS)
+        .then(function(settings) {
+          return angular.merge({}, DEFAULT_SETTINGS, settings);
+        });
     };
 
     service.getDesiredAccuracy = function() {
@@ -31,6 +43,7 @@ angular.module('bikemoves')
     };
 
     service.updateSettings = function(newSettings) {
+      newSettings.accuracyLevel = parseInt(newSettings.accuracyLevel);
       return storageService.set(SETTINGS_KEY, newSettings).then(function() {
         updateAccuracy();
         updateTracking();
@@ -41,6 +54,6 @@ angular.module('bikemoves')
       return storageService.delete(SETTINGS_KEY);
     };
 
-    // Set initial accuracy.
-    updateAccuracy();
+    // Migrate any old settings and set initial values.
+    migrateSettings();
   });
