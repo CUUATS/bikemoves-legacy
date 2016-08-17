@@ -7,7 +7,7 @@ angular.module('bikemoves')
 				debug: false, // Disable debug notifications
 				desiredAccuracy: 0, // Overridden by settings.
 				distanceFilter: 20, // Generate update events every 20 meters
-				disableElasticity: true, // Do not auto-adjust distanceFilter
+				disableElasticity: false, // Auto-adjust distanceFilter
 				fastestLocationUpdateInterval: 1000, // Prevent updates more than once per second (Android)
 				locationUpdateInterval: 5000, // Request updates every 5 seconds (Android)
 				startOnBoot: false, // Do not start tracking on device boot
