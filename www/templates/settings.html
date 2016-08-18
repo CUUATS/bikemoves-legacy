@@ -16,13 +16,11 @@
       Privacy information
       <i class="icon ion-chevron-right icon-accessory"></i>
     </a>
-    <ion-toggle ng-model="settings.autoSubmit"
-                 ng-change="updateSettings()">
+    <ion-toggle ng-model="settings.autoSubmit" ng-change="updateSettings()">
       Automatically submit trips
     </ion-toggle>
-    <ion-toggle ng-model="settings.trackData"
-                 ng-change="updateSettings()">
-                 Send anonymous usage statistics
+    <ion-toggle ng-model="settings.trackData" ng-change="updateSettings()">
+      Send anonymous usage statistics
     </ion-toggle>
     <ion-item href="#" ng-click="reset()">
       Reset all data
