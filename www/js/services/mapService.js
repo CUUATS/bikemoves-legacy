@@ -241,7 +241,6 @@ angular.module('bikemoves')
 			});
 		};
 		service.setTripLineString = function(linestring) {
-			console.log(linestring);
 			return service.initMap().then(function() {
 				tripPolyline.setPoints(
 					linestring.geometry.coordinates.map(function(coords) {
