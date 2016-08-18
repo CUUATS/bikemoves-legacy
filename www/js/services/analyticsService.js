@@ -1,15 +1,20 @@
 angular.module('bikemoves')
   .service('analyticsService', function() {
     var service = this,
+      isInitialized = false,
       isTracking = false;
     service.updateTracking = function(trackData) {
       isTracking = trackData;
-      console.log("Tracking State Changed to: ", isTracking);
+      if (typeof analytics != 'undefined' && trackData && !isInitialized) {
+        window.analytics.startTrackerWithId('UA-79702100-1');
+        window.analytics.setUserId(window.device.uuid);
+        isInitialized = true;
+      }
     };
     service.trackEvent = function(category, name) {
-      if (typeof analytics !== undefined && isTracking) analytics.trackEvent(category, name);
+      if (isInitialized && isTracking) analytics.trackEvent(category, name);
     };
     service.trackView = function(view) {
-      if (typeof analytics !== undefined && isTracking) analytics.trackEvent(view);
+      if (isInitialized && isTracking) analytics.trackEvent(view);
     };
   });
