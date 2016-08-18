@@ -26,7 +26,6 @@ angular.module('bikemoves')
 		service.isReporting = false;
 		service.currentLocation = null;
 
-
 		service.location2LatLng = function(location) {
 			return new plugin.google.maps.LatLng(location.latitude, location.longitude);
 		};
@@ -241,10 +240,14 @@ angular.module('bikemoves')
 				map.setClickable(clickable);
 			});
 		};
-		service.setTripLocations = function(locations) {
+		service.setTripLineString = function(linestring) {
+			console.log(linestring);
 			return service.initMap().then(function() {
-				tripPolyline.setPoints(locations.map(service.location2LatLng));
-				tripPolyline.setVisible(locations.length > 1);
+				tripPolyline.setPoints(
+					linestring.geometry.coordinates.map(function(coords) {
+						return new plugin.google.maps.LatLng(coords[1], coords[0]);
+					}));
+				tripPolyline.setVisible(linestring.geometry.coordinates.length > 1);
 			});
 		};
 		service.zoomToTripPolyline = function() {

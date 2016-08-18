@@ -13,6 +13,7 @@ function Trip(locations, startTime, endTime, origin, destination,
 
 // Maximum distance for location guesses, in meters
 Trip.prototype.NEAR_THESHOLD = 500;
+Trip.prototype.SIMPLIFY_TOLERANCE = 0.0002; // degrees
 
 Trip.prototype._appendLocation = function(location) {
 	this.locations.push(location);
@@ -105,15 +106,19 @@ Trip.prototype.guessODTypes = function(trips) {
 	});
 };
 
-Trip.prototype.getDistance = function() {
+Trip.prototype.getDistance = function(simplify) {
 	if (this.locations.length < 2) return 0;
-	return turf.lineDistance(this.toLineString(), 'kilometers') * 1000;
+	return turf.lineDistance(this.toLineString(simplify), 'kilometers') * 1000;
 };
 
-Trip.prototype.toLineString = function() {
-	return turf.linestring(this.locations.map(function(location) {
+Trip.prototype.toLineString = function(simplify) {
+	var linestring = turf.linestring(this.locations.map(function(location) {
 		return [location.longitude, location.latitude];
 	}));
+	if (simplify && linestring.geometry.coordinates.length) {
+		return turf.simplify(linestring, this.SIMPLIFY_TOLERANCE, false);
+	}
+	return linestring;
 };
 Trip.prototype.calcRunningTime = function(){
   var totalTime = this.endTime - this.startTime;

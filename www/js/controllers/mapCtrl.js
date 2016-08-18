@@ -9,11 +9,10 @@ angular.module('bikemoves').controller('MapCtrl', [
   'tripService',
   'settingsService',
   'incidentService',
-  'smootherService',
   'analyticsService',
   '$cordovaNetwork',
   '$rootScope',
-  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, smootherService, analyticsService, $cordovaNetwork, $rootScope) {
+  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, analyticsService, $cordovaNetwork, $rootScope) {
     var that = this;
     analyticsService.trackView("Map");
     that.START_TIME_KEY = 'bikemoves:starttime';
@@ -33,12 +32,12 @@ angular.module('bikemoves').controller('MapCtrl', [
           mapService.setCurrentLocation(that.currentLocation);
           mapService.setCenter(that.currentLocation);
         }
-        var filteredLocations = smootherService.standardFilter($scope.trip.locations);
-        mapService.setTripLocations(filteredLocations);
+        mapService.setTripLineString($scope.trip.toLineString(true));
       };
     var updateOdometer = function() {
         // Convert meters to miles.
-        $scope.odometer = ($scope.trip.getDistance() * 0.000621371).toFixed(1);
+        $scope.odometer = ($scope.trip.getDistance(true) * 0.000621371)
+          .toFixed(1);
       },
       onLocation = function(location, skipUpdate) {
         that.currentLocation = ($scope.status.isRecording) ?

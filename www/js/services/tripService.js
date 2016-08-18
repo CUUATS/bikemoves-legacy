@@ -36,7 +36,7 @@ angular.module('bikemoves')
       return service.getTripsCollection().then(function(collection) {
         if (collection.data.length === 0) return 0;
         return collection.mapReduce(function(trip) {
-          return trip.getDistance();
+          return trip.getDistance(true);
         }, function(distances) {
           return distances.reduce(function(a, b) {
             return a + b;

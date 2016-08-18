@@ -6,8 +6,7 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
   'mapService',
   'remoteService',
   'tripService',
-  'smootherService',
-  function($scope, $state, $stateParams, $ionicPopup, mapService, remoteService, tripService, smootherService) {
+  function($scope, $state, $stateParams, $ionicPopup, mapService, remoteService, tripService) {
     var SECOND = 1000,
       MINUTE = SECOND * 60,
       HOUR = MINUTE * 60,
@@ -26,12 +25,11 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
       };
 
     tripService.getTrip($stateParams.tripID).then(function(trip) {
-      trip.locations = smootherService.standardFilter(trip.locations);
       var duration = new Date(trip.calcRunningTime()), // In milliseconds
-        distance = trip.getDistance() * 0.000621371, // In miles
+        distance = trip.getDistance(true) * 0.000621371, // In miles
         speed = distance / (duration / HOUR); // In MPH
 
-      $scope.locations = trip.locations;
+      $scope.linestring = trip.toLineString(true);
       $scope.origin = remoteService.getLabel(
         'Trip', 'LocationType', trip.origin);
       $scope.destination = remoteService.getLabel(
@@ -66,7 +64,7 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
       });
     };
     $scope.uploadTrip = function() {
-      if ($scope.locations.length > 0) {
+      if ($scope.linestring.geometry.coordinates.length > 0) {
         tripService.getTrip($stateParams.tripID).then(function(trip) {
           remoteService.postTrip(trip).then(function() {
             trip.submitted = true;
@@ -92,8 +90,8 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
       mapService.resetMap(mapService.MAP_TYPE_PREVIOUS);
-      if ($scope.locations.length > 0) {
-        mapService.setTripLocations($scope.locations);
+      if ($scope.linestring.geometry.coordinates.length > 0) {
+        mapService.setTripLineString($scope.linestring);
         mapService.zoomToTripPolyline();
       }
     });
