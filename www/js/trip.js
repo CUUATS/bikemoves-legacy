@@ -115,7 +115,7 @@ Trip.prototype.toLineString = function(simplify) {
 	var linestring = turf.linestring(this.locations.map(function(location) {
 		return [location.longitude, location.latitude];
 	}));
-	if (simplify && linestring.geometry.coordinates.length) {
+	if (simplify && linestring.geometry.coordinates.length > 2) {
 		return turf.simplify(linestring, this.SIMPLIFY_TOLERANCE, false);
 	}
 	return linestring;
