@@ -42,8 +42,7 @@ angular.module('bikemoves', [
 			.state('app', {
 			url: '/app',
 			abstract: true,
-			templateUrl: 'templates/tabs.html',
-			controller: 'AppCtrl'
+			templateUrl: 'templates/tabs.html'
 		})
 
 		.state('app.profile', {

@@ -23,7 +23,10 @@ angular.module('bikemoves').controller('MapCtrl', [
         isPaused: status == locationService.STATUS_PAUSED,
         isRecording: status == locationService.STATUS_RECORDING
       };
+
       // Disable other tabs while recording.
+      $rootScope.isRecording = (status == locationService.STATUS_RECORDING);
+
       if (initial) return;
       return locationService.setStatus(status);
     };
