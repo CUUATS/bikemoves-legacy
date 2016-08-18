@@ -235,7 +235,6 @@ angular.module('bikemoves').controller('MapCtrl', [
           title: 'Report Incident Here',
         });
       }).then(function(res) {
-        console.log(res + "  res");
         if (res) {
           incidentReportModal.show();
           mapService.setMapState('normal');
