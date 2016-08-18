@@ -30,10 +30,6 @@ angular.module('bikemoves', [
 					cordova.plugins.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY
 				);
 			}
-			// Initialize devlog
-			if (window.localStorage['devLog'] === undefined) {
-				window.localStorage['devLog'] = JSON.stringify(new Array())
-			}
 		});
 	})
 	.config(function($stateProvider, $urlRouterProvider) {
