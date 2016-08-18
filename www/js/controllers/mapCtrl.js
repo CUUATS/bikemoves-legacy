@@ -308,23 +308,13 @@ angular.module('bikemoves').controller('MapCtrl', [
     };
 
     $scope.reportIncident = function($event) {
-      if ($scope.status.isRecording) {
-        mapService.setClickable(false);
-        var noReportPopup = $ionicPopup.alert({
-          title: 'Unable to Report Incident While Recording'
-        });
-        noReportPopup.then(function(res) {
-          mapService.setClickable(true);
-        });
+      if ($scope.isReport) {
+        $scope.isReport = false;
+        mapService.setMapState('normal');
       } else {
-        if ($scope.isReport) {
-          $scope.isReport = false;
-          mapService.setMapState('normal');
-        } else {
-          $scope.isReport = true;
-          mapService.setMapState('report');
-          analyticsService.trackEvent('Incident', 'Entered Reporting State');
-        }
+        $scope.isReport = true;
+        mapService.setMapState('report');
+        analyticsService.trackEvent('Incident', 'Entered Reporting State');
       }
     };
     document.addEventListener("deviceready", function() {
