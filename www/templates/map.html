@@ -4,7 +4,7 @@
     <div class="button button-energized" ng-if="status.isPaused">Paused</div>
     <div class="button button-assertive" ng-if="status.isRecording">Recording</div>
   </ion-nav-buttons>
-  <ion-nav-buttons side ="secondary" >
+  <ion-nav-buttons side="secondary">
     <div id="incident" ng-class= "isReport ? 'button-assertive' : 'button-stable'" ng-disabled="status.isRecording" class = "button icon-right ion-alert-circled" ng-click = "reportIncident($event)"></div>
   </ion-nav-buttons>
 

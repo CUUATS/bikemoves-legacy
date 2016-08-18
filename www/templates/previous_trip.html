@@ -1,8 +1,10 @@
 <ion-view view-title="Trip Details">
 	<ion-nav-buttons side="primary">
-    <a class="button button-assertive" ng-click="deleteTrip()">Delete</a>
-    <a class="button button-positive" ng-click="uploadTrip()" ng-disabled="submitted">Upload<a>
+    	<a class="button button-positive" ng-click="uploadTrip()" ng-disabled="submitted">Upload</a>
   </ion-nav-buttons>
+	<ion-nav-buttons side="secondary">
+			<a class="button button-assertive" ng-click="deleteTrip()">Delete</a>
+	</ion-nav-buttons>
 	<ion-content>
 		<div id="previous-map"></div>
 		<div class="card">
