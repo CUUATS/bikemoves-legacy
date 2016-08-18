@@ -14,7 +14,6 @@ angular.module('bikemoves').controller('MapCtrl', [
   '$rootScope',
   function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, analyticsService, $cordovaNetwork, $rootScope) {
     var that = this;
-    analyticsService.trackView("Map");
     that.START_TIME_KEY = 'bikemoves:starttime';
     that.setStatus = function(status, initial) {
       // console.log('Setting status: ' + status);
@@ -115,14 +114,14 @@ angular.module('bikemoves').controller('MapCtrl', [
         locationService.clearDatabase().then(function() {
           that.setStatus(locationService.STATUS_RECORDING);
         });
-      }
-      else if($scope.status.isPaused){
+      } else if ($scope.status.isPaused) {
         addPausePoint();
         that.setStatus(locationService.STATUS_RECORDING);
       }
         else {
         that.setStatus(locationService.STATUS_RECORDING);
       }
+      analyticsService.trackEvent('Trip', 'Started Recording');
     };
     var addPausePoint = function(){
       locationService.getCurrentPosition({
@@ -135,10 +134,10 @@ angular.module('bikemoves').controller('MapCtrl', [
     $scope.pauseRecording = function() {
       that.setStatus(locationService.STATUS_PAUSED);
       addPausePoint();
+      analyticsService.trackEvent('Trip', 'Paused Recording');
     }
 
     $scope.stopRecording = function() {
-      analyticsService.trackEvent("Trip", "Finished");
       that.setStatus(locationService.STATUS_PAUSED);
       $scope.trip.endTime = now();
       tripService.getTrips().then(function(trips) {
@@ -146,11 +145,10 @@ angular.module('bikemoves').controller('MapCtrl', [
         mapService.setClickable(false);
         tripSubmitModal.show();
       });
+      analyticsService.trackEvent('Trip', 'Stopped Recording');
     };
 
     $scope.submitTrip = function() {
-      analyticsService.trackEvent("Trip", "Submitted");
-
       that.setStatus(locationService.STATUS_STOPPED);
       tripSubmitModal.hide();
 
@@ -164,6 +162,7 @@ angular.module('bikemoves').controller('MapCtrl', [
           that.resetTrip(false);
         });
       }
+      analyticsService.trackEvent('Trip', 'Submitted Trip');
     };
 
     $scope.saveTrip = function() {
@@ -172,17 +171,20 @@ angular.module('bikemoves').controller('MapCtrl', [
       });
       that.setStatus(locationService.STATUS_STOPPED);
       tripSubmitModal.hide();
+      analyticsService.trackEvent('Trip', 'Saved Trip');
     };
 
     $scope.resumeTrip = function() {
       that.setStatus(locationService.STATUS_RECORDING);
       tripSubmitModal.hide();
+      analyticsService.trackEvent('Trip', 'Resumed Trip');
     };
 
     $scope.discardTrip = function() {
       that.resetTrip();
       that.setStatus(locationService.STATUS_STOPPED);
       tripSubmitModal.hide();
+      analyticsService.trackEvent('Trip', 'Discarded Trip');
     };
 
     $scope.getCurrentPosition = function() {
@@ -242,28 +244,29 @@ angular.module('bikemoves').controller('MapCtrl', [
         }
         mapService.removeIncident();
       });
+      analyticsService.trackEvent('Incident', 'Tapped Incident Location');
     });
 
     initIncidentForm();
     $scope.submitIncident = function() {
-      analyticsService.trackEvent("Incident", "Submitted");
       var incident = new Incident();
       incident.time = (new Date()).getTime();
       incident.category = $scope.incident.Ui != "other" ? $scope.incident.specific : "other";
       incident.comment = $scope.incident.comment;
       incidentService.saveIncident(incident);
       incidentReportModal.hide();
-      console.log("Submit");
       initIncidentForm();
+      analyticsService.trackEvent('Incident', 'Submitted Incident');
     };
     $scope.discardIncident = function() {
       initIncidentForm();
       incidentReportModal.hide();
-      console.log("discard");
+      analyticsService.trackEvent('Incident', 'Discarded Incident');
     };
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
       initView();
+      analyticsService.trackView('Map');
     });
     locationService.getStatus().then(function(status) {
       if (status != locationService.STATUS_STOPPED) {
@@ -318,9 +321,9 @@ angular.module('bikemoves').controller('MapCtrl', [
           $scope.isReport = false;
           mapService.setMapState('normal');
         } else {
-          analyticsService.trackEvent("Incident", "Entered Report State");
           $scope.isReport = true;
           mapService.setMapState('report');
+          analyticsService.trackEvent('Incident', 'Entered Reporting State');
         }
       }
     };

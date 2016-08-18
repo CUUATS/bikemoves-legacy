@@ -3,9 +3,12 @@ angular.module('bikemoves').controller('LegalCtrl', [
   'mapService',
   'analyticsService',
   function($scope, mapService, analyticsService) {
-    analyticsService.trackView("Legal");
     mapService.getLegalText().then(function(text) {
       $scope.googleText = text;
+    });
+
+    $scope.$on('$ionicView.enter', function(e) {
+      analyticsService.trackView('Legal');
     });
   }
 ]);

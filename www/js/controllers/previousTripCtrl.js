@@ -94,6 +94,7 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
         mapService.setTripLineString($scope.linestring);
         mapService.zoomToTripPolyline();
       }
+      analyticsService.trackView('Previous Trip');
     });
   }
 ]);

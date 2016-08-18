@@ -7,7 +7,6 @@ angular.module('bikemoves').controller('profileCtrl', [
   'analyticsService',
   'mapService',
   function($scope, $ionicPopup, profileService, remoteService, tripService, analyticsService, mapService) {
-    analyticsService.trackView("Profile");
     var saveProfile = function(profile) {
         return profileService.updateProfile(profile);
       },
@@ -23,7 +22,7 @@ angular.module('bikemoves').controller('profileCtrl', [
       // Prevent save action from firing twice when the save button is tapped.
       if (!$scope.dirty) return;
       $scope.dirty = false;
-      analyticsService.trackEvent("Profile", "Saved");
+      analyticsService.trackEvent('Profile', 'Saved Profile');
       saveProfile($scope.profile).then(submitProfile);
     };
 
@@ -32,6 +31,7 @@ angular.module('bikemoves').controller('profileCtrl', [
     };
 
     $scope.$on('$ionicView.enter', function(e) {
+      analyticsService.trackView('Profile');
       $scope.dirty = false;
       profileService.getProfile().then(function(profile) {
         $scope.profile = profile;

@@ -3,7 +3,6 @@ angular.module('bikemoves').controller('PreviousTripsCtrl', [
   'tripService',
   'analyticsService',
   function($scope, tripService, analyticsService) {
-    analyticsService.trackView("Previous Trips");
     $scope.formatDate = function(timestamp) {
       return moment(timestamp).calendar(moment(), {
         sameElse: 'dddd, MMMM D, YYYY [at] h:mm A'
@@ -15,6 +14,7 @@ angular.module('bikemoves').controller('PreviousTripsCtrl', [
       tripService.getTrips().then(function(trips) {
         $scope.trips = trips;
       });
+      analyticsService.trackView('Previous Trips');
     });
   }
 ]);
