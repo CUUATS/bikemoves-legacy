@@ -6,7 +6,8 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
   'mapService',
   'remoteService',
   'tripService',
-  function($scope, $state, $stateParams, $ionicPopup, mapService, remoteService, tripService) {
+  'analyticsService',
+  function($scope, $state, $stateParams, $ionicPopup, mapService, remoteService, tripService, analyticsService) {
     var SECOND = 1000,
       MINUTE = SECOND * 60,
       HOUR = MINUTE * 60,
@@ -71,14 +72,14 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
             $scope.submitted = true;
             tripService.updateTrip(trip);
           });
-        }).catch(function(error) {
+        }).catch(function(e) {
           mapService.setClickable(false);
-          console.log(error);
           $ionicPopup.confirm({
             title: 'Failed to Upload Trip'
           }).then(function() {
             mapService.setClickable(true);
           });
+          analyticsService.trackEvent('Error', 'Failed to Upload Trip');
         });
       }
       else {

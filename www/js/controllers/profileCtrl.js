@@ -13,7 +13,7 @@ angular.module('bikemoves').controller('profileCtrl', [
       submitProfile = function() {
         profileService.getProfile().then(function(profile) {
           remoteService.postUser(profile).catch(function(response) {
-            console.log(response);
+            analyticsService.trackEvent('Error', 'Failed to Submit Profile');
           });
         });
       };

@@ -1,5 +1,5 @@
 angular.module('bikemoves')
-  .service('incidentService', ['$q', '$rootScope', 'remoteService', '$cordovaNetwork', 'storageService', function($q, $rootScope, remoteService, $cordovaNetwork, storageService) {
+  .service('incidentService', ['$q', '$rootScope', 'remoteService', '$cordovaNetwork', 'storageService', 'analyticsService', function($q, $rootScope, remoteService, $cordovaNetwork, storageService, analyticsService) {
     var service = this,
       incidentlocation;
     service.getIncidentsCollection = function() {
@@ -47,7 +47,7 @@ angular.module('bikemoves')
             return collection.remove(collection.chain()[index]);
           });
         }).catch(function(error) {
-          console.log("Error Incident Post Failed ", error);
+          analyticsService.trackEvent('Error', 'Deferred Incident Posting Failed');
           return error;
         });
       });

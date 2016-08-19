@@ -103,10 +103,6 @@ angular.module('bikemoves')
 		};
 		service.onLocation = function(locationHandler) {
 			return initPlugin().then(function() {
-				bgGeo.onMotionChange(function(isMoving, loc, taskId) {
-					console.log("Motion State Changed to:", isMoving);
-					bgGeo.finish(taskId);
-				});
 				bgGeo.onLocation(function(e, taskId) {
 					locationHandler(makeLocation(e));
 					bgGeo.finish(taskId);

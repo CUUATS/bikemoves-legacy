@@ -16,7 +16,6 @@ angular.module('bikemoves').controller('MapCtrl', [
     var that = this;
     that.START_TIME_KEY = 'bikemoves:starttime';
     that.setStatus = function(status, initial) {
-      // console.log('Setting status: ' + status);
       $scope.status = {
         isStopped: status == locationService.STATUS_STOPPED,
         isPaused: status == locationService.STATUS_PAUSED,
@@ -58,6 +57,7 @@ angular.module('bikemoves').controller('MapCtrl', [
         }).then(function() {
           mapService.setClickable(true);
         });
+        analyticsService.trackEvent('Error', 'Failed to Submit Trip');
       },
       initTrip = function() {
         $scope.trip.startTime = now();

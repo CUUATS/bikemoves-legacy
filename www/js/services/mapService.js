@@ -319,14 +319,7 @@ angular.module('bikemoves')
 		// Initialize the map.
 		$ionicPlatform.ready().then(service.initializeMap);
 		service.setMapState = function(name) {
-			if (name == 'report') {
-				service.isReporting = true;
-				console.log("Enetered Report State");
-			} else {
-				service.isReporting = false;
-				console.log("Entered Normal State");
-			}
-			return;
+			service.isReporting = (name == 'report');
 		};
 		service.removeIncident = function() {
 			return currentIncidentMarker.setVisible(false);
