@@ -94,6 +94,15 @@ angular.module('bikemoves', [
 			}
 		})
 
+		.state('app.terms', {
+			url: '/terms',
+			views: {
+				'tab-settings': {
+					templateUrl: 'templates/terms.html'
+				}
+			}
+		})
+
 		.state('app.legal', {
 			url: '/legal',
 			views: {
