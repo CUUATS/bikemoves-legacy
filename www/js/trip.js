@@ -1,5 +1,5 @@
 function Trip(locations, startTime, endTime, origin, destination,
-	transit, submitted, desiredAccuracy, debug) {
+	transit, submitted, desiredAccuracy, debug, appVersion) {
 	this.desiredAccuracy = desiredAccuracy || null;
 	this.destination = destination || 0;
 	this.endTime = endTime || null;
@@ -9,6 +9,7 @@ function Trip(locations, startTime, endTime, origin, destination,
 	this.submitted = submitted || false;
 	this.transit = transit || false;
 	this.debug = debug || false;
+	this.appVersion = appVersion || null;
 }
 
 // Maximum distance for location guesses, in meters
@@ -140,6 +141,7 @@ Trip.prototype.serialize = function() {
 		transit: this.transit,
 		origin: this.origin,
 		destination: this.destination,
-		debug: this.debug
+		debug: this.debug,
+		appVersion: this.appVersion
 	};
 };

@@ -195,8 +195,13 @@ angular.module('bikemoves')
 							"type": "bool",
 							"name": "debug",
 							"id": 9
+						},
+						{
+							"rule": "optional",
+							"type": "string",
+							"name": "appVersion",
+							"id": 10
 						}
-
 					],
 					"messages": [{
 						"name": "Location",

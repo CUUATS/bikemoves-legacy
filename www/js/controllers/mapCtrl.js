@@ -10,9 +10,10 @@ angular.module('bikemoves').controller('MapCtrl', [
   'settingsService',
   'incidentService',
   'analyticsService',
+  'config',
   '$cordovaNetwork',
   '$rootScope',
-  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, analyticsService, $cordovaNetwork, $rootScope) {
+  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, analyticsService, config, $cordovaNetwork, $rootScope) {
     var that = this;
     that.START_TIME_KEY = 'bikemoves:starttime';
     that.setStatus = function(status, initial) {
@@ -80,6 +81,7 @@ angular.module('bikemoves').controller('MapCtrl', [
 
       that.resetTrip = function(skipUpdate) {
         $scope.trip = new Trip();
+        $scope.trip.appVersion = config.appVersion;
         if (!skipUpdate) {
           that.updateMap();
           updateOdometer();
