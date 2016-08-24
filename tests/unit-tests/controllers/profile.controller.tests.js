@@ -17,7 +17,7 @@ describe('Profile Controller Test', function() {
         expect(scope.dirty).toBeFalsy();
     });
     it('should trigger analytics', function(){
-      expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Profile", "Saved");
+      expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Profile", "Saved Profile");
     });
   });
   describe("On load",function(){

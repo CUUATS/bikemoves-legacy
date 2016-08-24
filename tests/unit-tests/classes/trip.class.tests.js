@@ -167,11 +167,6 @@ describe("Trip Class Test", function() {
 			testTrip.addLocation(pt2, false);
 			expect(testTrip.locations).toEqual([pt2]);
 		});
-		it("should replace less accurate if too close", function() {
-			testTrip._appendLocation(pt1);
-			testTrip.addLocation(pt3, false);
-			expect(testTrip.locations).toEqual([pt3]);
-		});
 		it("should app point if it is a pause point", function() {
 			testTrip.addLocation(pt4, false);
 			expect(testTrip.locations).toEqual([pt4]);

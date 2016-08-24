@@ -7,7 +7,7 @@ angular.module('bikemoves')
       isTracking = trackData;
       if (typeof analytics != 'undefined' && trackData && !isInitialized) {
         window.analytics.startTrackerWithId('UA-79702100-1');
-        window.analytics.setUserId(window.device.uuid);
+        if (window.device) window.analytics.setUserId(window.device.uuid);
         isInitialized = true;
       }
     };

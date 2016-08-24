@@ -8,10 +8,11 @@ describe('Settings Controller Test', function() {
   }));
   describe('Update Settings', function() {
     beforeEach(function() {
+      scope.settings = {accuracyLevel: 0};
       scope.updateSettings();
     })
     it("should make analytics call", function() {
-      expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Settings", "Updated");
+      expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Settings", "Updated Settings");
     });
     it("should call settings update service", function() {
       expect(settingsServiceMock.updateSettings).toHaveBeenCalled();

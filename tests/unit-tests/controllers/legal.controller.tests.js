@@ -6,9 +6,6 @@ describe('Legal Controller Test', function() {
     });
   }));
   describe("On Load", function(){
-    it("should call analyticsService", function(){
-      expect(analyticsServiceMock.trackView).toHaveBeenCalledWith("Legal");
-    });
     it("should get Legal Text", function(){
       genPromise.resolve("SomeText");
       scope.$digest();

@@ -16,11 +16,6 @@ describe("Pervious Trip Controller", function() {
       scope.$digest();
       expect(scope.submitted).toBeDefined();
     });
-    it("should display filtered trip", function(){
-      genPromise.resolve(new Trip());
-      scope.$digest();
-      expect(smootherServiceMock.standardFilter).toHaveBeenCalled();
-    })
   });
   describe("Delete Trip", function(){
     it("should call trip delete service", function(){

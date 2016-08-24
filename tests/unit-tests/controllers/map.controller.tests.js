@@ -43,7 +43,7 @@ describe('Map Controller Test', function() {
 
     });
     it("should call analytics event", function() {
-      expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Trip", 'Finished');
+      expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Trip", 'Stopped Recording');
     });
     it("should open modal", function() {
       genPromise.resolve();
@@ -56,7 +56,7 @@ describe('Map Controller Test', function() {
     });
     it("should call analytics event", function() {
       scope.submitTrip();
-      expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Trip", "Submitted");
+      expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Trip", 'Submitted Trip');
     });
     it("should hide modal", function() {
       scope.submitTrip();
@@ -214,7 +214,7 @@ describe('Map Controller Test', function() {
       scope.submitIncident();
     });
     it("should call analytics event", function() {
-      expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Incident", "Submitted");
+      expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Incident", "Submitted Incident");
     });
     it("should save incident", function() {
       expect(incidentServiceMock.saveIncident).toHaveBeenCalled();
@@ -257,12 +257,6 @@ describe('Map Controller Test', function() {
     });
   });
   describe("Report Incident Button", function() {
-
-    it("should block user if recording", function() {
-      scope.status.isRecording = true;
-      scope.reportIncident();
-      expect(ionicPopupMock.alert).toHaveBeenCalled();
-    });
     describe("Not recording", function() {
       beforeEach(function() {
         scope.status.isRecording = false;
@@ -282,7 +276,7 @@ describe('Map Controller Test', function() {
       it("should call analytics event if normal", function() {
         scope.isReport = false;
         scope.reportIncident();
-        expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Incident", "Entered Report State");
+        expect(analyticsServiceMock.trackEvent).toHaveBeenCalledWith("Incident", "Entered Reporting State");
 
       });
     });
@@ -305,9 +299,6 @@ describe('Map Controller Test', function() {
       MapCtrl.currentLocation = "here"
       MapCtrl.updateMap();
     })
-    it("shoud filter locations", function() {
-      expect(smootherServiceMock.standardFilter).toHaveBeenCalledWith(scope.trip.locations)
-    });
     it("should update map location", function() {
       expect(mapServiceMock.setCurrentLocation).toHaveBeenCalledWith("here");
       expect(mapServiceMock.setCenter).toHaveBeenCalledWith("here")

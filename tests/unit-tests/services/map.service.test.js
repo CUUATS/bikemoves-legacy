@@ -123,21 +123,6 @@ describe("Map Service Test", function() {
 			expect(map.setClickable).toHaveBeenCalledWith(true);
 		});
 	});
-	describe("Set Trip Locations", function() {
-		beforeEach(function() {
-			service.setTripLocations([{
-				lat: 1,
-				lng: 2
-			}]);
-			rootScope.$digest();
-		});
-		it("should set polylines", function() {
-			expect(tripPolyline.setPoints).toHaveBeenCalled();
-		});
-		it("should make them visible", function() {
-			expect(tripPolyline.setVisible).toHaveBeenCalledWith(false);
-		});
-	});
 	describe("Zoom to trip Polyline", function() {
 		it("should move camer to Polyline", function() {
 			service.zoomToTripPolyline();
