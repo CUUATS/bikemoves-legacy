@@ -6,6 +6,7 @@ angular.module('bikemoves', [
 
 .run(function($ionicPlatform) {
 		$ionicPlatform.ready(function() {
+			mapboxgl.accessToken = 'pk.eyJ1IjoiY3V1YXRzIiwiYSI6ImNpbm03NGFrdTB6ZTB1a2x5MHl6dTV6MXIifQ.Aq-CCCulBhKbmLGZUH6VDw';
 			// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
 			// for form inputs)
 			if (window.cordova && window.cordova.plugins.Keyboard) {
@@ -16,7 +17,7 @@ angular.module('bikemoves', [
 				// org.apache.cordova.statusbar required
 				StatusBar.styleDefault();
 			}
-			if (window.cordova.plugins.locationAccuracy) {
+			if (window.cordova && window.cordova.plugins.locationAccuracy) {
 				// Request high accuracy geolocation on Android.
 				cordova.plugins.locationAccuracy.request(
 					angular.noop,

@@ -3,10 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
+    <meta http-equiv="Content-Security-Policy" content="default-src * blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
     <title></title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="lib/mapbox-gl/mapbox-gl.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
 
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
@@ -27,6 +28,7 @@
     <script src="lib/long.min.js"></script>
     <script src="lib/bytebuffer.min.js"></script>
     <script src="lib/protobuf-light.min.js"></script>
+    <script src="lib/mapbox-gl/mapbox-gl.js"></script>
     <!-- BikeMoves -->
     <script src="js/trip.js"></script>
     <script src="js/incident.js"></script>

@@ -1,204 +1,94 @@
 angular.module('bikemoves')
 	.service('mapService', function($http, $q, $ionicPlatform, incidentService, $rootScope) {
 		var service = this,
-			DEFAULT_LOCATION = {
-				latitude: 40.109403,
-				longitude: -88.227203
-			},
-			DEFAULT_ZOOM = 16.1,
-			SERVICE_ENDPOINT = 'http://utility.arcgis.com/usrsvcs/servers/c9e754f1fc35468a9392372c79452704/rest/services/CCRPC/BikeMovesBase/MapServer',
+			DEFAULT_LOCATION = [-88.227203, 40.109403],
+			DEFAULT_ZOOM = 16,
 			excludedFields = ['OBJECTID', 'Shape', 'SHAPE'],
-			layers = [],
-			identifyLayerIds = [],
-			identifyLayerNames = ['Bicycle Rack', 'Bicycle Repair and Retail', 'Bicycle Path'],
-			ready = false,
-			readyQueue = [],
 			container,
-			map,
-			defaultCenter,
-			tileOverlay,
-			infoMarker,
-			tripPolyline,
-			mapType,
-			currentMapCamera,
-			disableDoubleClickZoom = true,
-			currentIncidentMarker;
+			map;
 		service.isReporting = false;
 		service.currentLocation = null;
 
 		service.location2LatLng = function(location) {
-			return new plugin.google.maps.LatLng(location.latitude, location.longitude);
+			// return new plugin.google.maps.LatLng(location.latitude, location.longitude);
 		};
-		var createMap = function() {
-				if (!map) {
-					defaultCenter = service.location2LatLng(DEFAULT_LOCATION);
-					container = document.getElementById('current-map');
-					getLayerInfo();
-					map = plugin.google.maps.Map.getMap(container, {
-						'camera': {
-							'latLng': defaultCenter,
-							'zoom': DEFAULT_ZOOM
-						}
+		var mapClick = function(e) {
+				// layer.scene.getFeatureAt(e.containerPoint).then(function(selection) {
+				// 	if (selection.feature && selection.feature.source_name == 'bikemoves') {
+				// 		map.openPopup(getPopupContent(selection.feature), e.latlng);
+				// 	}
+				// });
+			},
+			createMap = function() {
+				map = new mapboxgl.Map({
+				    container: 'current-map',
+				    style: 'mapbox://styles/mapbox/bright-v9',
+						zoom: DEFAULT_ZOOM,
+						center: DEFAULT_LOCATION
+				});
+				map.on('load', function() {
+					map.addSource('bikemoves', {
+						type: 'vector',
+						url: 'http://tileserver.bikemoves.me/data/bikemoves.json'
 					});
-				}
-				return $q(function(resolve, reject) {
-					map.addEventListener(plugin.google.maps.event.MAP_READY, resolve);
-				});
-			},
-			addTileOverlay = function(map) {
-				return $q(function(resolve, reject) {
-					map.addTileOverlay({
-						tileUrlFormat: "http://tiles.bikemoves.me/tiles/<zoom>/<y>/<x>.png",
-						tileSize: 1024
-					}, resolve);
-				});
-			},
-			addInfoMarker = function(map) {
-				return $q(function(resolve, reject) {
-					map.addMarker({
-						position: defaultCenter,
-						visible: false,
-						icon: '#fbb03b'
-					}, resolve);
-				});
-			},
-			addCurrentLocationMarker = function(map) {
-				return $q(function(resolve, reject) {
-					map.addMarker({
-						position: defaultCenter,
-						visible: false,
-						icon: '#00008b'
-					}, resolve);
-				});
-			},
-			addCurrentIncidentMarker = function(map) {
-				return $q(function(resolve, reject) {
-					map.addMarker({
-						position: defaultCenter,
-						visible: false,
-						icon: '#00008b'
-					}, resolve);
-				});
-			},
-			addTripPolyline = function(map) {
-				return $q(function(resolve, reject) {
-					map.addPolyline({
-						points: [defaultCenter, defaultCenter],
-						visible: false,
-						geodesic: true,
-						color: '#2677FF',
-						width: 5
-					}, resolve);
-				});
-			},
-			getLayerInfo = function() {
-				$http({
-					method: 'GET',
-					url: SERVICE_ENDPOINT,
-					params: {
-						f: 'json'
-					}
-				}).then(function(res) {
-					if (res.status == 200) {
-						layers = res.data.layers;
-						angular.forEach(res.data.layers, function(layer, idx) {
-							if (identifyLayerNames.indexOf(layer.name) != -1) {
-								identifyLayerIds.push(layer.id);
+					map.addLayer({
+            interactive: true,
+            layout: {
+              'line-cap': 'round',
+              'line-join': 'round'
+            },
+            type: 'line',
+            source: 'bikemoves',
+            id: 'bikemoves_bike_path',
+            paint: {
+              'line-color': {
+                property: 'path_type',
+                type: 'categorical',
+                stops: [
+									['Bike Route', '#ffff66'],
+									['Shared Lane Markings (sharrows)', '#ffff66'],
+									['Bike Lanes (on-street)', '#ff8080'],
+									['Bike Path', '#66b3ff'],
+									['UIUC Bike Path', '#66b3ff'],
+									['Divided Shared-Use Path', '#66b3ff'],
+                  ['Shared-Use Path (sidepath)', '#66b3ff'],
+									['Shared-Use Path (off-street)', '#66b3ff']
+                ]
+              },
+              'line-width': {
+                base: 1.4,
+                stops: [
+                  [6, 0.5],
+                  [20, 30]
+                ]
+              }
+            },
+            'source-layer': 'bike_path'
+	        }, 'water_label');
+					map.addLayer({
+						interactive: false,
+						layout: {
+							'line-cap': 'round',
+							'line-join': 'round'
+						},
+						type: 'line',
+						source: 'bikemoves',
+						id: 'bikemoves_sidewalk',
+						paint: {
+							'line-color': '#aaaaaa',
+							'line-width': {
+								base: 1.4,
+								stops: [
+									[13, 0.25],
+									[20, 8]
+								]
 							}
-						});
-					}
+						},
+						'source-layer': 'sidewalk'
+					}, 'water_label');
 				});
-			},
-			getIdentifyParams = function(latLng, callback) {
-				return $q(function(resolve, reject) {
-					map.getVisibleRegion(function(bounds) {
-						var ne = bounds.northeast,
-							sw = bounds.southwest;
-						resolve({
-							f: 'json',
-							geometry: [latLng.lng, latLng.lat].join(','),
-							geometryType: 'esriGeometryPoint',
-							sr: 4326,
-							layers: 'top:' + identifyLayerIds.join(','),
-							tolerance: 10,
-							mapExtent: [sw.lng, sw.lat, ne.lng, ne.lat].join(','),
-							imageDisplay: [
-								container.offsetWidth,
-								container.offsetHeight,
-								96
-							].join(','),
-							returnGeometry: true
-						});
-					});
-				});
-			},
-			snapToFeature = function(feature, latLng) {
-				if (feature.geometryType == 'esriGeometryPoint') {
-					return new plugin.google.maps.LatLng(feature.geometry.y, feature.geometry.x);
-				} else if (feature.geometryType == 'esriGeometryPolyline') {
-					var point,
-						distance = Infinity;
-					angular.forEach(feature.geometry.paths, function(path, idx) {
-						var tapPoint = turf.point([latLng.lng, latLng.lat]),
-							newPoint = turf.pointOnLine(turf.linestring(path), tapPoint),
-							newDist = turf.distance(tapPoint, newPoint);
-						if (newDist < distance) {
-							point = newPoint;
-							distance = newDist;
-						}
-					});
-					return new plugin.google.maps.LatLng(
-						point.geometry.coordinates[1], point.geometry.coordinates[0]);
-				}
-				return latLng;
-			},
-			displayFeatureInfo = function(feature, latLng) {
-				var snappedLatLng = snapToFeature(feature, latLng),
-					snippetParts = [];
-				angular.forEach(feature.attributes, function(value, attr) {
-					if (excludedFields.indexOf(attr) == -1 && value.toLowerCase() != 'null') {
-						snippetParts.push(attr + ': ' + value);
-					}
-				});
-				infoMarker.setPosition(snappedLatLng);
-				infoMarker.setTitle(feature.layerName);
-				infoMarker.setSnippet(snippetParts.join('\r\n'));
-				infoMarker.setVisible(true);
-				infoMarker.showInfoWindow();
-				map.getCameraPosition(function(camera) {
-					camera.target = snappedLatLng;
-					camera.duration = 200;
-					map.animateCamera(camera);
-				});
-			},
-			mapClick = function(latLng, map) {
-				if (service.isReporting) {
-					currentIncidentMarker.setPosition(latLng);
-					currentIncidentMarker.setVisible(true);
-					$rootScope.$broadcast('IncidentReport', latLng);
-				} else {
-					if (!identifyLayerIds || mapType != service.MAP_TYPE_CURRENT) return;
-					getIdentifyParams(latLng).then(function(params) {
-						return $http({
-							method: 'GET',
-							url: SERVICE_ENDPOINT + '/identify',
-							params: params
-						});
-					}).then(function(res) {
-						if (res.status == 200 && res.data.results.length) {
-							displayFeatureInfo(res.data.results[0], latLng);
-						} else {
-							infoMarker.hideInfoWindow();
-							infoMarker.setVisible(false);
-						}
-					});
-				}
-			},
-			cameraChange = function(camera) {
-				if (mapType == service.MAP_TYPE_CURRENT) {
-					currentMapCamera = camera;
-				}
 			};
+
 		service.initMap = function() {
 			return $q(function(resolve, reject) {
 				if (ready) {
@@ -291,33 +181,8 @@ angular.module('bikemoves')
 			});
 		};
 		service.initializeMap = function() {
-			createMap().then(function() {
-				return $q.all([
-					addTileOverlay(map),
-					addInfoMarker(map),
-					addCurrentLocationMarker(map),
-					addTripPolyline(map),
-					addCurrentIncidentMarker(map)
-				]);
-			}).then(function(mapFeatures) {
-				declareMapFeatures(mapFeatures);
-			});
+			createMap();
 		};
-		var declareMapFeatures = function(mapFeatures) {
-			tileOverlay = mapFeatures[0];
-			infoMarker = mapFeatures[1];
-			service.currentLocationMarker = mapFeatures[2];
-			tripPolyline = mapFeatures[3];
-			currentIncidentMarker = mapFeatures[4];
-			map.on(plugin.google.maps.event.CAMERA_CHANGE, cameraChange);
-			map.on(plugin.google.maps.event.MAP_CLICK, mapClick);
-			ready = true;
-			angular.forEach(readyQueue, function(callback) {
-				callback();
-			});
-		};
-		// Initialize the map.
-		$ionicPlatform.ready().then(service.initializeMap);
 		service.setMapState = function(name) {
 			service.isReporting = (name == 'report');
 		};
@@ -328,4 +193,6 @@ angular.module('bikemoves')
 			map = mapSpy;
 			declareMapFeatures(map.mapFeatures);
 		};
+
+		$ionicPlatform.ready().then(service.initializeMap);
 	});

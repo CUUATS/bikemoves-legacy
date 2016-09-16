@@ -136,12 +136,14 @@ angular.module('bikemoves')
 		};
 
 		$ionicPlatform.ready(function() {
-			bgGeo = window.BackgroundGeolocation;
-			bgGeo.configure(geoSettings, function() {
-				ready = true;
-				angular.forEach(readyQueue, function(callback) {
-					callback();
+			if (window.BackgroundGeolocation) {
+				bgGeo = window.BackgroundGeolocation;
+				bgGeo.configure(geoSettings, function() {
+					ready = true;
+					angular.forEach(readyQueue, function(callback) {
+						callback();
+					});
 				});
-			});
+			}
 		});
 	});

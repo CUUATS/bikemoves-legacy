@@ -31,7 +31,7 @@ angular.module('bikemoves')
           db.addCollection(INCIDENTS_COLLECTION);
       };
     service.initalizeDb = function(isTest) {
-      if (isTest) {
+      if (isTest || !window.cordova) {
         db = new Loki('bikemoves', {
           autosave: false
         });
