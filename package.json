@@ -1,6 +1,6 @@
 {
   "name": "bikemoves",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "BikeMoves Illinois: Bicycle route recording and assistance",
   "dependencies": {
     "gulp": "^3.5.6",
