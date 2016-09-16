@@ -48,3 +48,6 @@
 	background-color: rgba(0, 0, 0, 0);
 	color: white;
 }
+.map-buttons button {
+  float: left;
+}
