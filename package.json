@@ -59,7 +59,7 @@
     "cordova-plugin-file",
     "cordova-plugin-compat",
     "cordova-plugin-network-information",
-    "cordova-plugin-google-analytics"
+    "cordova-plugin-google-analytics@1.0.0"
   ],
   "cordovaPlatforms": [
     "ios",
