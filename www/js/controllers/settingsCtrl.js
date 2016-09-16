@@ -6,12 +6,15 @@ angular.module('bikemoves').controller('SettingsCtrl', [
   'settingsService',
   'tripService',
   'analyticsService',
-  function($scope, $q, $ionicPopup, profileService, settingsService, tripService, analyticsService) {
+  'config',
+  function($scope, $q, $ionicPopup, profileService, settingsService, tripService, analyticsService, config) {
     var reloadSettings = function() {
       return settingsService.getSettings().then(function(settings) {
         $scope.settings = settings;
       });
     };
+
+    $scope.version = config.appVersion;
 
     $scope.updateSettings = function() {
       analyticsService.trackEvent('Settings', 'Updated Settings');
