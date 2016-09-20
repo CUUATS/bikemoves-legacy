@@ -198,13 +198,14 @@ angular.module('bikemoves')
 						zoom: DEFAULT_ZOOM,
 						center: DEFAULT_LOCATION
 				});
+				new mapboxgl.Navigation().addTo(map);
 				map.on('load', function() {
 					map.addSource('bikemoves', TILE_SOURCE);
 					angular.forEach(MAP_LAYERS, function(layer) {
 						map.addLayer(layer, BEFORE_LAYER);
 					});
+					map.on('click', mapClick);
 				});
-				map.on('click', mapClick);
 			};
 
 		service.initMap = function() {
