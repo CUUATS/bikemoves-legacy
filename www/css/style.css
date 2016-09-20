@@ -48,3 +48,13 @@
 	background-color: rgba(0, 0, 0, 0);
 	color: white;
 }
+
+/* Map popup */
+.mapboxgl-popup-content h2 {
+  font-size: 1.4em;
+  font-weight: 200;
+  margin: 0 0 0.25em 0;
+}
+.mapboxgl-popup-content p {
+  margin: 0;
+}
