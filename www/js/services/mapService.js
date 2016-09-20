@@ -3,6 +3,7 @@ angular.module('bikemoves')
 		var service = this,
 			DEFAULT_LOCATION = [-88.227203, 40.109403],
 			DEFAULT_ZOOM = 16,
+			BASE_STYLE = 'mapbox://styles/mapbox/bright-v9',
 			TILE_SOURCE = {
 				type: 'vector',
 				url: 'http://tileserver.bikemoves.me/data/bikemoves.json'
@@ -126,6 +127,13 @@ angular.module('bikemoves')
 					'source-layer': 'bike_rack'
 				}
 			],
+			POPUP_FIELDS = [
+				{name: 'path_type', label: 'Path Type'},
+				{name:'rack_type', label: 'Rack Type'},
+				{name:'is_covered', label: 'Covered'},
+				{name:'location', label: 'Location'},
+				{name:'phone', label: 'Phone'}
+			],
 			excludedFields = ['OBJECTID', 'Shape', 'SHAPE'],
 			container,
 			map;
@@ -136,16 +144,57 @@ angular.module('bikemoves')
 			// return new plugin.google.maps.LatLng(location.latitude, location.longitude);
 		};
 		var mapClick = function(e) {
-				// layer.scene.getFeatureAt(e.containerPoint).then(function(selection) {
-				// 	if (selection.feature && selection.feature.source_name == 'bikemoves') {
-				// 		map.openPopup(getPopupContent(selection.feature), e.latlng);
-				// 	}
-				// });
+				var features = map.queryRenderedFeatures(e.point, {
+					layers: [
+						'bikemoves_bike_rack',
+						'bikemoves_bike_repair_retail',
+						'bikemoves_bike_path'
+					]
+				});
+
+				if (!features.length) return;
+
+				var feature = features[0],
+					popupPoint = snapToFeature(feature, e.lngLat),
+					popupContent = getPopupContent(feature);
+
+				var popup = new mapboxgl.Popup()
+	        .setLngLat(popupPoint)
+	        .setHTML(popupContent)
+	        .addTo(map);
+
+				map.flyTo({
+					center: popupPoint
+				});
 			},
+			snapToFeature = function(feature, lngLat) {
+				if (feature.geometry.type == 'Point') {
+					return feature.geometry.coordinates;
+				} else if (feature.geometry.type == 'LineString') {
+					var nearest = turf.pointOnLine(
+						feature, turf.point([lngLat.lng, lngLat.lat]));
+					return nearest.geometry.coordinates;
+				}
+				return lngLat;
+			},
+			getPopupContent = function(feature) {
+				var props = feature.properties,
+					headline = (feature.layer.id == 'bikemoves_bike_rack') ?
+					'Bike Rack' : props.name;
+				var content = '<h2>' + headline + '</h2>';
+				angular.forEach(POPUP_FIELDS, function(field) {
+					if (field.name in props && props[field.name]) {
+						content += '<p class="feature-field"><strong class="field-name">' +
+							field.label + ':</strong> <span class="field-value">' +
+							props[field.name] + '</span></p>';
+					}
+				});
+				return content;
+			}
 			createMap = function() {
 				map = new mapboxgl.Map({
 				    container: 'current-map',
-				    style: 'mapbox://styles/mapbox/bright-v9',
+				    style: BASE_STYLE,
 						zoom: DEFAULT_ZOOM,
 						center: DEFAULT_LOCATION
 				});
@@ -155,6 +204,7 @@ angular.module('bikemoves')
 						map.addLayer(layer, BEFORE_LAYER);
 					});
 				});
+				map.on('click', mapClick);
 			};
 
 		service.initMap = function() {
