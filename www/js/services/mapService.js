@@ -88,20 +88,47 @@ angular.module('bikemoves')
 					}, 'water_label');
 					map.addLayer({
 						interactive: true,
-						type: 'circle',
+						type: 'symbol',
 						source: 'bikemoves',
 						id: 'bikemoves_bike_repair_retail',
+						layout: {
+							'icon-image': 'bicycle-15',
+							'text-font': [
+								'Open Sans Semibold',
+								'Arial Unicode MS Bold'
+							],
+							'text-field': '{name}',
+							'text-max-width': 9,
+							'text-padding': 2,
+							'text-offset': [0, 0.6],
+							'text-anchor': 'top',
+							'text-size': 12
+						},
 						paint: {
-							'circle-color': '#990099',
+							'text-color': '#002db3',
+							'text-halo-color': '#ffffff',
+							'text-halo-width': 1,
+							'text-halo-blur': 0.5
+						},
+						'source-layer': 'bike_repair_retail'
+					}, 'water_label');
+					map.addLayer({
+						interactive: false,
+						type: 'circle',
+						source: 'bikemoves',
+						id: 'bikemoves_bike_rack_halo',
+						paint: {
+							'circle-color': '#ffffff',
+							'circle-blur': 0.25,
 							'circle-radius': {
 								base: 1.4,
 								stops: [
-									[13, 5],
-									[20, 20]
+									[13, 6],
+									[20, 18]
 								]
 							}
 						},
-						'source-layer': 'bike_repair_retail'
+						'source-layer': 'bike_rack'
 					}, 'water_label');
 					map.addLayer({
 						interactive: true,
