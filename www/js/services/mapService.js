@@ -32,40 +32,6 @@ angular.module('bikemoves')
 						url: 'http://tileserver.bikemoves.me/data/bikemoves.json'
 					});
 					map.addLayer({
-            interactive: true,
-            layout: {
-              'line-cap': 'round',
-              'line-join': 'round'
-            },
-            type: 'line',
-            source: 'bikemoves',
-            id: 'bikemoves_bike_path',
-            paint: {
-              'line-color': {
-                property: 'path_type',
-                type: 'categorical',
-                stops: [
-									['Bike Route', '#ffff66'],
-									['Shared Lane Markings (sharrows)', '#ffff66'],
-									['Bike Lanes (on-street)', '#ff8080'],
-									['Bike Path', '#66b3ff'],
-									['UIUC Bike Path', '#66b3ff'],
-									['Divided Shared-Use Path', '#66b3ff'],
-                  ['Shared-Use Path (sidepath)', '#66b3ff'],
-									['Shared-Use Path (off-street)', '#66b3ff']
-                ]
-              },
-              'line-width': {
-                base: 1.4,
-                stops: [
-                  [6, 0.5],
-                  [20, 30]
-                ]
-              }
-            },
-            'source-layer': 'bike_path'
-	        }, 'water_label');
-					map.addLayer({
 						interactive: false,
 						layout: {
 							'line-cap': 'round',
@@ -85,6 +51,74 @@ angular.module('bikemoves')
 							}
 						},
 						'source-layer': 'sidewalk'
+					}, 'water_label');
+					map.addLayer({
+						interactive: true,
+						layout: {
+							'line-cap': 'round',
+							'line-join': 'round'
+						},
+						type: 'line',
+						source: 'bikemoves',
+						id: 'bikemoves_bike_path',
+						paint: {
+							'line-color': {
+								property: 'path_type',
+								type: 'categorical',
+								stops: [
+									['Bike Route', '#ffff66'],
+									['Shared Lane Markings (sharrows)', '#ffff66'],
+									['Bike Lanes (on-street)', '#ff8080'],
+									['Bike Path', '#66b3ff'],
+									['UIUC Bike Path', '#66b3ff'],
+									['Divided Shared-Use Path', '#66b3ff'],
+									['Shared-Use Path (sidepath)', '#66b3ff'],
+									['Shared-Use Path (off-street)', '#66b3ff']
+								]
+							},
+							'line-width': {
+								base: 1.4,
+								stops: [
+									[6, 0.5],
+									[20, 30]
+								]
+							}
+						},
+						'source-layer': 'bike_path'
+					}, 'water_label');
+					map.addLayer({
+						interactive: true,
+						type: 'circle',
+						source: 'bikemoves',
+						id: 'bikemoves_bike_repair_retail',
+						paint: {
+							'circle-color': '#990099',
+							'circle-radius': {
+								base: 1.4,
+								stops: [
+									[13, 5],
+									[20, 20]
+								]
+							}
+						},
+						'source-layer': 'bike_repair_retail'
+					}, 'water_label');
+					map.addLayer({
+						interactive: true,
+						type: 'circle',
+						source: 'bikemoves',
+						id: 'bikemoves_bike_rack',
+						paint: {
+							'circle-color': '#e63900',
+							'circle-radius': {
+								base: 1.4,
+								stops: [
+									[13, 3],
+									[20, 15]
+								]
+							}
+						},
+						'source-layer': 'bike_rack'
 					}, 'water_label');
 				});
 			};
