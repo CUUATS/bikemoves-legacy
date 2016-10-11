@@ -9,9 +9,7 @@ angular.module('bikemoves')
       },
       updateAccuracy = function() {
         return service.getDesiredAccuracy().then(function(accuracy) {
-          return locationService.updateSettings({
-            desiredAccuracy: accuracy
-          });
+          locationService.desiredAccuracy = accuracy;
         });
       },
       updateTracking = function() {

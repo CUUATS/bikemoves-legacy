@@ -50,7 +50,7 @@
       "id": "com.googlemaps.ios"
     },
     {
-      "locator": "https://github.com/transistorsoft/cordova-background-geolocation.git#2.0.13",
+      "locator": "https://github.com/transistorsoft/cordova-background-geolocation.git",
       "id": "com.transistorsoft.cordova.background-geolocation"
     },
     "cordova-plugin-dialogs",

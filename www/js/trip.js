@@ -16,6 +16,12 @@ function Trip(locations, startTime, endTime, origin, destination,
 Trip.prototype.NEAR_THESHOLD = 500;
 Trip.prototype.SIMPLIFY_TOLERANCE = 0.0002; // degrees
 
+// Location flags
+Trip.prototype.START_POINT = 1;
+Trip.prototype.END_POINT = 2;
+Trip.prototype.PAUSE_POINT = 3;
+Trip.prototype.RESUME_POINT = 4;
+
 Trip.prototype._appendLocation = function(location) {
 	this.locations.push(location);
 	return location;
@@ -61,14 +67,13 @@ Trip.prototype.getODTypes = function() {
 	return od;
 };
 
-Trip.prototype.addLocation = function(location, debug) {
-	delete location.altitudeAccuracy; // Property only exists on iOS
+Trip.prototype.addLocation = function(location, force) {
 	var prev = this._getLocation(-1);
 
 	// If we have a previous location, check that the travel speed between
 	// the two locations is reasonable. If not, keep only the more
 	// accurate of the two locations.
-	if (prev && !location.isPausePoint) {
+	if (prev && !force) {
 		var meters = this._getDistance(prev, location),
 			seconds = (location.time - prev.time) / 1000;
 		if ((meters / seconds) > 23) {
@@ -123,11 +128,9 @@ Trip.prototype.toLineString = function(simplify) {
 };
 Trip.prototype.calcRunningTime = function(){
   var totalTime = this.endTime - this.startTime;
-  for(var i = 0; i < this.locations.length -1;i++){
-    if(this.locations[i].isPausePoint){
-      totalTime-=this.locations[i+1].time - this.locations[i].time;
-      i++
-    }
+  for (var i = 0; i < this.locations.length - 1; i++) {
+    if (this.locations[i].pointType == this.PAUSE_POINT)
+      totalTime -= this.locations[i+1].time - this.locations[i].time;
   }
   return totalTime;
 };
