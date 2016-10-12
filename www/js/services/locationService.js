@@ -80,28 +80,26 @@ angular.module('bikemoves')
 			return initService().then(function() {
 				if (bgGeo) {
 					var options = {
-						interval: 1000,
+						interval: 15000,
 						desiredAccuracy: service.desiredAccuracy,
 						persist: false
 					};
-					console.log('bgGeo - Watching position with settings: ', options);
-					bgGeo.watchPosition(function(position) {
-						console.log('bgGeo - Watch got position: ', position);
-						if (position) success(makeLocation(position));
-					}, function(errorCode) {
-						console.log('Watch error: ', errorCode);
-						if (errorCode == 1) failure(service.ERROR_PERMISSION_DENIED)
-							else failure(service.ERROR_POSITION_UNAVAILABLE);
-					}, options);
+					bgGeo.start(function() {
+						bgGeo.watchPosition(function(position) {
+							if (position) success(makeLocation(position));
+						}, function(errorCode) {
+							if (errorCode === -1) return;
+							if (errorCode === 1) failure(service.ERROR_PERMISSION_DENIED)
+								else failure(service.ERROR_POSITION_UNAVAILABLE);
+						}, options);
+					});
 				} else if (nativeGeo) {
 					var options = {
 						enableHighAccuracy: true,
-						timeout: 10000,
+						timeout: 15000,
 						maximumAge: 5000
 					};
-					console.log('nativeGeo - Watching position with settings: ', options);
 					watchId = nativeGeo.watchPosition(function(position) {
-						console.log('nativeGeo - Watch got position: ', position);
 						success(makeLocation(position));
 					}, function(e) {
 						failure(e.code);
@@ -114,7 +112,9 @@ angular.module('bikemoves')
 			return initService().then(function() {
 				return $q(function(resolve, reject) {
 					if (bgGeo) {
-						bgGeo.stopWatchPosition(resolve, reject);
+						bgGeo.stopWatchPosition(function() {
+							bgGeo.stop(resolve, reject);
+						}, reject);
 					} else if (nativeGeo) {
 						if (watchId) {
 							nativeGeo.clearWatch(watchId);
@@ -131,7 +131,13 @@ angular.module('bikemoves')
 		$ionicPlatform.ready(function() {
 			if (window.BackgroundGeolocation) {
 				bgGeo = window.BackgroundGeolocation;
-				bgGeo.configure({}, serviceReady);
+				bgGeo.configure({}, function(state) {
+					if (state.enabled) {
+						bgGeo.stop(serviceReady);
+					} else {
+						serviceReady();
+					}
+				});
 			} else if (navigator && 'geolocation' in navigator) {
 				nativeGeo = navigator.geolocation;
 				serviceReady();
