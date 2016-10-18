@@ -49,12 +49,8 @@
       "locator": "https://bitbucket.org/nightstomp/cordova-plugin-googlemaps-sdk.git",
       "id": "com.googlemaps.ios"
     },
-    {
-      "locator": "https://github.com/transistorsoft/cordova-background-geolocation.git",
-      "id": "com.transistorsoft.cordova.background-geolocation"
-    },
     "cordova-plugin-dialogs",
-    "cordova-plugin-background-fetch",
+    "cordova-plugin-geolocation",
     "cordova-plugin-inappbrowser",
     "cordova-plugin-file",
     "cordova-plugin-compat",
