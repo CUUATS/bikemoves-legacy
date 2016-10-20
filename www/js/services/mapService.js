@@ -75,7 +75,7 @@ angular.module('bikemoves')
 						zoom: DEFAULT_ZOOM,
 						center: DEFAULT_LOCATION
 				});
-				new mapboxgl.Navigation().addTo(map);
+				new mapboxgl.NavigationControl().addTo(map);
 				map.on('click', mapClick);
 			};
 
