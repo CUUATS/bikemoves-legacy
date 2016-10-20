@@ -3,7 +3,7 @@ angular.module('bikemoves')
 		var service = this,
 			DEFAULT_LOCATION = [-88.227203, 40.109403],
 			DEFAULT_ZOOM = 16,
-			MAP_STYLE = 'http://tileserver.bikemoves.me/styles/bikemoves.json',
+			MAP_STYLE = 'http://tileserver.bikemoves.me/styles/bikemoves-v1.json',
 			POPUP_FIELDS = [
 				{name: 'path_type', label: 'Path Type'},
 				{name:'rack_type', label: 'Rack Type'},
