@@ -17,11 +17,13 @@ function Map(containerId, options) {
   new mapboxgl.NavigationControl().addTo(this.map);
 
   // Set up event handlers.
-  this.map.on('click', this._onMapClick);
-  if (this.options.onClick) this.map.on('click', this.options.onClick);
+  var obj = this;
+  this.map.on('click', function(e) {
+    if (obj.options.interactive) obj._onMapClick(e);
+    if (obj.options.onClick) obj.options.onClick(e);
+  });
 
   // Add the trip source and layer.
-  var obj = this;
   this.map.on('load', function() {
     obj._addTripSource();
     obj._addTripLayer();
@@ -41,17 +43,14 @@ Map.prototype.POPUP_FIELDS = [
 	{name:'location', label: 'Location'},
 	{name:'phone', label: 'Phone'}
 ];
+Map.prototype.BIKEMOVES_LAYERS = [
+  'bikemoves_bike_rack',
+  'bikemoves_bike_repair_retail',
+  'bikemoves_bike_path'
+];
 
 Map.prototype._onMapClick = function(e) {
-  if (!this.options.interactive) return;
-  var features = map.queryRenderedFeatures(e.point, {
-    layers: [
-      'bikemoves_bike_rack',
-      'bikemoves_bike_repair_retail',
-      'bikemoves_bike_path'
-    ]
-  });
-
+  var features = this._getFeaturesNear(e.point, 10);
   if (!features.length) return;
 
   var feature = features[0],
@@ -65,6 +64,22 @@ Map.prototype._onMapClick = function(e) {
 
   this.map.flyTo({
     center: popupPoint
+  });
+};
+
+Map.prototype._getFeaturesNear = function(point, distance) {
+  // First try querying using the exact point that was tapped.
+  var features = this.map.queryRenderedFeatures(point, {
+    layers: this.BIKEMOVES_LAYERS
+  });
+  if (features.length) return features;
+
+  // Fallback to querying around the point that was tapped.
+  return this.map.queryRenderedFeatures([
+    [point.x - distance, point.y + distance],
+    [point.x + distance, point.y - distance]
+  ], {
+    layers: this.BIKEMOVES_LAYERS
   });
 };
 
@@ -84,7 +99,7 @@ Map.prototype._getPopupContent = function(feature) {
     headline = (feature.layer.id == 'bikemoves_bike_rack') ?
     'Bike Rack' : props.name;
   var content = '<h2>' + headline + '</h2>';
-  angular.forEach(POPUP_FIELDS, function(field) {
+  angular.forEach(this.POPUP_FIELDS, function(field) {
     if (field.name in props && props[field.name]) {
       content += '<p class="feature-field"><strong class="field-name">' +
         field.label + ':</strong> <span class="field-value">' +
