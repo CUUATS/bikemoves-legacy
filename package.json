@@ -38,18 +38,6 @@
     "cordova-plugin-request-location-accuracy",
     "ionic-plugin-keyboard",
     {
-      "locator": "https://github.com/mapsplugin/cordova-plugin-googlemaps.git",
-      "id": "cordova-plugin-googlemaps",
-      "variables": {
-        "API_KEY_FOR_ANDROID": "AIzaSyBAQVf1Q9_ZJ0Gbau-BhKPnJiJXIDkG6nA",
-        "API_KEY_FOR_IOS": "AIzaSyCLwMemMVj7q0Kgen_DMxw22ECifEzZrxA"
-      }
-    },
-    {
-      "locator": "https://bitbucket.org/nightstomp/cordova-plugin-googlemaps-sdk.git",
-      "id": "com.googlemaps.ios"
-    },
-    {
       "locator": "https://github.com/transistorsoft/cordova-background-geolocation.git#2.0.7",
       "id": "com.transistorsoft.cordova.background-geolocation"
     },

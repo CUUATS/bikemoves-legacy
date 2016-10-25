@@ -113,6 +113,7 @@ Trip.prototype.getDistance = function(simplify) {
 };
 
 Trip.prototype.toLineString = function(simplify) {
+	if (this.locations.length < 2) return null;
 	var linestring = turf.linestring(this.locations.map(function(location) {
 		return [location.longitude, location.latitude];
 	}));

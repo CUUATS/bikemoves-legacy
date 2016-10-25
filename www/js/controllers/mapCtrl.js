@@ -4,7 +4,6 @@ angular.module('bikemoves').controller('MapCtrl', [
   '$ionicModal',
   '$ionicPopup',
   'locationService',
-  'mapService',
   'remoteService',
   'tripService',
   'settingsService',
@@ -13,8 +12,9 @@ angular.module('bikemoves').controller('MapCtrl', [
   'config',
   '$cordovaNetwork',
   '$rootScope',
-  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, analyticsService, config, $cordovaNetwork, $rootScope) {
-    var that = this;
+  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, remoteService, tripService, settingsService, incidentService, analyticsService, config, $cordovaNetwork, $rootScope) {
+    var that = this,
+      map;
     that.START_TIME_KEY = 'bikemoves:starttime';
     that.setStatus = function(status, initial) {
       $scope.status = {
@@ -30,12 +30,13 @@ angular.module('bikemoves').controller('MapCtrl', [
       return locationService.setStatus(status);
     };
     that.updateMap = function() {
-        if (that.currentLocation) {
-          mapService.setCurrentLocation(that.currentLocation);
-          mapService.setCenter(that.currentLocation);
-        }
-        mapService.setTripLineString($scope.trip.toLineString(true));
-      };
+      if (that.currentLocation) {
+        map.setCurrentLocation(that.currentLocation);
+        map.setCenter(that.currentLocation);
+      }
+      var linestring = $scope.trip.toLineString(true);
+      if (linestring) map.setTrip(linestring);
+    };
     var updateOdometer = function() {
         // Convert meters to miles.
         $scope.odometer = ($scope.trip.getDistance(true) * 0.000621371)
@@ -50,13 +51,10 @@ angular.module('bikemoves').controller('MapCtrl', [
         }
       },
       onSubmitError = function() {
-        mapService.setClickable(false);
         $ionicPopup.alert({
           title: 'Trip Submission Failed',
           template: 'Sorry, an error occurred while submitting your trip. ' +
             'Please try again later.'
-        }).then(function() {
-          mapService.setClickable(true);
         });
         analyticsService.trackEvent('Error', 'Failed to Submit Trip');
       },
@@ -89,17 +87,21 @@ angular.module('bikemoves').controller('MapCtrl', [
       };
 
       var initView = function() {
-        mapService.resetMap(mapService.MAP_TYPE_CURRENT);
-        if (!angular.isDefined(this.currentLocation)) $scope.getCurrentPosition();
+        if (!that.currentLocation) $scope.getCurrentPosition();
+        map = new Map('current-map', {
+          interactive: true,
+          onLoad: function() {
+            if (that.currentLocation) that.updateMap();
+          }
+        });
+
         settingsService.getSettings().then(function(settings) {
           $scope.autoSubmit = settings.autoSubmit;
         });
       },
-
       now = function() {
         return (new Date()).getTime();
       },
-
       initIncidentForm = function() {
         isWarned = false;
         $scope.isReport = false;
@@ -144,7 +146,6 @@ angular.module('bikemoves').controller('MapCtrl', [
       $scope.trip.endTime = now();
       tripService.getTrips().then(function(trips) {
         $scope.trip.guessODTypes(trips);
-        mapService.setClickable(false);
         tripSubmitModal.show();
       });
       analyticsService.trackEvent('Trip', 'Stopped Recording');
@@ -208,7 +209,6 @@ angular.module('bikemoves').controller('MapCtrl', [
     });
     $scope.$on('modal.hidden', function(e) {
       cordova.plugins.Keyboard.close();
-      mapService.setClickable(true);
     });
     $scope.$on('$destroy', function() {
       tripSubmitModal.remove();
@@ -224,7 +224,6 @@ angular.module('bikemoves').controller('MapCtrl', [
     });
 
     $scope.$on('IncidentReport', function(e, latLng) {
-      mapService.setClickable(false);
       $scope.incidentAddress = undefined;
       incidentService.getAddress(latLng).then(function(address) {
         $scope.incidentAddress = address;
@@ -239,11 +238,9 @@ angular.module('bikemoves').controller('MapCtrl', [
       }).then(function(res) {
         if (res) {
           incidentReportModal.show();
-          mapService.setMapState('normal');
-        } else {
-          mapService.setClickable(true);
+          // mapService.setMapState('normal');
         }
-        mapService.removeIncident();
+        // mapService.removeIncident();
       });
       analyticsService.trackEvent('Incident', 'Tapped Incident Location');
     });
@@ -311,10 +308,10 @@ angular.module('bikemoves').controller('MapCtrl', [
     $scope.reportIncident = function($event) {
       if ($scope.isReport) {
         $scope.isReport = false;
-        mapService.setMapState('normal');
+        // mapService.setMapState('normal');
       } else {
         $scope.isReport = true;
-        mapService.setMapState('report');
+        // mapService.setMapState('report');
         analyticsService.trackEvent('Incident', 'Entered Reporting State');
       }
     };

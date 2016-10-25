@@ -111,6 +111,7 @@ angular.module('bikemoves')
 		};
 		service.getCurrentPosition = function(options) {
 			return doGeoTask('getCurrentPosition', options).then(function(position) {
+				console.log('got current position', position);
 				return makeLocation(position);
 			});
 		};
