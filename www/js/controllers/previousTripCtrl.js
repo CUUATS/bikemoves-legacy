@@ -90,6 +90,7 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
     };
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
+      map.resize();
       if ($scope.linestring) {
         if (map.loaded) map.setTrip($scope.linestring);
         map.zoomToFeature($scope.linestring);

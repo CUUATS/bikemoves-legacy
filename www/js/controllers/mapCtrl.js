@@ -92,6 +92,9 @@ angular.module('bikemoves').controller('MapCtrl', [
       };
 
       var initView = function() {
+        // Update the map size once the view has fully loaded.
+        map.resize();
+        
         if (!that.currentLocation) $scope.getCurrentPosition();
 
         settingsService.getSettings().then(function(settings) {

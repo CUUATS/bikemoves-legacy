@@ -182,3 +182,7 @@ Map.prototype.zoomToFeature = function(feature) {
     padding: 25
   });
 };
+
+Map.prototype.resize = function() {
+  this.map.resize();
+};
