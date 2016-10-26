@@ -22,7 +22,13 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
         return zeroPad(Math.floor(millisec / HOUR), 2) + ':' +
           zeroPad(Math.floor((millisec % HOUR) / MINUTE), 2) + ':' +
           zeroPad(Math.round((millisec % MINUTE) / SECOND), 2);
-      };
+      },
+      map = new Map('previous-map', {
+        interactive: false,
+        onLoad: function() {
+          if ($scope.linestring) map.setTrip($scope.linestring);
+        }
+      });
 
     tripService.getTrip($stateParams.tripID).then(function(trip) {
       var duration = new Date(trip.calcRunningTime()), // In milliseconds
@@ -84,15 +90,10 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
     };
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
-      var map = new Map('previous-map', {
-        interactive: false,
-        onLoad: function() {
-          if ($scope.linestring.geometry.coordinates.length > 1) {
-            map.setTrip($scope.linestring);
-          }
-        }
-      });
-      map.zoomToFeature($scope.linestring);
+      if ($scope.linestring) {
+        if (map.loaded) map.setTrip($scope.linestring);
+        map.zoomToFeature($scope.linestring);
+      }
       analyticsService.trackView('Previous Trip');
     });
   }

@@ -14,7 +14,12 @@ angular.module('bikemoves').controller('MapCtrl', [
   '$rootScope',
   function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, remoteService, tripService, settingsService, incidentService, analyticsService, config, $cordovaNetwork, $rootScope) {
     var that = this,
-      map;
+      map = new Map('current-map', {
+        interactive: true,
+        onLoad: function() {
+          if (that.currentLocation) that.updateMap();
+        }
+      });
     that.START_TIME_KEY = 'bikemoves:starttime';
     that.setStatus = function(status, initial) {
       $scope.status = {
@@ -88,12 +93,6 @@ angular.module('bikemoves').controller('MapCtrl', [
 
       var initView = function() {
         if (!that.currentLocation) $scope.getCurrentPosition();
-        map = new Map('current-map', {
-          interactive: true,
-          onLoad: function() {
-            if (that.currentLocation) that.updateMap();
-          }
-        });
 
         settingsService.getSettings().then(function(settings) {
           $scope.autoSubmit = settings.autoSubmit;
