@@ -3,11 +3,10 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
   '$state',
   '$stateParams',
   '$ionicPopup',
-  'mapService',
   'remoteService',
   'tripService',
   'analyticsService',
-  function($scope, $state, $stateParams, $ionicPopup, mapService, remoteService, tripService, analyticsService) {
+  function($scope, $state, $stateParams, $ionicPopup, remoteService, tripService, analyticsService) {
     var SECOND = 1000,
       MINUTE = SECOND * 60,
       HOUR = MINUTE * 60,
@@ -49,14 +48,12 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
     });
 
     $scope.deleteTrip = function() {
-      mapService.setClickable(false);
       $ionicPopup.confirm({
         title: 'Delete Trip',
         template: 'Are you sure you want to delete this trip?',
         okText: 'Delete',
         okType: 'button-assertive'
       }).then(function(res) {
-        mapService.setClickable(true);
         if (res) {
           tripService.deleteTrip($stateParams.tripID).then(function() {
             $state.go('app.previous_trips');
@@ -73,11 +70,8 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
             tripService.updateTrip(trip);
           });
         }).catch(function(e) {
-          mapService.setClickable(false);
           $ionicPopup.confirm({
             title: 'Failed to Upload Trip'
-          }).then(function() {
-            mapService.setClickable(true);
           });
           analyticsService.trackEvent('Error', 'Failed to Upload Trip');
         });
@@ -90,11 +84,15 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
     };
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
-      mapService.resetMap(mapService.MAP_TYPE_PREVIOUS);
-      if ($scope.linestring.geometry.coordinates.length > 0) {
-        mapService.setTripLineString($scope.linestring);
-        mapService.zoomToTripPolyline();
-      }
+      var map = new Map('previous-map', {
+        interactive: false,
+        onLoad: function() {
+          if ($scope.linestring.geometry.coordinates.length > 1) {
+            map.setTrip($scope.linestring);
+          }
+        }
+      });
+      map.zoomToFeature($scope.linestring);
       analyticsService.trackView('Previous Trip');
     });
   }

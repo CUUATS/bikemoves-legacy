@@ -173,8 +173,12 @@ Map.prototype.setTrip = function(linestring) {
   });
 };
 
-Map.prototype.zoomToTrip = function() {
-  // if (!this.tripLinestring) return;
-  // var bbox = turf.bbox(this.tripLinestring);
-  // this.map.fitBounds([bbox.slice(0, 2), bbox.slice(2)]);
+Map.prototype.zoomToFeature = function(feature) {
+  if (!feature) return;
+  var bbox = turf.bbox(feature);
+  this.map.fitBounds([bbox.slice(0, 2), bbox.slice(2)], {
+    duration: 0,
+    linear: true,
+    padding: 25
+  });
 };
