@@ -26,8 +26,7 @@ angular.module('bikemoves', [
 			}
 		});
 	})
-	.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
-		$ionicConfigProvider.views.forwardCache(true);
+	.config(function($stateProvider, $urlRouterProvider) {
 		$stateProvider
 
 			.state('app', {

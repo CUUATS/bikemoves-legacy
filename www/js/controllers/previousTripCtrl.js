@@ -3,10 +3,11 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
   '$state',
   '$stateParams',
   '$ionicPopup',
+  'mapService',
   'remoteService',
   'tripService',
   'analyticsService',
-  function($scope, $state, $stateParams, $ionicPopup, remoteService, tripService, analyticsService) {
+  function($scope, $state, $stateParams, $ionicPopup, mapService, remoteService, tripService, analyticsService) {
     var SECOND = 1000,
       MINUTE = SECOND * 60,
       HOUR = MINUTE * 60,
@@ -23,12 +24,7 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
           zeroPad(Math.floor((millisec % HOUR) / MINUTE), 2) + ':' +
           zeroPad(Math.round((millisec % MINUTE) / SECOND), 2);
       },
-      map = new Map('previous-map', {
-        interactive: false,
-        onLoad: function() {
-          if ($scope.linestring) map.setTrip($scope.linestring);
-        }
-      });
+      map = mapService.getMap();
 
     tripService.getTrip($stateParams.tripID).then(function(trip) {
       var duration = new Date(trip.calcRunningTime()), // In milliseconds
@@ -90,12 +86,16 @@ angular.module('bikemoves').controller('PreviousTripCtrl', [
     };
     // Set up the view.
     $scope.$on('$ionicView.enter', function(e) {
-      map.resize();
+      map.show().assignTo(document.getElementById('previous-map'));
       if ($scope.linestring) {
         if (map.loaded) map.setTrip($scope.linestring);
         map.zoomToFeature($scope.linestring);
       }
       analyticsService.trackView('Previous Trip');
+    });
+
+    $scope.$on('$ionicView.beforeLeave', function(e) {
+      map.reset().hide();
     });
   }
 ]);

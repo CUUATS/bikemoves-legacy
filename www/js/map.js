@@ -140,10 +140,12 @@ Map.prototype._addTripLayer = function() {
 
 Map.prototype.setInteractive = function(interactive) {
   this.options.interactive = interactive;
+  return this;
 };
 
 Map.prototype.locationToLngLat = function(location) {
   return [location.longitude, location.latitude];
+  return this;
 };
 
 Map.prototype.setCurrentLocation = function(location) {
@@ -155,8 +157,10 @@ Map.prototype.setCurrentLocation = function(location) {
         offset: [-15, -15]
     }).setLngLat(this.locationToLngLat(location)).addTo(this.map);
   } else {
+    this.currentLocationMarkerEl.style.display = 'block';
     this.currentLocationMarker.setLngLat(this.locationToLngLat(location));
   }
+  return this;
 };
 
 Map.prototype.setCenter = function(location) {
@@ -169,8 +173,9 @@ Map.prototype.setTrip = function(linestring) {
   this.tripLinestring = linestring;
   this.tripSource.setData({
     type: 'FeatureCollection',
-    features: [linestring]
+    features: (linestring) ? [linestring] : []
   });
+  return this;
 };
 
 Map.prototype.zoomToFeature = function(feature) {
@@ -181,8 +186,44 @@ Map.prototype.zoomToFeature = function(feature) {
     linear: true,
     padding: 25
   });
+  return this;
 };
 
-Map.prototype.resize = function() {
+Map.prototype.assignTo = function(placeholder) {
+  var rect = placeholder.getBoundingClientRect(),
+    top = rect.top + document.body.scrollTop,
+    left = rect.left + document.body.scrollLeft,
+    height = placeholder.offsetHeight,
+    width = placeholder.offsetWidth,
+    container = this.map.getContainer();
+
+  container.style.position = 'absolute';
+  container.style.top = top + 'px';
+  container.style.left = left + 'px';
+  container.style.height = height - 1 + 'px'; // One pixel for bar border.
+  container.style.width = width + 'px';
   this.map.resize();
+
+  return this;
 };
+
+Map.prototype.reset = function() {
+  if (this.currentLocationMarkerEl)
+    this.currentLocationMarkerEl.style.display = 'none';
+  this.setTrip();
+  this.map.jumpTo({
+    zoom: this.DEFAULT_ZOOM,
+    center: this.DEFAULT_LOCATION
+  });
+  return this;
+};
+
+Map.prototype.show = function() {
+  this.map.getContainer().style.display = 'block';
+  return this;
+}
+
+Map.prototype.hide = function() {
+  this.map.getContainer().style.display = 'none';
+  return this;
+}

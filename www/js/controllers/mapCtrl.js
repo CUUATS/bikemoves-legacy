@@ -4,6 +4,7 @@ angular.module('bikemoves').controller('MapCtrl', [
   '$ionicModal',
   '$ionicPopup',
   'locationService',
+  'mapService',
   'remoteService',
   'tripService',
   'settingsService',
@@ -12,14 +13,10 @@ angular.module('bikemoves').controller('MapCtrl', [
   'config',
   '$cordovaNetwork',
   '$rootScope',
-  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, remoteService, tripService, settingsService, incidentService, analyticsService, config, $cordovaNetwork, $rootScope) {
+  function($scope, $ionicPlatform, $ionicModal, $ionicPopup, locationService, mapService, remoteService, tripService, settingsService, incidentService, analyticsService, config, $cordovaNetwork, $rootScope) {
     var that = this,
-      map = new Map('current-map', {
-        interactive: true,
-        onLoad: function() {
-          if (that.currentLocation) that.updateMap();
-        }
-      });
+      map = mapService.getMap(),
+      isActiveView = false;
     that.START_TIME_KEY = 'bikemoves:starttime';
     that.setStatus = function(status, initial) {
       $scope.status = {
@@ -35,6 +32,7 @@ angular.module('bikemoves').controller('MapCtrl', [
       return locationService.setStatus(status);
     };
     that.updateMap = function() {
+      if (!isActiveView) return;
       if (that.currentLocation) {
         map.setCurrentLocation(that.currentLocation);
         map.setCenter(that.currentLocation);
@@ -92,14 +90,25 @@ angular.module('bikemoves').controller('MapCtrl', [
       };
 
       var initView = function() {
-        // Update the map size once the view has fully loaded.
-        map.resize();
-        
-        if (!that.currentLocation) $scope.getCurrentPosition();
+        isActiveView = true;
+        map.show().setInteractive(true)
+          .assignTo(document.getElementById('current-map'));
+
+        if (that.currentLocation)
+          that.updateMap();
+        else {
+          $scope.getCurrentPosition();
+        }
 
         settingsService.getSettings().then(function(settings) {
           $scope.autoSubmit = settings.autoSubmit;
         });
+
+        analyticsService.trackView('Map');
+      },
+      exitView = function() {
+        isActiveView = false;
+        map.reset().setInteractive(false).hide();
       },
       now = function() {
         return (new Date()).getTime();
@@ -264,10 +273,14 @@ angular.module('bikemoves').controller('MapCtrl', [
       analyticsService.trackEvent('Incident', 'Discarded Incident');
     };
     // Set up the view.
-    $scope.$on('$ionicView.enter', function(e) {
-      initView();
-      analyticsService.trackView('Map');
+    $scope.$on('$ionicView.enter', initView);
+
+    $scope.$on('$ionicView.beforeLeave', exitView);
+
+    $scope.$on('map.load', function(e) {
+      if (that.currentLocation) that.updateMap();
     });
+
     locationService.getStatus().then(function(status) {
       if (status != locationService.STATUS_STOPPED) {
         // A trip is in progress.
@@ -327,6 +340,5 @@ angular.module('bikemoves').controller('MapCtrl', [
     $scope.$on('$cordovaNetwork:offline', function(event, networkState) {
       $scope.online = false;
     });
-
   }
 ]);

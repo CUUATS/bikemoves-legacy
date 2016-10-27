@@ -1,5 +1,8 @@
 
 /* Map */
+#map {
+  z-index: 100;
+}
 #current-map {
   display: block;
   height: 100%;
