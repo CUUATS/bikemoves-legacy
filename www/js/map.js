@@ -163,10 +163,16 @@ Map.prototype.setCurrentLocation = function(location) {
   return this;
 };
 
-Map.prototype.setCenter = function(location) {
-  this.map.flyTo({
-    center: this.locationToLngLat(location)
-  });
+Map.prototype.setCenter = function(location, animate) {
+  var latLng = this.locationToLngLat(location);
+  if (animate) {
+    this.map.flyTo({
+      center: latLng
+    });
+  } else {
+    this.map.setCenter(latLng);
+  }
+  return this;
 };
 
 Map.prototype.setTrip = function(linestring) {
@@ -212,8 +218,7 @@ Map.prototype.reset = function() {
     this.currentLocationMarkerEl.style.display = 'none';
   this.setTrip();
   this.map.jumpTo({
-    zoom: this.DEFAULT_ZOOM,
-    center: this.DEFAULT_LOCATION
+    zoom: this.DEFAULT_ZOOM
   });
   return this;
 };

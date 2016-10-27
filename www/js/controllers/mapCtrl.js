@@ -31,11 +31,11 @@ angular.module('bikemoves').controller('MapCtrl', [
       if (initial) return;
       return locationService.setStatus(status);
     };
-    that.updateMap = function() {
+    that.updateMap = function(animate) {
       if (!isActiveView) return;
       if (that.currentLocation) {
         map.setCurrentLocation(that.currentLocation);
-        map.setCenter(that.currentLocation);
+        map.setCenter(that.currentLocation, animate);
       }
       var linestring = $scope.trip.toLineString(true);
       if (linestring) map.setTrip(linestring);
@@ -46,11 +46,12 @@ angular.module('bikemoves').controller('MapCtrl', [
           .toFixed(1);
       },
       onLocation = function(location, skipUpdate) {
+        var animate = !that.currentLocation;
         that.currentLocation = ($scope.status.isRecording) ?
           $scope.trip.addLocation(location, false) : location;
         if (!skipUpdate) {
           updateOdometer();
-          that.updateMap();
+          that.updateMap(animate);
         }
       },
       onSubmitError = function() {
