@@ -14,7 +14,8 @@ function Map(containerId, options) {
   });
 
   // Add navigation control.
-  new mapboxgl.NavigationControl().addTo(this.map);
+  var nav = new mapboxgl.NavigationControl();
+  this.map.addControl(nav, 'top-right');
 
   // Set up event handlers.
   var obj = this;
