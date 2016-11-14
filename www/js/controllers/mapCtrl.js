@@ -235,28 +235,6 @@ angular.module('bikemoves').controller('MapCtrl', [
       incidentReportModal = modal;
     });
 
-    $scope.$on('IncidentReport', function(e, latLng) {
-      $scope.incidentAddress = undefined;
-      incidentService.getAddress(latLng).then(function(address) {
-        $scope.incidentAddress = address;
-        return $ionicPopup.confirm({
-          title: 'Report Incident Near:',
-          template: $scope.incidentAddress
-        });
-      }).catch(function() {
-        return $ionicPopup.confirm({
-          title: 'Report Incident Here',
-        });
-      }).then(function(res) {
-        if (res) {
-          incidentReportModal.show();
-          // mapService.setMapState('normal');
-        }
-        // mapService.removeIncident();
-      });
-      analyticsService.trackEvent('Incident', 'Tapped Incident Location');
-    });
-
     initIncidentForm();
     $scope.submitIncident = function() {
       var incident = new Incident();
@@ -280,6 +258,20 @@ angular.module('bikemoves').controller('MapCtrl', [
 
     $scope.$on('map.load', function(e) {
       if (that.currentLocation) that.updateMap();
+    });
+
+    $scope.$on('map.load', function(e) {
+      if (that.currentLocation) that.updateMap();
+    });
+
+    $scope.$on('map.click', function(e) {
+      if (!$scope.isReport) return;
+      $ionicPopup.confirm({
+        title: 'Report Incident Here',
+      }).then(function(res) {
+        if (res) incidentReportModal.show();
+      });
+      analyticsService.trackEvent('Incident', 'Tapped Incident Location');
     });
 
     locationService.getStatus().then(function(status) {
@@ -321,13 +313,13 @@ angular.module('bikemoves').controller('MapCtrl', [
       locationType: remoteService.getOptions('Trip', 'LocationType')
     };
 
-    $scope.reportIncident = function($event) {
+    $scope.reportIncident = function(e) {
       if ($scope.isReport) {
         $scope.isReport = false;
-        // mapService.setMapState('normal');
+        map.setInteractive(true);
       } else {
         $scope.isReport = true;
-        // mapService.setMapState('report');
+        map.setInteractive(false);
         analyticsService.trackEvent('Incident', 'Entered Reporting State');
       }
     };

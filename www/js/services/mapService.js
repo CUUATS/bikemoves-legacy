@@ -4,9 +4,13 @@ angular.module('bikemoves')
       dispatchMapLoad = function() {
         $rootScope.$broadcast('map.load');
       },
+      dispatchMapClick = function() {
+        $rootScope.$broadcast('map.click');
+      },
       map = new Map('map', {
         interactive: true,
-        onLoad: dispatchMapLoad
+        onLoad: dispatchMapLoad,
+        onClick: dispatchMapClick
       });
 
     service.getMap = function() {
